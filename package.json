@@ -67,7 +67,7 @@
     "@ntegral/nestjs-sentry": "^4.0.1",
     "@sentry/node": "^7.95.0",
     "@types/response-time": "^2.3.8",
-    "axios": "^1.6.5",
+    "axios": "^1.7.4",
     "bcryptjs": "^2.4.3",
     "case": "^1.6.3",
     "class-transformer": "^0.5.1",
