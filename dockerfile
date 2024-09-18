@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:20.14.0-alpine3.20
 LABEL maintainer "ack@baibay.id"
 
 ENV NODE_ENV=${NODE_ENV}
