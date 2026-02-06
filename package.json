@@ -61,7 +61,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.2",
     "@nestjs/schedule": "^4.0.0",
-    "@nestjs/swagger": "^7.2.0",
+    "@nestjs/swagger": "^11.2.6",
     "@nestjs/terminus": "^10.2.0",
     "@nestjs/throttler": "^5.1.1",
     "@ntegral/nestjs-sentry": "^4.0.1",
