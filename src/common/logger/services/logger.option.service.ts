@@ -71,11 +71,11 @@ export class LoggerOptionService {
         this.sensitiveFields = new Set(
             LoggerSensitiveFields.map(field => field.toLowerCase())
         );
-        this.sensitivePaths = LoggerSensitivePaths.map(path =>
+        this.sensitivePaths = LoggerSensitivePaths.flatMap(path =>
             LoggerSensitiveFields.map(field =>
                 field.includes('-') ? `${path}["${field}"]` : `${path}.${field}`
             )
-        ).flat();
+        );
     }
 
     /**
@@ -146,7 +146,7 @@ export class LoggerOptionService {
                     translateTime: 'SYS:standard',
                     messageFormat: '[{context}] {msg}',
                     ignore: 'context',
-                    singleLine: false,
+                    singleLine: true, // for single line log. set to false for JSON log.
                 },
             });
         }
@@ -173,7 +173,7 @@ export class LoggerOptionService {
      * @param {unknown} message - The message to sanitize
      * @returns {string | unknown} Sanitized string or original value if not a string
      */
-    private sanitizeMessage(message: unknown): string | unknown {
+    private sanitizeMessage(message: unknown): unknown {
         if (typeof message === 'string') {
             return stripAnsi(message)
                 .replaceAll(/[~→]/g, '')
@@ -353,11 +353,11 @@ export class LoggerOptionService {
      */
     private extractClientIP(request: IRequestApp): string {
         if (request.ip) {
-            return request.ip as string;
+            return request.ip;
         }
 
         if (request.socket?.remoteAddress) {
-            return request.socket.remoteAddress as string;
+            return request.socket.remoteAddress;
         }
 
         const headers = request.headers;
@@ -483,11 +483,18 @@ export class LoggerOptionService {
 
             if (error instanceof HttpException) {
                 const response = error.getResponse() as { _error?: unknown };
+                let stack = defaultError.stack;
+
+                if (response._error) {
+                    stack =
+                        typeof response._error === 'string'
+                            ? response._error
+                            : JSON.stringify(response._error);
+                }
+
                 return {
                     ...defaultError,
-                    stack: response._error
-                        ? String(response._error)
-                        : defaultError.stack,
+                    stack,
                 };
             }
 

@@ -79,7 +79,7 @@ async function bootstrap(): Promise<void> {
             'NestApplication'
         );
 
-        throw new Error('Env Variable Invalid', {
+        throw new Error('Env Variable Invalid. Please check your .env file.', {
             cause: errorsMessage,
         });
     }
@@ -110,7 +110,8 @@ async function bootstrap(): Promise<void> {
     logger.log(`Logger Debug Enable: ${loggerDebugEnable}`, 'NestApplication');
     logger.log(`Logger Debug Level: ${loggerDebugLevel}`, 'NestApplication');
     logger.log('=='.repeat(30), 'NestApplication');
-
-    return;
 }
+
+// NOSONAR: typescript:S7785 - top-level await requires `module: NodeNext` in tsconfig, which is a
+// project-wide breaking change. The bootstrap wrapper is intentional here.
 bootstrap();
