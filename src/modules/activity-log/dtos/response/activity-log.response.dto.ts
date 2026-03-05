@@ -10,7 +10,7 @@ import { UserListResponseDto } from '@modules/user/dtos/response/user.list.respo
 export class ActivityLogResponseDto extends DatabaseDto {
     @ApiProperty({
         required: true,
-        example: faker.database.mongodbObjectId(),
+        example: faker.string.uuid(),
     })
     userId: string;
 

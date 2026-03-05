@@ -7,6 +7,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { HealthIndicatorResult } from '@nestjs/terminus';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+
 import { IDatabaseService } from 'src/common/database/interfaces/database.service.interface';
 
 /**
@@ -22,12 +25,20 @@ export class DatabaseService
     >
     implements OnModuleInit, IDatabaseService, OnModuleDestroy
 {
+    private readonly pool: Pool;
     private readonly logger: Logger = new Logger(DatabaseService.name);
     private readonly isDebugMode: boolean;
     private readonly prettier: boolean;
 
     constructor(private readonly configService: ConfigService) {
+        const databaseUrl = configService.get<string>('database.url');
+        const pool = new Pool({
+            connectionString: databaseUrl,
+        });
+        const adapter = new PrismaPg(pool as any);
+
         super({
+            adapter,
             log: [
                 { emit: 'event', level: 'query' },
                 { emit: 'event', level: 'error' },
@@ -37,6 +48,7 @@ export class DatabaseService
             errorFormat: 'pretty',
         });
 
+        this.pool = pool;
         this.isDebugMode = this.configService.get<boolean>('database.debug');
         this.prettier = this.configService.get<boolean>('logger.prettier');
     }
@@ -46,7 +58,7 @@ export class DatabaseService
      */
     async isHealthy(): Promise<HealthIndicatorResult> {
         try {
-            await this.$runCommandRaw({ ping: 1 });
+            await this.$queryRaw`SELECT 1`;
             return {
                 database: {
                     status: 'up',
@@ -86,6 +98,7 @@ export class DatabaseService
      */
     async onModuleDestroy(): Promise<void> {
         await this.disconnect();
+        await this.pool.end();
     }
 
     private async connect(): Promise<void> {

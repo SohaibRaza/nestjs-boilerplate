@@ -123,7 +123,7 @@ export class TermPolicyRepository {
         type: EnumTermPolicyType
     ): Promise<{
         id: string;
-        contents: Prisma.JsonArray;
+        contents: Prisma.JsonValue;
         status: EnumTermPolicyStatus;
     } | null> {
         return this.databaseService.termPolicy.findFirst({
@@ -238,20 +238,21 @@ export class TermPolicyRepository {
 
     async addContent(
         termPolicyId: string,
+        existingContents: TermContentDto[],
         newContent: TermContentDto,
         updatedBy: string
     ): Promise<TermPolicy> {
+        const merged = [
+            ...this.databaseUtil.toPlainArray(existingContents),
+            this.databaseUtil.toPlainObject(newContent),
+        ];
+
         return this.databaseService.termPolicy.update({
             where: {
                 id: termPolicyId,
             },
             data: {
-                contents: {
-                    push: this.databaseUtil.toPlainObject<
-                        TermContentDto,
-                        Prisma.TermPolicyContentCreateInput
-                    >(newContent),
-                },
+                contents: merged as Prisma.InputJsonValue,
                 updatedBy,
             },
         });
@@ -293,7 +294,9 @@ export class TermPolicyRepository {
                 data: {
                     status: EnumTermPolicyStatus.published,
                     publishedAt: this.helperService.dateCreate(),
-                    contents,
+                    contents: this.databaseUtil.toPlainArray(
+                        contents
+                    ) as Prisma.InputJsonValue,
                     updatedBy,
                 },
             }),

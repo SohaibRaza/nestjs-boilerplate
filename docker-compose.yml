@@ -17,7 +17,7 @@ services:
         depends_on:
             redis:
                 condition: service_healthy
-            mongo:
+            postgres:
                 condition: service_healthy
             jwks-server:
                 condition: service_healthy
@@ -117,58 +117,32 @@ services:
                     cpus: '0.3'
                     memory: 128M
 
-    mongo:
-        image: mongo:latest
-        hostname: mongo
+    postgres:
+        image: postgres:17-alpine
+        hostname: postgres
         ports:
-            - '27017:27017'
+            - '5432:5432'
+        environment:
+            POSTGRES_DB: ack_nestjs
+            POSTGRES_USER: sohaib
+            POSTGRES_PASSWORD: sohaib
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
         networks:
             - app-network
-        volumes:
-            - mongo_data:/data/db
-        command: mongod --bind_ip_all --replSet rs0 --port 27017
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
         deploy:
             resources:
                 limits:
                     cpus: '1'
-                    memory: 1GB
+                    memory: 512M
         healthcheck:
-            test: mongosh --eval "db.adminCommand('ping')" --quiet
+            test: ['CMD-SHELL', 'pg_isready -U postgres']
             interval: 10s
             timeout: 5s
             retries: 5
-            start_period: 30s
-
-    mongo-init:
-        image: mongo:latest
-        restart: 'no'
-        depends_on:
-            mongo:
-                condition: service_healthy
-        networks:
-            - app-network
-        command: >
-            bash -c "
-            echo 'Waiting for MongoDB instance to be ready...' &&
-            mongosh --host mongo:27017 --eval '
-            config = {
-                    \"_id\": \"rs0\",
-                    \"members\": [
-                    { \"_id\": 0, \"host\": \"localhost:27017\", \"priority\": 1 }
-                ]
-            };
-            rs.initiate(config);
-            rs.status();' &&
-            echo 'Single-node replica set initialized successfully. Container will exit now.'
-            "
-        deploy:
-            restart_policy:
-                condition: none
 
 volumes:
-    mongo_data:
+    postgres_data:
     redis_data:
 
 networks:

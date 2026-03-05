@@ -180,7 +180,7 @@ export class UserUtil {
                 !!twoFactor.secret &&
                 !!twoFactor.iv &&
                 !twoFactor.confirmedAt,
-            backupCodesRemaining: twoFactor.backupCodes.length,
+            backupCodesRemaining: (twoFactor.backupCodes as string[]).length,
             confirmedAt: twoFactor.confirmedAt,
             lastUsedAt: twoFactor.lastUsedAt,
         };

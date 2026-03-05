@@ -424,6 +424,7 @@ export class TermPolicyService implements ITermPolicyService {
             };
             const updated = await this.termPolicyRepository.addContent(
                 termPolicyId,
+                termPolicy.contents as unknown as TermContentDto[],
                 mappedContent,
                 updatedBy
             );

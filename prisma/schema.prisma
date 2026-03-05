@@ -1,15 +1,15 @@
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma-client"
+  provider   = "prisma-client-js"
+  output     = "../generated/prisma-client"
+  engineType = "client"
 }
 
 model ApiKey {
-  id       String         @id @default(auto()) @map("_id") @db.ObjectId
+  id       String         @id @default(cuid())
   type     EnumApiKeyType @default(default)
   name     String
   key      String
@@ -20,43 +20,45 @@ model ApiKey {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
-  @@unique(fields: [key])
-  @@index(fields: [name, isActive, type, createdAt])
-  @@index(fields: [createdAt])
+  @@unique([key])
+  @@index([name, isActive, type, createdAt])
+  @@index([createdAt])
   @@map("ApiKeys")
 }
 
 model Role {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(cuid())
   name        String
   description String?
-  type        EnumRoleType  @default(user)
-  abilities   RoleAbility[]
+  type        EnumRoleType @default(user)
+  // RoleAbility[] stored as JSON: [{ action: string[], subject: string }]
+  abilities   Json         @default("[]")
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   users User[] @relation("UserRole")
 
-  @@unique(fields: [name])
-  @@index(fields: [name, type, createdAt])
-  @@index(fields: [createdAt])
+  @@unique([name])
+  @@index([name, type, createdAt])
+  @@index([createdAt])
   @@map("Roles")
 }
 
 model Country {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  id         String @id @default(cuid())
   name       String
   alpha2Code String
   alpha3Code String
-  phoneCode  String[]
+  // phoneCode String[] stored as JSON array
+  phoneCode  Json
   continent  String
   timezone   String
 
@@ -65,21 +67,21 @@ model Country {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
-  @@unique(fields: [alpha2Code])
-  @@unique(fields: [alpha3Code])
-  @@index(fields: [name, alpha2Code, alpha3Code, continent, createdAt])
-  @@index(fields: [createdAt])
+  @@unique([alpha2Code])
+  @@unique([alpha3Code])
+  @@index([name, alpha2Code, alpha3Code, continent, createdAt])
+  @@index([createdAt])
   @@map("Countries")
 }
 
 model UserMobileNumber {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId     String    @db.ObjectId
-  countryId  String    @db.ObjectId
+  id         String    @id @default(cuid())
+  userId     String
+  countryId  String
   phoneCode  String
   number     String
   isVerified Boolean   @default(false)
@@ -87,29 +89,29 @@ model UserMobileNumber {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   country       Country?       @relation("UserMobileNumberCountry", fields: [countryId], references: [id])
   user          User?          @relation("UserMobileNumberUser", fields: [userId], references: [id])
   verifications Verification[] @relation("UserMobileNumberVerification")
 
-  @@unique(fields: [userId, countryId, phoneCode, number])
-  @@index(fields: [userId])
-  @@index(fields: [isVerified])
-  @@index(fields: [createdAt])
+  @@unique([userId, countryId, phoneCode, number])
+  @@index([userId])
+  @@index([isVerified])
+  @@index([createdAt])
   @@map("UserMobiles")
 }
 
 model User {
-  id              String             @id @default(auto()) @map("_id") @db.ObjectId
+  id              String             @id @default(cuid())
   name            String?
   username        String
   isVerified      Boolean            @default(false)
   verifiedAt      DateTime?
   email           String
-  roleId          String             @db.ObjectId
+  roleId          String
   password        String?
   passwordExpired DateTime?
   passwordCreated DateTime?
@@ -119,21 +121,23 @@ model User {
   signUpWith      EnumUserSignUpWith
   status          EnumUserStatus     @default(active)
   gender          EnumUserGender?
-  countryId       String             @db.ObjectId
+  countryId       String
   lastLoginAt     DateTime?
   lastIPAddress   String?
   lastLoginFrom   EnumUserLoginFrom?
   lastLoginWith   EnumUserLoginWith?
-  termPolicy      UserTermPolicy
-  photo           UserPhoto?
+  // UserTermPolicy stored as JSON: { termsOfService, privacy, marketing, cookies }
+  termPolicy      Json
+  // UserPhoto stored as JSON: { bucket, key, cdnUrl?, completedUrl, mime, extension, access }
+  photo           Json?
 
   // timestamps fields
   createdAt DateTime  @default(now())
-  createdBy String?   @db.ObjectId
+  createdBy String?
   updatedAt DateTime  @updatedAt
-  updatedBy String?   @db.ObjectId
+  updatedBy String?
   deletedAt DateTime?
-  deletedBy String?   @db.ObjectId
+  deletedBy String?
 
   mobileNumbers     UserMobileNumber[]         @relation("UserMobileNumberUser")
   verifications     Verification[]             @relation("UserVerifications")
@@ -146,19 +150,19 @@ model User {
   forgotPasswords   ForgotPassword[]           @relation("UserForgotPassword")
   twoFactor         TwoFactor?                 @relation("UserTwoFactor")
 
-  @@unique(fields: [username])
-  @@unique(fields: [email])
-  @@index(fields: [status, countryId, roleId, createdAt])
-  @@index(fields: [id, deletedAt])
-  @@index(fields: [email, deletedAt])
-  @@index(fields: [createdAt])
+  @@unique([username])
+  @@unique([email])
+  @@index([status, countryId, roleId, createdAt])
+  @@index([id, deletedAt])
+  @@index([email, deletedAt])
+  @@index([createdAt])
   @@map("Users")
 }
 
 model Verification {
-  id             String               @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String               @db.ObjectId
-  mobileNumberId String?              @db.ObjectId
+  id             String               @id @default(cuid())
+  userId         String
+  mobileNumberId String?
   to             String
   type           EnumVerificationType
   token          String
@@ -169,22 +173,22 @@ model Verification {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   user         User?             @relation("UserVerifications", fields: [userId], references: [id])
   mobileNumber UserMobileNumber? @relation("UserMobileNumberVerification", fields: [mobileNumberId], references: [id])
 
-  @@unique(fields: [reference])
-  @@index(fields: [token, expiredAt, isUsed, type])
-  @@index(fields: [token])
+  @@unique([reference])
+  @@index([token, expiredAt, isUsed, type])
+  @@index([token])
   @@map("Verifications")
 }
 
 model PasswordHistory {
-  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String                  @db.ObjectId
+  id        String                  @id @default(cuid())
+  userId    String
   password  String
   type      EnumPasswordHistoryType
   expiredAt DateTime
@@ -193,34 +197,38 @@ model PasswordHistory {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
+
+  @@map("PasswordHistories")
 }
 
 model ActivityLog {
-  id        String                @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String                @db.ObjectId
+  id        String                @id @default(cuid())
+  userId    String
   action    EnumActivityLogAction
   ipAddress String
-  userAgent UserAgent
+  // UserAgent stored as JSON: { ua, browser, cpu, device, engine, os }
+  userAgent Json
   metadata  Json?
 
   user User? @relation("UserActivityLogs", fields: [userId], references: [id])
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
 
-  @@index(fields: [userId])
-  @@index(fields: [createdAt])
+  @@index([userId])
+  @@index([createdAt])
   @@map("ActivityLogs")
 }
 
 model Session {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
+  id        String    @id @default(cuid())
+  userId    String
   jti       String
   ipAddress String
-  userAgent UserAgent
+  // UserAgent stored as JSON: { ua, browser, cpu, device, engine, os }
+  userAgent Json
   expiredAt DateTime
   revokedAt DateTime?
   isRevoked Boolean   @default(false)
@@ -229,23 +237,24 @@ model Session {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
-  @@index(fields: [userId])
-  @@index(fields: [userId, isRevoked, expiredAt])
-  @@index(fields: [createdAt])
-  @@index(fields: [updatedAt])
+  @@index([userId])
+  @@index([userId, isRevoked, expiredAt])
+  @@index([createdAt])
+  @@index([updatedAt])
   @@map("Sessions")
 }
 
 model TwoFactor {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String    @db.ObjectId
+  id            String    @id @default(cuid())
+  userId        String    @unique
   secret        String?
   iv            String?
-  backupCodes   String[]  @default([])
+  // backupCodes String[] stored as JSON array
+  backupCodes   Json      @default("[]")
   enabled       Boolean   @default(false)
   requiredSetup Boolean   @default(false)
   confirmedAt   DateTime?
@@ -254,46 +263,46 @@ model TwoFactor {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   user User? @relation("UserTwoFactor", fields: [userId], references: [id])
 
-  @@unique(fields: [userId])
-  @@index(fields: [createdAt])
-  @@index(fields: [updatedAt])
+  @@index([createdAt])
+  @@index([updatedAt])
   @@map("TwoFactors")
 }
 
 model TermPolicy {
-  id          String               @id @default(auto()) @map("_id") @db.ObjectId
+  id          String               @id @default(cuid())
   type        EnumTermPolicyType
-  contents    TermPolicyContent[]
+  // TermPolicyContent[] stored as JSON array: [{ language, bucket, key, cdnUrl?, completedUrl, mime, extension, access, size }]
+  contents    Json                 @default("[]")
   version     Int                  @default(1)
   status      EnumTermPolicyStatus @default(draft)
   publishedAt DateTime?
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   userAcceptances TermPolicyUserAcceptance[] @relation("TermPolicyUserAcceptanceTermPolicy")
 
-  @@unique(fields: [type, version])
-  @@index(fields: [type, status, createdAt])
-  @@index(fields: [createdAt])
-  @@index(fields: [publishedAt])
-  @@index(fields: [version])
+  @@unique([type, version])
+  @@index([type, status, createdAt])
+  @@index([createdAt])
+  @@index([publishedAt])
+  @@index([version])
   @@map("TermPolicies")
 }
 
 model TermPolicyUserAcceptance {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String   @db.ObjectId
-  termPolicyId String   @db.ObjectId
+  id           String   @id @default(cuid())
+  userId       String
+  termPolicyId String
   acceptedAt   DateTime @default(now())
 
   user       User?       @relation("TermPolicyUserAcceptanceUser", fields: [userId], references: [id])
@@ -301,17 +310,17 @@ model TermPolicyUserAcceptance {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
 
-  @@unique(fields: [userId, termPolicyId])
-  @@index(fields: [userId])
-  @@index(fields: [acceptedAt])
-  @@index(fields: [createdAt])
+  @@unique([userId, termPolicyId])
+  @@index([userId])
+  @@index([acceptedAt])
+  @@index([createdAt])
   @@map("TermPolicyUserAcceptances")
 }
 
 model FeatureFlag {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  id             String  @id @default(cuid())
   key            String
   description    String
   isEnable       Boolean @default(true)
@@ -320,19 +329,19 @@ model FeatureFlag {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
-  @@unique(fields: [key])
-  @@index(fields: [key, createdAt])
-  @@index(fields: [createdAt])
+  @@unique([key])
+  @@index([key, createdAt])
+  @@index([createdAt])
   @@map("FeatureFlags")
 }
 
 model ForgotPassword {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String    @db.ObjectId
+  id        String    @id @default(cuid())
+  userId    String
   to        String
   token     String
   expiredAt DateTime
@@ -342,86 +351,16 @@ model ForgotPassword {
 
   // timestamps fields
   createdAt DateTime @default(now())
-  createdBy String?  @db.ObjectId
+  createdBy String?
   updatedAt DateTime @updatedAt
-  updatedBy String?  @db.ObjectId
+  updatedBy String?
 
   user User? @relation("UserForgotPassword", fields: [userId], references: [id])
 
-  @@unique(fields: [reference])
-  @@index(fields: [token, expiredAt, isUsed])
-  @@index(fields: [token])
+  @@unique([reference])
+  @@index([token, expiredAt, isUsed])
+  @@index([token])
   @@map("ForgotPasswords")
-}
-
-type UserTermPolicy {
-  termsOfService Boolean
-  privacy        Boolean
-  marketing      Boolean
-  cookies        Boolean
-}
-
-type RoleAbility {
-  action  String[]
-  subject String
-}
-
-type UserPhoto {
-  bucket       String
-  key          String
-  cdnUrl       String?
-  completedUrl String
-  mime         String
-  extension    String
-  access       String
-}
-
-type TermPolicyContent {
-  language     String
-  bucket       String
-  key          String
-  cdnUrl       String?
-  completedUrl String
-  mime         String
-  extension    String
-  access       String
-  size         Int
-}
-
-type UserAgentBrowser {
-  name    String?
-  version String?
-  major   String?
-  type    String?
-}
-
-type UserAgentCpu {
-  architecture String?
-}
-
-type UserAgentDevice {
-  type   String?
-  vendor String?
-  model  String?
-}
-
-type UserAgentEngine {
-  name    String?
-  version String?
-}
-
-type UserAgentOs {
-  name    String?
-  version String?
-}
-
-type UserAgent {
-  ua      String?
-  browser UserAgentBrowser?
-  cpu     UserAgentCpu?
-  device  UserAgentDevice?
-  engine  UserAgentEngine?
-  os      UserAgentOs?
 }
 
 enum EnumUserGender {
