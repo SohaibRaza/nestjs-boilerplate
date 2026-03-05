@@ -1,9 +1,10 @@
-import { AwsSESService } from '@common/aws/services/aws.ses.service';
 import { Injectable } from '@nestjs/common';
 import {
     HealthIndicatorResult,
     HealthIndicatorService,
 } from '@nestjs/terminus';
+
+import { AwsSESService } from '@common/aws/services/aws.ses.service';
 
 @Injectable()
 export class HealthAwsSESIndicator {

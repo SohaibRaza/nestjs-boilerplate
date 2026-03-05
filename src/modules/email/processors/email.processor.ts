@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
+
 import { EmailMobileNumberVerifiedDto } from '@modules/email/dtos/email.mobile-number-verified.dto';
 import { EmailSendDto } from '@modules/email/dtos/email.send.dto';
 import { EmailTempPasswordDto } from '@modules/email/dtos/email.temp-password.dto';
@@ -8,11 +9,11 @@ import { EmailVerifiedDto } from '@modules/email/dtos/email.verified.dto';
 import { EmailWorkerDto } from '@modules/email/dtos/email.worker.dto';
 import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
 import { IEmailProcessor } from '@modules/email/interfaces/email.processor.interface';
+import { EmailUtil } from '@modules/email/utils/email.util';
+import { EmailForgotPasswordDto } from '@modules/email/dtos/email.forgot-password.dto';
 import { EnumQueue } from 'src/queues/enums/queue.enum';
 import { QueueProcessorBase } from 'src/queues/bases/queue.processor.base';
 import { QueueProcessor } from 'src/queues/decorators/queue.decorator';
-import { EmailUtil } from '@modules/email/utils/email.util';
-import { EmailForgotPasswordDto } from '@modules/email/dtos/email.forgot-password.dto';
 
 @QueueProcessor(EnumQueue.EMAIL)
 export class EmailProcessor

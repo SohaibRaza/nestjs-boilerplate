@@ -1,3 +1,7 @@
+import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable } from '@nestjs/common';
+import { Queue } from 'bullmq';
+
 import { EmailCreateByAdminDto } from '@modules/email/dtos/email.create-by-admin.dto';
 import { EmailForgotPasswordDto } from '@modules/email/dtos/email.forgot-password.dto';
 import { EmailSendDto } from '@modules/email/dtos/email.send.dto';
@@ -6,9 +10,6 @@ import { EmailVerificationDto } from '@modules/email/dtos/email.verification.dto
 import { EmailVerifiedDto } from '@modules/email/dtos/email.verified.dto';
 import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
 import { IEmailService } from '@modules/email/interfaces/email.service.interface';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
-import { Queue } from 'bullmq';
 import { EnumQueue, EnumQueuePriority } from 'src/queues/enums/queue.enum';
 
 @Injectable()

@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EnumUserLoginFrom, EnumUserLoginWith, User } from '@prisma/client';
 import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
 import { Algorithm } from 'jsonwebtoken';
+import { createPrivateKey, createPublicKey } from 'node:crypto';
+import verifyAppleToken, {
+    VerifyAppleIdTokenResponse,
+} from 'verify-apple-id-token';
+
 import {
     IAuthJwtAccessTokenPayload,
     IAuthJwtRefreshTokenPayload,
@@ -11,11 +17,6 @@ import {
 } from '@modules/auth/interfaces/auth.interface';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { HelperService } from '@common/helper/services/helper.service';
-import { EnumUserLoginFrom, EnumUserLoginWith, User } from '@prisma/client';
-import { createPrivateKey, createPublicKey } from 'crypto';
-import verifyAppleToken, {
-    VerifyAppleIdTokenResponse,
-} from 'verify-apple-id-token';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 /**

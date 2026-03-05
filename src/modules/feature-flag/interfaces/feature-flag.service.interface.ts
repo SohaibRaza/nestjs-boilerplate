@@ -1,3 +1,5 @@
+import { FeatureFlag } from '@prisma/client';
+
 import {
     IPaginationQueryCursorParams,
     IPaginationQueryOffsetParams,
@@ -10,7 +12,6 @@ import {
 import { FeatureFlagUpdateMetadataRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-metadata.request';
 import { FeatureFlagUpdateStatusRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-status.request';
 import { FeatureFlagResponseDto } from '@modules/feature-flag/dtos/response/feature-flag.response';
-import { FeatureFlag } from '@prisma/client';
 
 export interface IFeatureFlagService {
     validateFeatureFlagGuard(request: IRequestApp, key: string): Promise<void>;

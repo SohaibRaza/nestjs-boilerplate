@@ -7,6 +7,7 @@ import {
     IsOptional,
     ValidateNested,
 } from 'class-validator';
+
 import { EmailSendDto } from '@modules/email/dtos/email.send.dto';
 
 export class EmailWorkerDto<T> {

@@ -1,3 +1,5 @@
+import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
+
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import {
     IAuthAccessTokenGenerate,
@@ -7,7 +9,6 @@ import {
     IAuthSocialPayload,
 } from '@modules/auth/interfaces/auth.interface';
 import { IUser } from '@modules/user/interfaces/user.interface';
-import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
 
 export interface IAuthService {
     createTokens(

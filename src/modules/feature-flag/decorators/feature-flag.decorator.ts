@@ -1,6 +1,7 @@
+import { SetMetadata, UseGuards, applyDecorators } from '@nestjs/common';
+
 import { FeatureFlagKeyPathMetaKey } from '@modules/feature-flag/constants/feature-flag.constant';
 import { FeatureFlagGuard } from '@modules/feature-flag/guards/feature-flag.guard';
-import { SetMetadata, UseGuards, applyDecorators } from '@nestjs/common';
 
 /**
  * Method decorator that applies feature flag protection to routes.

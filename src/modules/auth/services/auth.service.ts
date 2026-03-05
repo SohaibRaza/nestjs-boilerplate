@@ -1,3 +1,7 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
+import { TokenPayload } from 'google-auth-library';
+
 import { DatabaseUtil } from '@common/database/utils/database.util';
 import { HelperService } from '@common/helper/services/helper.service';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
@@ -15,9 +19,6 @@ import { AuthUtil } from '@modules/auth/utils/auth.util';
 import { EnumSessionStatusCodeError } from '@modules/session/enums/session.status-code.enum';
 import { SessionUtil } from '@modules/session/utils/session.util';
 import { IUser } from '@modules/user/interfaces/user.interface';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
-import { TokenPayload } from 'google-auth-library';
 
 /**
  * Authentication service handling JWT token operations, session validation,

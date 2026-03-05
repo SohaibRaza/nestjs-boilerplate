@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
-import { readFileSync } from 'fs';
 import { GetTemplateCommandOutput } from '@aws-sdk/client-ses';
-import { join } from 'path';
+import { Injectable, Logger } from '@nestjs/common';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
 import { IEmailTemplateService } from '@modules/email/interfaces/email.template-service.interface';
 import { AwsSESService } from '@common/aws/services/aws.ses.service';
 

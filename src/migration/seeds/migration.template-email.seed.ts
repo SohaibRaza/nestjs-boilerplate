@@ -1,8 +1,9 @@
+import { Logger } from '@nestjs/common';
+import { Command } from 'nest-commander';
+
 import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
 import { EmailTemplateService } from '@modules/email/services/email.template.service';
-import { Logger } from '@nestjs/common';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'template-email',
@@ -120,8 +121,6 @@ export class MigrationTemplateEmailSeed
         }
 
         this.logger.log('Emails seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -145,7 +144,5 @@ export class MigrationTemplateEmailSeed
         }
 
         this.logger.log('Emails removed successfully.');
-
-        return;
     }
 }

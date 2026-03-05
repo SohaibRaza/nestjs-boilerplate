@@ -1,9 +1,10 @@
-import { DatabaseService } from '@common/database/services/database.service';
 import { Injectable } from '@nestjs/common';
 import {
     HealthIndicatorResult,
     HealthIndicatorService,
 } from '@nestjs/terminus';
+
+import { DatabaseService } from '@common/database/services/database.service';
 
 @Injectable()
 export class HealthDatabaseIndicator {

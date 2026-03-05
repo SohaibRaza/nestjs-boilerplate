@@ -6,6 +6,7 @@ import {
     HealthCheckService,
     MemoryHealthIndicator,
 } from '@nestjs/terminus';
+
 import { ApiKeySystemProtected } from '@modules/api-key/decorators/api-key.decorator';
 import { Response } from '@common/response/decorators/response.decorator';
 import { HealthAwsResponseDto } from '@modules/health/dtos/response/health.aws.response.dto';

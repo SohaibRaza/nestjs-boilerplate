@@ -1,8 +1,9 @@
+import { SetMetadata, UseInterceptors, applyDecorators } from '@nestjs/common';
+import { EnumActivityLogAction } from '@prisma/client';
+
 import { ActivityLogMetadataMetaKey } from '@modules/activity-log/constants/activity-log.constant';
 import { ActivityLogInterceptor } from '@modules/activity-log/interceptors/activity-log.interceptor';
 import { IActivityLogMetadata } from '@modules/activity-log/interfaces/activity-log.interface';
-import { SetMetadata, UseInterceptors, applyDecorators } from '@nestjs/common';
-import { EnumActivityLogAction } from '@prisma/client';
 
 /**
  * Decorator that enables activity logging for controller methods.

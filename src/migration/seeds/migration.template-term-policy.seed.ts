@@ -1,12 +1,13 @@
+import { Logger } from '@nestjs/common';
+import { EnumTermPolicyStatus, EnumTermPolicyType } from '@prisma/client';
+import { Command } from 'nest-commander';
+
 import { DatabaseService } from '@common/database/services/database.service';
 import { DatabaseUtil } from '@common/database/utils/database.util';
 import { EnumMessageLanguage } from '@common/message/enums/message.enum';
 import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
 import { TermPolicyTemplateService } from '@modules/term-policy/services/term-policy.template.service';
-import { Logger } from '@nestjs/common';
-import { EnumTermPolicyStatus, EnumTermPolicyType } from '@prisma/client';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'template-termPolicy',
@@ -159,13 +160,9 @@ export class MigrationTemplateTermPolicySeed
         }
 
         this.logger.log('Term Policies seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
         this.logger.log('Skipping removal of Term Policies seed.');
-
-        return;
     }
 }

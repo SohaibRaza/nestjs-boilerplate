@@ -1,16 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
 import { title } from 'case';
 import { ConfigService } from '@nestjs/config';
+
 import { EmailSendDto } from '@modules/email/dtos/email.send.dto';
 import { EmailTempPasswordDto } from '@modules/email/dtos/email.temp-password.dto';
 import { EmailVerificationDto } from '@modules/email/dtos/email.verification.dto';
+import { EnumSendEmailProcess } from '@modules/email/enums/email.enum';
 import { EmailVerifiedDto } from '@modules/email/dtos/email.verified.dto';
 import { EmailMobileNumberVerifiedDto } from '@modules/email/dtos/email.mobile-number-verified.dto';
-import { AwsSESService } from '@common/aws/services/aws.ses.service';
-import { HelperService } from '@common/helper/services/helper.service';
 import { EmailCreateByAdminDto } from '@modules/email/dtos/email.create-by-admin.dto';
 import { EmailForgotPasswordDto } from '@modules/email/dtos/email.forgot-password.dto';
+
+import { AwsSESService } from '@common/aws/services/aws.ses.service';
+import { HelperService } from '@common/helper/services/helper.service';
 
 /**
  * Util for handling email operations using AWS SES

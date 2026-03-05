@@ -1,3 +1,9 @@
+import { Cache } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'node:crypto';
+import { authenticator } from 'otplib';
+
 import { CacheMainProvider } from '@common/cache/constants/cache.constant';
 import { HelperService } from '@common/helper/services/helper.service';
 import { TwoFactor } from '@generated/prisma-client';
@@ -12,11 +18,6 @@ import {
     IAuthTwoFactorVerifyResult,
 } from '@modules/auth/interfaces/auth.interface';
 import { IUser } from '@modules/user/interfaces/user.interface';
-import { Cache } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { randomBytes } from 'crypto';
-import { authenticator } from 'otplib';
 
 /**
  * Utility class for Two-Factor Authentication (2FA) operations.

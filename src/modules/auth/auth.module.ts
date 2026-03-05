@@ -1,8 +1,9 @@
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { Global, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { AuthJwtAccessStrategy } from '@modules/auth/guards/jwt/strategies/auth.jwt.access.strategy';
 import { AuthJwtRefreshStrategy } from '@modules/auth/guards/jwt/strategies/auth.jwt.refresh.strategy';
-import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthUtil } from '@modules/auth/utils/auth.util';
 import { AuthService } from '@modules/auth/services/auth.service';
 import { SessionModule } from '@modules/session/session.module';

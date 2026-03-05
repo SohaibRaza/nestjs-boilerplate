@@ -1,6 +1,7 @@
+import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
+
 import { AuthTokenResponseDto } from '@modules/auth/dtos/response/auth.token.response.dto';
 import { EnumAuthTwoFactorMethod } from '@modules/auth/enums/auth.enum';
-import { EnumUserLoginFrom, EnumUserLoginWith } from '@prisma/client';
 
 export interface IAuthPassword {
     passwordHash: string;

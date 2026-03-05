@@ -1,3 +1,7 @@
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Command } from 'nest-commander';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { DatabaseService } from '@common/database/services/database.service';
 import { DatabaseUtil } from '@common/database/utils/database.util';
@@ -5,9 +9,6 @@ import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { migrationRoleData } from '@migration/data/migration.role.data';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
 import { RoleCreateRequestDto } from '@modules/role/dtos/request/role.create.request.dto';
-import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'role',
@@ -62,8 +63,6 @@ export class MigrationRoleSeed
         }
 
         this.logger.log('Roles seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -77,7 +76,5 @@ export class MigrationRoleSeed
         }
 
         this.logger.log('Roles removed successfully.');
-
-        return;
     }
 }

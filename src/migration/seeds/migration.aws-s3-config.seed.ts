@@ -1,9 +1,10 @@
+import { Logger } from '@nestjs/common';
+import { Command } from 'nest-commander';
+
 import { EnumAwsS3Accessibility } from '@common/aws/enums/aws.enum';
 import { AwsS3Service } from '@common/aws/services/aws.s3.service';
 import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
-import { Logger } from '@nestjs/common';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'aws-s3-config',
@@ -80,13 +81,9 @@ export class MigrationAwsS3ConfigSeed
         }
 
         this.logger.log('Finished seeding AWS S3 Policies.');
-
-        return;
     }
 
     async remove(): Promise<void> {
         this.logger.log('Skipping removal of AWS S3 Policies seed.');
-
-        return;
     }
 }

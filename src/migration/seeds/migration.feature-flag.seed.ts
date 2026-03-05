@@ -1,12 +1,13 @@
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Prisma } from '@prisma/client';
+import { Command } from 'nest-commander';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { DatabaseService } from '@common/database/services/database.service';
 import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { migrationFeatureFlagData } from '@migration/data/migration.feature-flag.data';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
-import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'featureFlag',
@@ -56,8 +57,6 @@ export class MigrationFeatureFlagSeed
         }
 
         this.logger.log('Feature Flags seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -71,7 +70,5 @@ export class MigrationFeatureFlagSeed
         }
 
         this.logger.log('Feature Flags removed successfully.');
-
-        return;
     }
 }

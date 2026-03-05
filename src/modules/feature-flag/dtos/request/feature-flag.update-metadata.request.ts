@@ -1,7 +1,8 @@
-import { IFeatureFlagMetadata } from '@modules/feature-flag/interfaces/feature-flag.interface';
-import { IsFeatureFlagMetadata } from '@modules/feature-flag/validations/feature-flag.metadata.validation';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject } from 'class-validator';
+
+import { IFeatureFlagMetadata } from '@modules/feature-flag/interfaces/feature-flag.interface';
+import { IsFeatureFlagMetadata } from '@modules/feature-flag/validations/feature-flag.metadata.validation';
 
 export class FeatureFlagUpdateMetadataRequestDto {
     @ApiProperty({

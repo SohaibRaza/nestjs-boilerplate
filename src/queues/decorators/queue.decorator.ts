@@ -1,5 +1,6 @@
 import { Processor } from '@nestjs/bullmq';
 import { NestWorkerOptions } from '@nestjs/bullmq/dist/interfaces/worker-options.interface';
+
 import { QueueProcessorConfigKey } from 'src/queues/constants/queue.constant';
 import { EnumQueue } from 'src/queues/enums/queue.enum';
 
