@@ -99,3 +99,7 @@ Access the API at `http://localhost:3000/api/v1` and Swagger documentation at `h
 ### ❌ `HTTP_HOST must be an ip address`
 
 **Fix**: use `127.0.0.1` instead of `localhost`.
+
+### ❌ Cannot find module 'generated/prisma-client'
+
+**Fix**: Run `pnpm db:generate` OR `pnpm exec prisma generate`
