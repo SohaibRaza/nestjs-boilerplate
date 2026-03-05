@@ -1,12 +1,17 @@
-import { Request } from 'express';
-import { IAuthJwtAccessTokenPayload } from '@modules/auth/interfaces/auth.interface';
-import { IPaginationQuery } from '@common/pagination/interfaces/pagination.interface';
+import { FastifyRequest } from 'fastify';
 import { ApiKey } from '@prisma/client';
+
+import type { IFile } from '@common/file/interfaces/file.interface';
+import { IPaginationQuery } from '@common/pagination/interfaces/pagination.interface';
+import { RequestUserAgentDto } from '@common/request/dtos/request.user-agent.dto';
+import { IAuthJwtAccessTokenPayload } from '@modules/auth/interfaces/auth.interface';
 import { RoleAbilityDto } from '@modules/role/dtos/role.ability.dto';
 import { IUser } from '@modules/user/interfaces/user.interface';
-import { RequestUserAgentDto } from '@common/request/dtos/request.user-agent.dto';
 
-export interface IRequestApp<T = IAuthJwtAccessTokenPayload> extends Request {
+export interface IRequestApp<
+    T = IAuthJwtAccessTokenPayload,
+> extends FastifyRequest {
+    id: string;
     correlationId: string;
     user?: T;
 
@@ -18,6 +23,11 @@ export interface IRequestApp<T = IAuthJwtAccessTokenPayload> extends Request {
 
     __language: string;
     __version: string;
+
+    /** Single uploaded file (set by FileUploadSingle interceptor) */
+    __file?: IFile;
+    /** Multiple uploaded files (set by FileUploadMultiple / FileUploadMultipleFields) */
+    __files?: IFile[] | Record<string, IFile[]>;
 }
 
 export interface IRequestLog {

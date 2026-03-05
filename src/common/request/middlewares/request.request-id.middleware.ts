@@ -1,7 +1,8 @@
-import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { NextFunction, Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { v7 as uuid } from 'uuid';
+
+import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 /**
  * Middleware for generating and attaching request and correlation IDs.
@@ -15,15 +16,15 @@ export class RequestRequestIdMiddleware implements NestMiddleware {
     /**
      * Handles request and correlation ID assignment for each request.
      *
-     * @param req - The Express request object
-     * @param _res - The Express response object
+     * @param req - The Fastify request object
+     * @param _res - The Fastify reply object
      * @param next - The next middleware function
      *
      * - Sets `req.id` to a new UUID for request identification.
      * - Sets `req.correlationId` to the value of `x-correlation-id` header if provided and valid, otherwise generates a new UUID.
      * - Ensures the `x-correlation-id` header is present and synchronized with `req.correlationId`.
      */
-    use(req: IRequestApp, _res: Response, next: NextFunction): void {
+    use(req: IRequestApp, _res: FastifyReply, next: () => void): void {
         req.id = uuid();
 
         const correlationId = req.headers['x-correlation-id'];

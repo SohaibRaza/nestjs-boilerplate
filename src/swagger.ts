@@ -1,13 +1,15 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestApplication } from '@nestjs/core';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { writeFileSync } from 'node:fs';
 
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { MessageService } from '@common/message/services/message.service';
 
-export default async function swagger(app: NestApplication): Promise<void> {
+export default async function swagger(
+    app: NestFastifyApplication
+): Promise<void> {
     const configService = app.get(ConfigService);
     const messageService = app.get(MessageService);
 

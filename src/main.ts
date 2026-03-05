@@ -1,21 +1,38 @@
 import './instrument';
 
-import { NestApplication, NestFactory } from '@nestjs/core';
+import helmet from '@fastify/helmet';
+import compress from '@fastify/compress';
+import multipart from '@fastify/multipart';
 import { Logger, VersioningType } from '@nestjs/common';
-import { AppModule } from '@app/app.module';
 import { ConfigService } from '@nestjs/config';
-import { useContainer, validate } from 'class-validator';
-import swaggerInit from 'src/swagger';
+import { NestFactory } from '@nestjs/core';
+import {
+    FastifyAdapter,
+    NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { plainToInstance } from 'class-transformer';
+import { useContainer, validate } from 'class-validator';
+import { FastifyRequest } from 'fastify';
+import { Logger as PinoLogger } from 'nestjs-pino';
+import { v7 as uuid } from 'uuid';
+
+import { AppModule } from '@app/app.module';
 import { AppEnvDto } from '@app/dtos/app.env.dto';
 import { MessageService } from '@common/message/services/message.service';
-import { Logger as PinoLogger } from 'nestjs-pino';
+import swaggerInit from 'src/swagger';
 
 async function bootstrap(): Promise<void> {
-    const app: NestApplication = await NestFactory.create(AppModule, {
-        abortOnError: true,
-        bufferLogs: false,
-    });
+    const app = await NestFactory.create<NestFastifyApplication>(
+        AppModule,
+        new FastifyAdapter({
+            // Generate UUID v7 as request IDs (instead of Fastify's default req-N format)
+            genReqId: () => uuid(),
+        }),
+        {
+            abortOnError: true,
+            bufferLogs: false,
+        }
+    );
 
     // Custom Logger
     app.useLogger(app.get(PinoLogger));
@@ -83,6 +100,113 @@ async function bootstrap(): Promise<void> {
             cause: errorsMessage,
         });
     }
+
+    // --- Fastify Plugins ---
+
+    // Helmet: Security headers
+    await app.register(helmet, {
+        contentSecurityPolicy: false, // disabled for Swagger UI compatibility
+    });
+
+    // Compression
+    await app.register(compress);
+
+    // Multipart (file uploads)
+    await app.register(multipart, {
+        limits: {
+            fileSize:
+                configService.get<number>(
+                    'request.body.applicationOctetStream.limitInBytes'
+                ) ?? 10 * 1024 * 1024, // 10MB default
+        },
+    });
+
+    // CORS
+    const corsAllowedOrigin = configService.get<string[]>(
+        'request.cors.allowedOrigin'
+    );
+    const corsAllowedMethod = configService.get<string[]>(
+        'request.cors.allowedMethod'
+    );
+    const corsAllowedHeader = configService.get<string[]>(
+        'request.cors.allowedHeader'
+    );
+
+    app.enableCors({
+        origin: (origin, callback) => {
+            if (!origin) {
+                return callback(null, true);
+            }
+
+            // Allow all if wildcard
+            if (
+                corsAllowedOrigin.includes('*') ||
+                corsAllowedOrigin.length === 0
+            ) {
+                return callback(null, true);
+            }
+
+            // Check if the origin matches any allowed pattern
+            const isAllowed = corsAllowedOrigin.some(pattern => {
+                if (pattern.startsWith('*.')) {
+                    const baseDomain = pattern.slice(2);
+                    try {
+                        const url = new URL(origin);
+                        return (
+                            url.hostname.endsWith('.' + baseDomain) ||
+                            url.hostname === baseDomain
+                        );
+                    } catch {
+                        return false;
+                    }
+                }
+                return origin === pattern;
+            });
+
+            return callback(null, isAllowed);
+        },
+        methods: corsAllowedMethod,
+        allowedHeaders: corsAllowedHeader,
+        credentials: !corsAllowedOrigin.includes('*'),
+        optionsSuccessStatus: 204,
+        maxAge: 86400,
+    });
+
+    // Request ID, Correlation ID, and Response-Time hooks
+    // These must be Fastify hooks (not NestJS middleware) to run on ALL requests,
+    // including 404s and other non-routed requests.
+    const fastifyInstance = app.getHttpAdapter().getInstance();
+    fastifyInstance.addHook(
+        'onRequest',
+        (request: FastifyRequest & { correlationId?: string }, reply, done) => {
+            // Inject correlationId from request header or generate a new UUID
+            const headerCorrelationId = request.headers['x-correlation-id'];
+            const correlationId =
+                typeof headerCorrelationId === 'string' && headerCorrelationId
+                    ? headerCorrelationId
+                    : uuid();
+            request.correlationId = correlationId;
+            reply.header('x-correlation-id', correlationId);
+            reply.header('x-request-id', request.id);
+
+            // Start response-time timer
+            (request as FastifyRequest & { __startTime: bigint }).__startTime =
+                process.hrtime.bigint();
+
+            done();
+        }
+    );
+
+    fastifyInstance.addHook('onSend', (request, reply, _payload, done) => {
+        const start = (request as FastifyRequest & { __startTime?: bigint })
+            .__startTime;
+        if (start) {
+            const diff = process.hrtime.bigint() - start;
+            const ms = Number(diff) / 1_000_000;
+            reply.header('X-Response-Time', `${ms.toFixed(3)}ms`);
+        }
+        done();
+    });
 
     // Swagger
     await swaggerInit(app);

@@ -8,7 +8,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { HelperService } from '@common/helper/services/helper.service';
 import { FileService } from '@common/file/services/file.service';
 import { IResponseFileReturn } from '@common/response/interfaces/response.interface';
@@ -52,9 +52,9 @@ export class ResponseFileInterceptor implements NestInterceptor {
     ): Observable<Promise<StreamableFile>> {
         if (context.getType() === 'http') {
             return next.handle().pipe(
-                map(async (res: Promise<Response>) => {
+                map(async (res: Promise<FastifyReply>) => {
                     const ctx: HttpArgumentsHost = context.switchToHttp();
-                    const response: Response = ctx.getResponse();
+                    const response: FastifyReply = ctx.getResponse();
                     const request: IRequestApp = ctx.getRequest<IRequestApp>();
 
                     const responseData =
@@ -175,13 +175,13 @@ export class ResponseFileInterceptor implements NestInterceptor {
      * generates one using the timestamp.
      *
      * @private
-     * @param {Response} response - The Express response object
+     * @param {FastifyReply} response - The Fastify reply object
      * @param {Buffer} file - The file buffer
      * @param {number} timestamp - Timestamp for default filename generation
      * @param {string} [filename] - Optional custom filename
      */
     private setFileHeaders(
-        response: Response,
+        response: FastifyReply,
         file: Buffer,
         timestamp: number,
         filename?: string
@@ -190,12 +190,9 @@ export class ResponseFileInterceptor implements NestInterceptor {
             filename ?? `export-${timestamp}.${EnumFileExtensionDocument.csv}`;
         const mime = this.fileService.extractMimeFromFilename(filename);
         response
-            .setHeader('Content-Type', mime)
-            .setHeader(
-                'Content-Disposition',
-                `attachment; filename=${filename}`
-            )
-            .setHeader('Content-Length', file.length);
+            .header('Content-Type', mime)
+            .header('Content-Disposition', `attachment; filename=${filename}`)
+            .header('Content-Length', file.length);
     }
 
     /**
@@ -205,10 +202,13 @@ export class ResponseFileInterceptor implements NestInterceptor {
      * API version, repository version, request ID, and correlation ID.
      *
      * @private
-     * @param {Response} response - The Express response object
+     * @param {FastifyReply} response - The Fastify reply object
      * @param {IRequestApp} request - The custom request object with additional properties
      */
-    private setStandardHeaders(response: Response, request: IRequestApp): void {
+    private setStandardHeaders(
+        response: FastifyReply,
+        request: IRequestApp
+    ): void {
         const today = this.helperService.dateCreate();
         const xLanguage: string =
             request.__language ??
@@ -220,12 +220,12 @@ export class ResponseFileInterceptor implements NestInterceptor {
             this.configService.get<string>('app.urlVersion.version');
         const xRepoVersion = this.configService.get<string>('app.version');
 
-        response.setHeader('x-custom-lang', xLanguage);
-        response.setHeader('x-timestamp', xTimestamp);
-        response.setHeader('x-timezone', xTimezone);
-        response.setHeader('x-version', xVersion);
-        response.setHeader('x-repo-version', xRepoVersion);
-        response.setHeader('x-request-id', String(request.id));
-        response.setHeader('x-correlation-id', String(request.correlationId));
+        response.header('x-custom-lang', xLanguage);
+        response.header('x-timestamp', xTimestamp);
+        response.header('x-timezone', xTimezone);
+        response.header('x-version', xVersion);
+        response.header('x-repo-version', xRepoVersion);
+        response.header('x-request-id', String(request.id));
+        response.header('x-correlation-id', String(request.correlationId));
     }
 }

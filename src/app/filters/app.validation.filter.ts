@@ -1,15 +1,16 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
+
 import { HelperService } from '@common/helper/services/helper.service';
+import { EnumMessageLanguage } from '@common/message/enums/message.enum';
 import { IMessageValidationError } from '@common/message/interfaces/message.interface';
 import { MessageService } from '@common/message/services/message.service';
 import { RequestValidationException } from '@common/request/exceptions/request.validation.exception';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { ResponseMetadataDto } from '@common/response/dtos/response.dto';
 import { ResponseErrorDto } from '@common/response/dtos/response.error.dto';
-import { EnumMessageLanguage } from '@common/message/enums/message.enum';
 
 /**
  * Exception filter specifically for handling request validation errors.
@@ -35,7 +36,7 @@ export class AppValidationFilter implements ExceptionFilter {
         host: ArgumentsHost
     ): Promise<void> {
         const ctx: HttpArgumentsHost = host.switchToHttp();
-        const response: Response = ctx.getResponse<Response>();
+        const response: FastifyReply = ctx.getResponse<FastifyReply>();
         const request: IRequestApp = ctx.getRequest<IRequestApp>();
 
         const today = this.helperService.dateCreate();
@@ -54,7 +55,7 @@ export class AppValidationFilter implements ExceptionFilter {
             language: xLanguage,
             timestamp: xTimestamp,
             timezone: xTimezone,
-            path: request.path,
+            path: request.url,
             version: xVersion,
             repoVersion: xRepoVersion,
             requestId: xRequestId,
@@ -77,15 +78,15 @@ export class AppValidationFilter implements ExceptionFilter {
         };
 
         response
-            .setHeader('x-custom-lang', xLanguage)
-            .setHeader('x-timestamp', xTimestamp)
-            .setHeader('x-timezone', xTimezone)
-            .setHeader('x-version', xVersion)
-            .setHeader('x-repo-version', xRepoVersion)
-            .setHeader('x-request-id', xRequestId)
-            .setHeader('x-correlation-id', xCorrelationId)
-            .status(exception.httpStatus)
-            .json(responseBody);
+            .header('x-custom-lang', xLanguage)
+            .header('x-timestamp', xTimestamp)
+            .header('x-timezone', xTimezone)
+            .header('x-version', xVersion)
+            .header('x-repo-version', xRepoVersion)
+            .header('x-request-id', xRequestId)
+            .header('x-correlation-id', xCorrelationId)
+            .code(exception.httpStatus)
+            .send(responseBody);
 
         return;
     }

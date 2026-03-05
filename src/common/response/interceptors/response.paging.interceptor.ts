@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { MessageService } from '@common/message/services/message.service';
 import { Reflector } from '@nestjs/core';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
@@ -68,9 +68,9 @@ export class ResponsePagingInterceptor<T> implements NestInterceptor {
     ): Observable<Promise<ResponsePagingDto<T>>> {
         if (context.getType() === 'http') {
             return next.handle().pipe(
-                map(async (res: Promise<Response>) => {
+                map(async (res: Promise<FastifyReply>) => {
                     const ctx: HttpArgumentsHost = context.switchToHttp();
-                    const response: Response = ctx.getResponse();
+                    const response: FastifyReply = ctx.getResponse();
                     const request: IRequestApp = ctx.getRequest<IRequestApp>();
 
                     let messagePath: string = this.reflector.get<string>(
@@ -162,7 +162,7 @@ export class ResponsePagingInterceptor<T> implements NestInterceptor {
                     );
 
                     this.setResponseHeaders(response, metadata);
-                    response.status(httpStatus);
+                    response.code(httpStatus);
 
                     return {
                         statusCode,
@@ -204,7 +204,7 @@ export class ResponsePagingInterceptor<T> implements NestInterceptor {
             language: xLanguage,
             timestamp: this.helperService.dateGetTimestamp(today),
             timezone: this.helperService.dateGetZone(today),
-            path: request.path,
+            path: request.url,
             version: xVersion,
             repoVersion: this.configService.get<string>('app.version'),
             requestId: String(request.id),
@@ -273,15 +273,15 @@ export class ResponsePagingInterceptor<T> implements NestInterceptor {
      * @param metadata - Response metadata containing header values
      */
     private setResponseHeaders(
-        response: Response,
+        response: FastifyReply,
         metadata: ResponsePagingMetadataDto
     ): void {
-        response.setHeader('x-custom-lang', metadata.language);
-        response.setHeader('x-timestamp', metadata.timestamp);
-        response.setHeader('x-timezone', metadata.timezone);
-        response.setHeader('x-version', metadata.version);
-        response.setHeader('x-repo-version', metadata.repoVersion);
-        response.setHeader('x-request-id', String(metadata.requestId));
-        response.setHeader('x-correlation-id', String(metadata.correlationId));
+        response.header('x-custom-lang', metadata.language);
+        response.header('x-timestamp', metadata.timestamp);
+        response.header('x-timezone', metadata.timezone);
+        response.header('x-version', metadata.version);
+        response.header('x-repo-version', metadata.repoVersion);
+        response.header('x-request-id', metadata.requestId);
+        response.header('x-correlation-id', metadata.correlationId);
     }
 }
