@@ -2,7 +2,7 @@ import { Cache } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'node:crypto';
-import { authenticator } from 'otplib';
+import { OTP } from 'otplib';
 
 import { CacheMainProvider } from '@common/cache/constants/cache.constant';
 import { HelperService } from '@common/helper/services/helper.service';
@@ -41,6 +41,7 @@ export class AuthTwoFactorUtil {
     private readonly encryptionKey: string;
     private readonly maxAttempt: number;
     private readonly lockAttemptDuration: number;
+    private readonly otp: OTP;
 
     constructor(
         @Inject(CacheMainProvider) private readonly cacheManager: Cache,
@@ -75,12 +76,7 @@ export class AuthTwoFactorUtil {
         this.lockAttemptDuration = this.configService.get<number>(
             'auth.twoFactor.lockAttemptDuration'
         );
-
-        authenticator.options = {
-            step: this.step,
-            digits: this.digits,
-            window: this.window,
-        };
+        this.otp = new OTP();
     }
 
     /**
@@ -88,7 +84,7 @@ export class AuthTwoFactorUtil {
      * @returns {string} Secret string
      */
     generateSecret(): string {
-        return authenticator.generateSecret(this.secretLength);
+        return this.otp.generateSecret(this.secretLength);
     }
 
     /**
@@ -98,7 +94,13 @@ export class AuthTwoFactorUtil {
      * @returns Key URI
      */
     createKeyUri(email: string, secret: string): string {
-        return authenticator.keyuri(email, this.issuer, secret);
+        return this.otp.generateURI({
+            issuer: this.issuer,
+            label: email,
+            secret,
+            digits: this.digits,
+            period: this.step,
+        });
     }
 
     /**
@@ -108,7 +110,14 @@ export class AuthTwoFactorUtil {
      * @returns True if valid
      */
     verifyCode(secret: string, code: string): boolean {
-        return authenticator.check(code, secret);
+        const result = this.otp.verifySync({
+            secret,
+            token: code,
+            digits: this.digits,
+            period: this.step,
+            epochTolerance: this.window,
+        });
+        return result.valid;
     }
 
     /**
