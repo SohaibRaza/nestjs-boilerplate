@@ -38,6 +38,9 @@ async function bootstrap(): Promise<void> {
     // Custom Logger
     app.useLogger(app.get(PinoLogger));
 
+    // Graceful Shutdown Hooks
+    app.enableShutdownHooks();
+
     const configService = app.get(ConfigService);
     const env: string = configService.get<string>('app.env');
     const timezone: string = configService.get<string>('app.timezone');
