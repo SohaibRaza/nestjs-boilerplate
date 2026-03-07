@@ -31,7 +31,7 @@ export class RequestIdempotencyInterceptor implements NestInterceptor {
     async intercept(
         context: ExecutionContext,
         next: CallHandler
-    ): Promise<Observable<any>> {
+    ): Promise<Observable<unknown>> {
         const isIdempotent = this.reflector.get<boolean>(
             RequestIdempotencyMetaKey,
             context.getHandler()

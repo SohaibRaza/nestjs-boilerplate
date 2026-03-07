@@ -28,10 +28,11 @@
         "start": "nest start application --config nest-cli.json",
         "start:dev": "nest start application --watch --config nest-cli.json",
         "start:prod": "node dist/main",
-        "lint": "eslint",
+        "lint": "eslint --cache",
         "lint:staged": "lint-staged",
         "lint:fix": "eslint --fix",
         "test": "TZ=UTC jest --config test/jest.json --passWithNoTests --detectOpenHandles",
+        "test:vitest": "vitest run src/common/request/interceptors/request.idempotency.interceptor.spec.ts src/common/request/decorators/request.idempotency.decorator.spec.ts",
         "package:upgrade": "npx npm-check-updates -u",
         "package:check": "npx npm-check-updates -i",
         "migration": "nest build migration --config nest-cli.json && node dist/migration.js",
@@ -111,7 +112,8 @@
         "strip-ansi": "^7.2.0",
         "ua-parser-js": "^2.0.9",
         "uuid": "^13.0.0",
-        "verify-apple-id-token": "^3.1.2"
+        "verify-apple-id-token": "^3.1.2",
+        "vitest": "^4.0.18"
     },
     "devDependencies": {
         "@commitlint/cli": "^20.4.3",

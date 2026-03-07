@@ -54,6 +54,7 @@ jwks.json
 
 # Temporary and cache files
 .cache/
+.eslintcache
 .temp/
 .tmp/
 temp/
