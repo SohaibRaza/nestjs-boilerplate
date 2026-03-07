@@ -34,7 +34,6 @@ This document provides step-by-step instructions for setting up the ACK NestJS B
 - [Development Tools](#development-tools)
 - [Accessing the Application](#accessing-the-application)
 
-
 ## Prerequisites
 
 > **Note**: ACK NestJS Boilerplate uses PNPM for package management. All documentation examples will use PNPM commands.
@@ -44,7 +43,7 @@ Before starting, install the following tools and packages. We recommend using th
 ### Required Tools
 
 | Tool | Version |
-|------|---------|
+| ---- | ------- |
 | [Node.js](https://nodejs.org) | v24.11.0+ |
 | [MongoDB](https://docs.mongodb.com/) | v8.0.x |
 | [Redis](https://redis.io) | v8.x |
@@ -109,6 +108,7 @@ pnpm generate:keys --direct-insert
 ```
 
 **What this command does:**
+
 - Creates private/public key pairs for both access and refresh tokens
 - Generates JWKS (JSON Web Key Set) files in `/keys` directory
 - Creates `access-jwks.json` and `refresh-jwks.json` for public key distribution
@@ -134,7 +134,6 @@ AUTH_JWT_ACCESS_TOKEN_JWKS_URI="https://your-domain.com/.well-known/access-jwks.
 AUTH_JWT_REFRESH_TOKEN_JWKS_URI="https://your-domain.com/.well-known/refresh-jwks.json"
 ```
 
-
 ## 🐳 Installation with Docker
 
 > **Note:** You can skip this section if all dependencies are already installed and you do not want to use Docker for your setup.
@@ -144,6 +143,7 @@ Docker provides the fastest and most reliable way to set up the ACK NestJS Boile
 ### What's Included
 
 The Docker setup provides:
+
 - **MongoDB replica set** - Configured for transactions
 - **Redis instances** - Separate instances for caching and queues
 - **JWKS server** - Hosts your JWT public keys automatically
@@ -176,12 +176,14 @@ cp .env.example .env
 For Docker installation, ensure these specific values in your `.env` file:
 
 **Database Configuration:**
+
 ```bash
 # MongoDB (Docker containers)
 DATABASE_URL=mongodb://localhost:27017/ACKNestJs?retryWrites=true&w=majority&replicaSet=rs0
 ```
 
 **Redis Configuration:**
+
 ```bash
 # Redis (Docker containers)
 CACHE_REDIS_URL=redis://localhost:6379/0
@@ -189,6 +191,7 @@ QUEUE_REDIS_URL=redis://localhost:6379/1
 ```
 
 **JWKS Configuration (Docker-hosted):**
+
 ```bash
 # JWKS server URLs (hosted by Docker container)
 AUTH_JWT_ACCESS_TOKEN_JWKS_URI=http://localhost:3011/.well-known/access-jwks.json
@@ -211,6 +214,7 @@ pnpm generate:keys --direct-insert
 ```
 
 **What this command does:**
+
 - Creates private/public key pairs for both access and refresh tokens
 - Generates JWKS (JSON Web Key Set) files in `/keys` directory
 - Creates `access-jwks.json` and `refresh-jwks.json` for Docker container serving
@@ -232,18 +236,21 @@ Now you're ready to start the complete Docker environment with all services.
 > **Note**: By default, Docker installation only sets up dependencies (MongoDB, Redis, JWKS server, BullMQ dashboard). The API container is not included. To also run the API container, use the `full` profile.
 
 **Start only dependencies:**
+
 ```bash
 # Start MongoDB, Redis, JWKS, and BullMQ dashboard
 docker-compose up -d
 ```
 
 **Start with API container (recommended for full development setup):**
+
 ```bash
 # Start all services including the API container
 docker-compose up -d
 ```
 
 **What this command does:**
+
 - Starts MongoDB replica set with 1 nodes (ports 27017)
 - Launches Redis server for caching and queues (port 6379)
 - Starts JWKS server to host your JWT public keys (port 3011)
@@ -263,7 +270,6 @@ docker-compose logs -f
 
 The Docker setup includes comprehensive health checks for all services, ensuring they're fully operational before marking as available.
 
-
 ### Troubleshooting
 
 - **Port conflicts**: Ensure ports 27017, 6379, 3010, 3011 are not in use by other applications
@@ -271,12 +277,12 @@ The Docker setup includes comprehensive health checks for all services, ensuring
 - **MongoDB replica set initialization**: Wait 1-2 minutes for complete setup
 - **Permission issues**: Ensure Docker has proper permissions to create volumes and networks
 
-
 ## Generate Database Client
 
 Prisma uses a generated client to provide type-safe database access and query building. You must generate the Prisma Client every time you change your Prisma schema (in `prisma/schema.prisma`).
 
 **Generate database client from Prisma Schema:**
+
 ```bash
 pnpm db:generate
 ```
@@ -284,11 +290,13 @@ pnpm db:generate
 ## Database Migration & Seeding
 
 **Migrate schema to MongoDB:**
+
 ```bash
 pnpm db:migrate
 ```
 
 **Seed all initial data:**
+
 ```bash
 pnpm migration:seed
 ```
@@ -310,7 +318,6 @@ pnpm migration template-termPolicy --type seed
 ```
 
 For a complete guide and module details, see [Database Documentation][ref-doc-database].
-
 
 ## Run Project
 
@@ -370,7 +377,6 @@ pnpm clean && pnpm install
 
 > **Note**: The `pnpm clean` command is a custom script that removes `node_modules` directory, `dist` build folder, and pnpm cache before reinstalling. This is useful when you encounter dependency conflicts, build issues, or want a fresh installation.
 
-
 ## Accessing the Application
 
 Once your application is successfully running, you can access various endpoints and tools:
@@ -395,98 +401,20 @@ To verify everything is working correctly:
 3. **Database Connection**: Check application logs for successful database connection
 4. **Redis Connection**: Verify Redis connection in the application logs
 
-
-
-
 <!-- REFERENCES -->
 
 <!-- BADGE LINKS -->
 
-[ack-contributors-shield]: https://img.shields.io/github/contributors/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-forks-shield]: https://img.shields.io/github/forks/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-stars-shield]: https://img.shields.io/github/stars/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-issues-shield]: https://img.shields.io/github/issues/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-license-shield]: https://img.shields.io/github/license/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[nestjs-shield]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
-[nodejs-shield]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white
-[typescript-shield]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
-[mongodb-shield]: https://img.shields.io/badge/MongoDB-white?style=for-the-badge&logo=mongodb&logoColor=4EA94B
-[jwt-shield]: https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white
-[jest-shield]: https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white
-[pnpm-shield]: https://img.shields.io/badge/pnpm-%232C8EBB.svg?style=for-the-badge&logo=pnpm&logoColor=white&color=F9AD00
-[docker-shield]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[github-shield]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white
-
 <!-- CONTACTS -->
-
-[ref-author-linkedin]: https://linkedin.com/in/andrechristikan
-[ref-author-email]: mailto:andrechristikan@gmail.com
-[ref-author-github]: https://github.com/andrechristikan
-[ref-author-paypal]: https://www.paypal.me/andrechristikan
-[ref-author-kofi]: https://ko-fi.com/andrechristikan
 
 <!-- Repo LINKS -->
 
-[ref-ack]: https://github.com/andrechristikan/ack-nestjs-boilerplate
-[ref-ack-issues]: https://github.com/andrechristikan/ack-nestjs-boilerplate/issues
-[ref-ack-stars]: https://github.com/andrechristikan/ack-nestjs-boilerplate/stargazers
-[ref-ack-forks]: https://github.com/andrechristikan/ack-nestjs-boilerplate/network/members
-[ref-ack-contributors]: https://github.com/andrechristikan/ack-nestjs-boilerplate/graphs/contributors
-[ref-ack-license]: LICENSE.md
-
 <!-- THIRD PARTY -->
 
-[ref-nestjs]: http://nestjs.com
-[ref-nestjs-swagger]: https://docs.nestjs.com/openapi/introduction
-[ref-nestjs-swagger-types]: https://docs.nestjs.com/openapi/types-and-parameters
-[ref-prisma]: https://www.prisma.io
-[ref-prisma-mongodb]: https://www.prisma.io/docs/orm/overview/databases/mongodb#commonalities-with-other-database-provider
-[ref-prisma-setup]: https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project#switching-databases
 [ref-mongodb]: https://docs.mongodb.com/
-[ref-redis]: https://redis.io
-[ref-bullmq]: https://bullmq.io
-[ref-nodejs]: https://nodejs.org/
-[ref-typescript]: https://www.typescriptlang.org/
-[ref-docker]: https://docs.docker.com
-[ref-dockercompose]: https://docs.docker.com/compose/
-[ref-pnpm]: https://pnpm.io
-[ref-12factor]: https://12factor.net
-[ref-commander]: https://nest-commander.jaymcdoniel.dev
-[ref-package-json]: package.json
-[ref-jwt]: https://jwt.io
-[ref-jest]: https://jestjs.io/docs/getting-started
-[ref-git]: https://git-scm.com
-[ref-google-console]: https://console.cloud.google.com/
-[ref-google-client-secret]: https://developers.google.com/identity/protocols/oauth2
 
-[ref-doc-root]: ../readme.md
-[ref-doc-activity-log]: activity-log.md
-[ref-doc-authentication]: authentication.md
-[ref-doc-authorization]: authorization.md
-[ref-doc-cache]: cache.md
 [ref-doc-configuration]: configuration.md
 [ref-doc-database]: database.md
 [ref-doc-environment]: environment.md
-[ref-doc-feature-flag]: feature-flag.md
-[ref-doc-file-upload]: file-upload.md
-[ref-doc-handling-error]: handling-error.md
-[ref-doc-installation]: installation.md
-[ref-doc-logger]: logger.md
-[ref-doc-message]: message.md
-[ref-doc-pagination]: pagination.md
-[ref-doc-project-structure]: project-structure.md
-[ref-doc-queue]: queue.md
-[ref-doc-request-validation]: request-validation.md
-[ref-doc-response]: response.md
-[ref-doc-security-and-middleware]: security-and-middleware.md
-[ref-doc-doc]: doc.md
-[ref-doc-third-party-integration]: third-party-integration.md
-[ref-doc-presign]: presign.md
-[ref-doc-term-policy]: term-policy.md
-[ref-doc-two-factor]: two-factor.md
 
 <!-- CONTRIBUTOR -->
-
-[ref-contributor-gzerox]: https://github.com/Gzerox
-[ref-contributor-ak2g]: https://github.com/ak2g

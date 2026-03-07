@@ -81,5 +81,6 @@
         "activityBarBadge.background": "#b72c1f"
     },
     "window.title": "order-booking-backend",
-    "projectColors.mainColor": "#b72c1f"
+    "projectColors.mainColor": "#b72c1f",
+    "cSpell.words": ["fkey", "pkey"]
 }

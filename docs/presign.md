@@ -34,6 +34,7 @@ AWS S3 presigned URLs for downloads enable secure, temporary access to private S
 ### Implementation
 
 **Step 1 - Request DTO:**
+
 ```typescript
 export class UserGetPhotoProfilePresignRequestDto {
   @ApiProperty({
@@ -48,6 +49,7 @@ export class UserGetPhotoProfilePresignRequestDto {
 ```
 
 **Step 2 - Controller Endpoint:**
+
 ```typescript
 @Controller('users')
 export class UserController {
@@ -68,6 +70,7 @@ export class UserController {
 ```
 
 **Step 3 - Service Implementation:**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -100,6 +103,7 @@ export class UserService {
 ```
 
 **Step 4 - Client-Side Download:**
+
 ```typescript
 async function downloadPhotoWithPresign(key: string) {
   try {
@@ -149,6 +153,7 @@ async function downloadPhotoWithPresign(key: string) {
 ```
 
 ### Configuration Options
+
 ```typescript
 interface IAwsS3PresignGetItemOptions {
   access?: EnumAwsS3Accessibility; // public or private
@@ -157,6 +162,7 @@ interface IAwsS3PresignGetItemOptions {
 ```
 
 ### Response Structure
+
 ```typescript
 interface AwsS3PresignDto {
   presignUrl: string;    // The presigned URL for download
@@ -168,6 +174,7 @@ interface AwsS3PresignDto {
 ```
 
 ### Usage Examples
+
 ```typescript
 // Example 1: Generate presign URL for private file (5 minutes)
 const presign = await awsS3Service.presignGetItem(
@@ -193,6 +200,7 @@ const buffer = await response.arrayBuffer();
 ```
 
 ### Flow Diagram
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -246,6 +254,7 @@ AWS S3 presigned URLs enable secure client-side direct uploads to S3 without exp
 ### Implementation
 
 **Step 1 - Request DTO:**
+
 ```typescript
 export class UserGeneratePhotoProfileRequestDto {
   @ApiProperty({
@@ -298,6 +307,7 @@ export class UserUpdateProfilePhotoRequestDto {
 ```
 
 **Step 2 - Controller Endpoints:**
+
 ```typescript
 @Controller('users')
 export class UserController {
@@ -334,6 +344,7 @@ export class UserController {
 ```
 
 **Step 3 - Service Implementation:**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -384,6 +395,7 @@ export class UserService {
 ```
 
 **Step 4 - Client-Side Upload:**
+
 ```typescript
 async function uploadPhotoSimple(file: File) {
   try {
@@ -437,6 +449,7 @@ async function uploadPhotoSimple(file: File) {
 ```
 
 ### Configuration Options
+
 ```typescript
 interface IAwsS3PresignPutItemOptions {
   access?: EnumAwsS3Accessibility; // public or private
@@ -446,6 +459,7 @@ interface IAwsS3PresignPutItemOptions {
 ```
 
 ### Response Structure
+
 ```typescript
 interface AwsS3PresignDto {
   presignUrl: string;    // The presigned URL for upload
@@ -457,6 +471,7 @@ interface AwsS3PresignDto {
 ```
 
 ### Flow Diagram
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -524,97 +539,19 @@ sequenceDiagram
    - Repository updates user profile with S3 file reference
    - Transaction logged with IP address and user agent for audit trail
 
-
 <!-- REFERENCES -->
 
 <!-- BADGE LINKS -->
 
-[ack-contributors-shield]: https://img.shields.io/github/contributors/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-forks-shield]: https://img.shields.io/github/forks/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-stars-shield]: https://img.shields.io/github/stars/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-issues-shield]: https://img.shields.io/github/issues/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-license-shield]: https://img.shields.io/github/license/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[nestjs-shield]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
-[nodejs-shield]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white
-[typescript-shield]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
-[mongodb-shield]: https://img.shields.io/badge/MongoDB-white?style=for-the-badge&logo=mongodb&logoColor=4EA94B
-[jwt-shield]: https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white
-[jest-shield]: https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white
-[pnpm-shield]: https://img.shields.io/badge/pnpm-%232C8EBB.svg?style=for-the-badge&logo=pnpm&logoColor=white&color=F9AD00
-[docker-shield]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[github-shield]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white
-
 <!-- CONTACTS -->
-
-[ref-author-linkedin]: https://linkedin.com/in/andrechristikan
-[ref-author-email]: mailto:andrechristikan@gmail.com
-[ref-author-github]: https://github.com/andrechristikan
-[ref-author-paypal]: https://www.paypal.me/andrechristikan
-[ref-author-kofi]: https://ko-fi.com/andrechristikan
 
 <!-- Repo LINKS -->
 
-[ref-ack]: https://github.com/andrechristikan/ack-nestjs-boilerplate
-[ref-ack-issues]: https://github.com/andrechristikan/ack-nestjs-boilerplate/issues
-[ref-ack-stars]: https://github.com/andrechristikan/ack-nestjs-boilerplate/stargazers
-[ref-ack-forks]: https://github.com/andrechristikan/ack-nestjs-boilerplate/network/members
-[ref-ack-contributors]: https://github.com/andrechristikan/ack-nestjs-boilerplate/graphs/contributors
-[ref-ack-license]: LICENSE.md
-
 <!-- THIRD PARTY -->
 
-[ref-nestjs]: http://nestjs.com
-[ref-nestjs-swagger]: https://docs.nestjs.com/openapi/introduction
-[ref-nestjs-swagger-types]: https://docs.nestjs.com/openapi/types-and-parameters
-[ref-prisma]: https://www.prisma.io
-[ref-prisma-mongodb]: https://www.prisma.io/docs/orm/overview/databases/mongodb#commonalities-with-other-database-provider
-[ref-prisma-setup]: https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project#switching-databases
-[ref-mongodb]: https://docs.mongodb.com/
-[ref-redis]: https://redis.io
-[ref-bullmq]: https://bullmq.io
-[ref-nodejs]: https://nodejs.org/
-[ref-typescript]: https://www.typescriptlang.org/
-[ref-docker]: https://docs.docker.com
-[ref-dockercompose]: https://docs.docker.com/compose/
-[ref-pnpm]: https://pnpm.io
-[ref-12factor]: https://12factor.net
-[ref-commander]: https://nest-commander.jaymcdoniel.dev
-[ref-package-json]: package.json
-[ref-jwt]: https://jwt.io
-[ref-jest]: https://jestjs.io/docs/getting-started
-[ref-git]: https://git-scm.com
-[ref-google-console]: https://console.cloud.google.com/
-[ref-google-client-secret]: https://developers.google.com/identity/protocols/oauth2
-
-[ref-doc-root]: ../readme.md
-[ref-doc-activity-log]: activity-log.md
-[ref-doc-authentication]: authentication.md
-[ref-doc-authorization]: authorization.md
-[ref-doc-cache]: cache.md
-[ref-doc-configuration]: configuration.md
-[ref-doc-database]: database.md
-[ref-doc-environment]: environment.md
-[ref-doc-feature-flag]: feature-flag.md
 [ref-doc-file-upload]: file-upload.md
 [ref-doc-handling-error]: handling-error.md
-[ref-doc-installation]: installation.md
-[ref-doc-logger]: logger.md
 [ref-doc-message]: message.md
-[ref-doc-pagination]: pagination.md
-[ref-doc-project-structure]: project-structure.md
-[ref-doc-queue]: queue.md
-[ref-doc-request-validation]: request-validation.md
-[ref-doc-response]: response.md
-[ref-doc-security-and-middleware]: security-and-middleware.md
 [ref-doc-doc]: doc.md
-[ref-doc-third-party-integration]: third-party-integration.md
-[ref-doc-presign]: presign.md
-[ref-doc-term-policy]: term-policy.md
-[ref-doc-two-factor]: two-factor.md
 
 <!-- CONTRIBUTOR -->
-
-[ref-contributor-gzerox]: https://github.com/Gzerox
-[ref-contributor-ak2g]: https://github.com/ak2g
-

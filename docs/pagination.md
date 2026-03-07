@@ -5,6 +5,7 @@ This documentation explains the features and usage of the **Pagination Module** 
 ## Overview
 
 The Pagination module provides a comprehensive solution for handling paginated data throughout the application. It supports:
+
 - **Offset-based pagination**: Traditional page number and limit approach
 - **Cursor-based pagination**: Efficient traversal using cursor tokens
 - **Advanced filtering**: Enum, equality, date range, and custom filters
@@ -22,45 +23,44 @@ The module uses a pipe-based architecture with factory functions for maximum fle
 
 ## Table of Contents
 
-
 - [Overview](#overview)
 - [Related Documents](#related-documents)
 - [Table of Contents](#table-of-contents)
 - [Module](#module)
-    - [PaginationService](#paginationservice)
-        - [offset<TReturn>()](#offsettreturn)
-        - [cursor<TReturn>()](#cursortreturn)
-    - [Input Validation (Pipes)](#input-validation-pipes)
-    - [Decorators](#decorators)
-        - [Pagination Query Decorators](#pagination-query-decorators)
-            - [@PaginationOffsetQuery](#paginationoffsetquery)
-            - [@PaginationCursorQuery](#paginationcursorquery)
-        - [Filter Decorators](#filter-decorators)
-            - [@PaginationQueryFilterInEnum<T>](#paginationqueryfilterinenumt)
-            - [@PaginationQueryFilterNinEnum<T>](#paginationqueryfilterninenumt)
-            - [@PaginationQueryFilterEqualBoolean](#paginationqueryfilterequalboolean)
-            - [@PaginationQueryFilterEqualNumber](#paginationqueryfilterequalnumber)
-            - [@PaginationQueryFilterEqualString](#paginationqueryfilterequalstring)
-            - [@PaginationQueryFilterNotEqual<T>](#paginationqueryfilternotequalt)
-            - [@PaginationQueryFilterDate](#paginationqueryfilterdate)
-        - [Ordering Decorator](#ordering-decorator)
-            - [@PaginationOrder](#paginationorder)
+  - [PaginationService](#paginationservice)
+    - [offset<TReturn>()](#offsettreturn)
+    - [cursor<TReturn>()](#cursortreturn)
+  - [Input Validation (Pipes)](#input-validation-pipes)
+  - [Decorators](#decorators)
+    - [Pagination Query Decorators](#pagination-query-decorators)
+      - [@PaginationOffsetQuery](#paginationoffsetquery)
+      - [@PaginationCursorQuery](#paginationcursorquery)
+    - [Filter Decorators](#filter-decorators)
+      - [@PaginationQueryFilterInEnum<T>](#paginationqueryfilterinenumt)
+      - [@PaginationQueryFilterNinEnum<T>](#paginationqueryfilterninenumt)
+      - [@PaginationQueryFilterEqualBoolean](#paginationqueryfilterequalboolean)
+      - [@PaginationQueryFilterEqualNumber](#paginationqueryfilterequalnumber)
+      - [@PaginationQueryFilterEqualString](#paginationqueryfilterequalstring)
+      - [@PaginationQueryFilterNotEqual<T>](#paginationqueryfilternotequalt)
+      - [@PaginationQueryFilterDate](#paginationqueryfilterdate)
+    - [Ordering Decorator](#ordering-decorator)
+      - [@PaginationOrder](#paginationorder)
 - [Pagination Strategies](#pagination-strategies)
-    - [Offset-Based](#offset-based)
-    - [Cursor-Based](#cursor-based)
+  - [Offset-Based](#offset-based)
+  - [Cursor-Based](#cursor-based)
 - [Filtering System](#filtering-system)
-    - [Enum Filters](#enum-filters)
-    - [Equality Filters](#equality-filters)
-    - [Date Filters](#date-filters)
+  - [Enum Filters](#enum-filters)
+  - [Equality Filters](#equality-filters)
+  - [Date Filters](#date-filters)
 - [Ordering](#ordering)
 - [Usage Examples](#usage-examples)
-    - [Basic Offset Pagination](#basic-offset-pagination)
-    - [Cursor Pagination](#cursor-pagination)
-    - [With Filters](#with-filters)
-    - [Complete Example](#complete-example)
+  - [Basic Offset Pagination](#basic-offset-pagination)
+  - [Cursor Pagination](#cursor-pagination)
+  - [With Filters](#with-filters)
+  - [Complete Example](#complete-example)
 - [Integration with Doc Module](#integration-with-doc-module)
 - [Implementation Notes](#implementation-notes)
-    - [Performance Considerations](#performance-considerations)
+  - [Performance Considerations](#performance-considerations)
 
 ## Module
 
@@ -82,13 +82,16 @@ async offset<TReturn>(
 ```
 
 **Parameters:**
+
 - `repository`: Repository instance implementing IPaginationRepository
 - `args`: Validated pagination parameters from pipe
 
 **Default Values:**
+
 - `orderBy`: `{ createdAt: 'desc' }` - Sort by creation date descending
 
 **Returns:**
+
 ```typescript
 {
     type: 'offset',
@@ -116,20 +119,24 @@ async cursor<TReturn>(
 ```
 
 **Parameters:**
+
 - `repository`: Repository instance
 - `args`: Validated pagination parameters from pipe
 
 **Default Values:**
+
 - `orderBy`: `{ createdAt: 'desc' }` - Sort by creation date descending
 - `cursorField`: `'id'` - Field used for cursor positioning
 
 **Cursor Validation:**
+
 - Cursor contains: cursor value, orderBy, and where conditions
 - If `orderBy` or `where` conditions change: throws `BadRequestException` (400)
 - Client must request from beginning if conditions change
 - Prevents stale cursor navigation
 
 **Returns:**
+
 ```typescript
 {
     type: 'cursor',
@@ -144,7 +151,8 @@ async cursor<TReturn>(
 ### Input Validation (Pipes)
 
 **Architecture:**
-```
+
+```text
 Client Request
     ↓
 Pipes (Validation & Transformation)
@@ -170,16 +178,19 @@ Service (Business Logic)
 Decorator for offset-based pagination with search and ordering.
 
 **Options:**
+
 - `defaultPerPage`: Items per page (default: 20, max: 100)
 - `availableSearch`: Array of searchable fields
 - `availableOrderBy`: Array of fields available for ordering
 
 **Default Behavior:**
+
 - If no `orderBy`: sorts by `createdAt: DESC`
 - Page defaults to 1
 - PerPage defaults to PaginationDefaultPerPage (20)
 
 **Usage:**
+
 ```typescript
 @PaginationOffsetQuery({
     availableSearch: ['name', 'email'],
@@ -189,6 +200,7 @@ pagination: IPaginationQueryOffsetParams
 ```
 
 **Transformed to:**
+
 ```typescript
 {
     limit: 20,           // from perPage
@@ -205,17 +217,20 @@ pagination: IPaginationQueryOffsetParams
 Decorator for cursor-based pagination.
 
 **Options:**
+
 - `defaultPerPage`: Items per page (default: 20, max: 100)
 - `cursorField`: Field for cursor (default: 'id')
 - `availableSearch`: Array of searchable fields
 - `availableOrderBy`: Array of fields available for ordering
 
 **Default Behavior:**
+
 - If no `orderBy`: sorts by `createdAt: DESC`
 - Cursor is optional (undefined = first page)
 - PerPage defaults to PaginationDefaultPerPage (20)
 
 **Usage:**
+
 ```typescript
 @PaginationCursorQuery({
     availableSearch: ['name', 'email'],
@@ -231,6 +246,7 @@ pagination: IPaginationQueryCursorParams
 Filters by comma-separated enum values using 'in' operator.
 
 **Factory Function:**
+
 ```typescript
 PaginationQueryFilterInEnum<T>(
     field: string,
@@ -240,11 +256,13 @@ PaginationQueryFilterInEnum<T>(
 ```
 
 **Parameters:**
+
 - `field`: Query parameter name
 - `defaultEnum`: Array of valid enum values
 - `options.customField`: Database field name (defaults to field)
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterInEnum(
     'status',
@@ -254,10 +272,12 @@ status?: Record<string, IPaginationIn>
 ```
 
 **Transforms:**
+
 - Query: `?status=ACTIVE,INACTIVE`
 - To: `{ status: { in: ['ACTIVE', 'INACTIVE'] } }`
 
 **Validation:**
+
 - Throws `BadRequestException` (400) if value not in enum
 - Error code: `5021 (filterInvalidValue)`
 
@@ -266,6 +286,7 @@ status?: Record<string, IPaginationIn>
 Filters by comma-separated enum values using 'not in' operator.
 
 **Factory Function:**
+
 ```typescript
 PaginationQueryFilterNinEnum<T>(
     field: string,
@@ -275,6 +296,7 @@ PaginationQueryFilterNinEnum<T>(
 ```
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterNinEnum(
     'status',
@@ -284,6 +306,7 @@ status?: Record<string, IPaginationNin>
 ```
 
 **Transforms:**
+
 - Query: `?status=BANNED,INACTIVE`
 - To: `{ status: { notIn: ['BANNED', 'INACTIVE'] } }`
 
@@ -292,16 +315,19 @@ status?: Record<string, IPaginationNin>
 Filters by boolean value ('true'/'false').
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterEqualBoolean('isActive')
 isActive?: Record<string, IPaginationEqual>
 ```
 
 **Transforms:**
+
 - Query: `?isActive=true`
 - To: `{ isActive: { equals: true } }`
 
 **Validation:**
+
 - Accepts only 'true' or 'false'
 - Throws `BadRequestException` (400) for invalid boolean
 
@@ -310,16 +336,19 @@ isActive?: Record<string, IPaginationEqual>
 Filters by numeric value.
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterEqualNumber('age')
 age?: Record<string, IPaginationEqual>
 ```
 
 **Transforms:**
+
 - Query: `?age=25`
 - To: `{ age: { equals: 25 } }`
 
 **Validation:**
+
 - Parses as float
 - Throws `BadRequestException` (400) for non-numeric value
 
@@ -328,12 +357,14 @@ age?: Record<string, IPaginationEqual>
 Filters by string value.
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterEqualString('role')
 role?: Record<string, IPaginationEqual>
 ```
 
 **Transforms:**
+
 - Query: `?role=admin`
 - To: `{ role: { equals: 'admin' } }`
 
@@ -342,6 +373,7 @@ role?: Record<string, IPaginationEqual>
 Filters by inequality (not equal).
 
 **Factory Function:**
+
 ```typescript
 PaginationQueryFilterNotEqual<T>(
     field: string,
@@ -350,12 +382,14 @@ PaginationQueryFilterNotEqual<T>(
 ```
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterNotEqual('status')
 status?: Record<string, IPaginationNotEqual>
 ```
 
 **Transforms:**
+
 - Query: `?status=inactive`
 - To: `{ status: { not: 'inactive' } }`
 
@@ -366,6 +400,7 @@ status?: Record<string, IPaginationNotEqual>
 Filters by ISO date string with range operations.
 
 **Factory Function:**
+
 ```typescript
 PaginationQueryFilterDate(
     field: string,
@@ -378,6 +413,7 @@ PaginationQueryFilterDate(
 ```
 
 **Parameters:**
+
 - `field`: Query parameter name
 - `options.type`:
   - `START`: Greater than or equal (gte) - use for start date
@@ -386,6 +422,7 @@ PaginationQueryFilterDate(
 - `options.dayOf`: Day adjustment option
 
 **Usage:**
+
 ```typescript
 @PaginationQueryFilterDate('createdAt', {
     type: EnumPaginationFilterDateBetweenType.START
@@ -399,10 +436,12 @@ endDate?: Record<string, IPaginationDate>
 ```
 
 **Transforms:**
+
 - Query: `?startDate=2024-01-01`
 - To: `{ createdAt: { gte: new Date('2024-01-01T00:00:00Z') } }`
 
 **Validation:**
+
 - Accepts ISO format (YYYY-MM-DD, ISO 8601 timestamps)
 - Throws `BadRequestException` (400) for invalid ISO date
 
@@ -413,32 +452,39 @@ endDate?: Record<string, IPaginationDate>
 Decorator for field ordering.
 
 **Factory Function:**
+
 ```typescript
 PaginationOrderPipe(defaultAvailableOrder?: string[]): Type<PipeTransform>
 ```
 
 **Parameters:**
+
 - `defaultAvailableOrder`: Array of fields allowed for ordering
 
 **Default Behavior:**
+
 - If no `orderBy`: sorts by `createdAt: DESC`
 - If `orderBy` not in allowed fields: throws `BadRequestException` (400)
 
 **Usage:**
+
 ```typescript
 @PaginationOrder(['createdAt', 'name', 'email'])
 order?: IPaginationOrderBy
 ```
 
 **Query Parameters:**
+
 - `orderBy`: Field name (must be in allowed list)
 - `orderDirection`: 'asc' or 'desc'
 
 **Transforms:**
+
 - Query: `?orderBy=name&orderDirection=asc`
 - To: `{ name: 'asc' }`
 
 **Validation:**
+
 - Field must be in allowed list
 - Throws error code: `5020 (orderByNotAllowed)`
 
@@ -447,18 +493,21 @@ order?: IPaginationOrderBy
 ### Offset-Based
 
 **Characteristics:**
+
 - Returns total count
 - Slower with large offsets
 - Predictable page numbers
 - Affected by inserts/deletes during pagination
 
 **Constraints:**
+
 - Max page: 20
 - Max perPage: 100
 - Min page: 1
 - Min perPage: 1
 
 **Response Example:**
+
 ```json
 {
     "type": "offset",
@@ -476,12 +525,14 @@ order?: IPaginationOrderBy
 ### Cursor-Based
 
 **How It Works:**
+
 1. Cursor encodes: cursor value, orderBy, where conditions
 2. Cursor validates conditions match on each request
 3. If conditions change: throws error (client must restart)
 4. Prevents navigation with stale conditions
 
 **Characteristics:**
+
 - Cursor-based navigation (no page numbers)
 - Consistent performance (indexed cursor field)
 - Optional count (requests only if needed)
@@ -489,12 +540,14 @@ order?: IPaginationOrderBy
 - MongoDB ObjectID timestamps prevent duplicates
 
 **Constraints:**
+
 - Max cursor length: 256 characters
 - Cursor format: URL-safe base64 (A-Za-z0-9_-)
 - Max perPage: 100
 - Min perPage: 1
 
 **Response Example:**
+
 ```json
 {
     "type": "cursor",
@@ -525,6 +578,7 @@ return this.paginationService.offset(repository, {
 ### Enum Filters
 
 **In (inclusion):**
+
 ```typescript
 @PaginationQueryFilterInEnum('status', [ACTIVE, INACTIVE])
 status?: Record<string, IPaginationIn>
@@ -534,6 +588,7 @@ status?: Record<string, IPaginationIn>
 ```
 
 **Nin (exclusion):**
+
 ```typescript
 @PaginationQueryFilterNinEnum('status', [BANNED, DELETED])
 status?: Record<string, IPaginationNin>
@@ -545,6 +600,7 @@ status?: Record<string, IPaginationNin>
 ### Equality Filters
 
 **Boolean:**
+
 ```typescript
 @PaginationQueryFilterEqualBoolean('isActive')
 isActive?: Record<string, IPaginationEqual>
@@ -554,6 +610,7 @@ isActive?: Record<string, IPaginationEqual>
 ```
 
 **Number:**
+
 ```typescript
 @PaginationQueryFilterEqualNumber('age')
 age?: Record<string, IPaginationEqual>
@@ -563,6 +620,7 @@ age?: Record<string, IPaginationEqual>
 ```
 
 **String:**
+
 ```typescript
 @PaginationQueryFilterEqualString('role')
 role?: Record<string, IPaginationEqual>
@@ -572,6 +630,7 @@ role?: Record<string, IPaginationEqual>
 ```
 
 **Not Equal:**
+
 ```typescript
 @PaginationQueryFilterNotEqual('country')
 country?: Record<string, IPaginationNotEqual>
@@ -583,6 +642,7 @@ country?: Record<string, IPaginationNotEqual>
 ### Date Filters
 
 **Date Range:**
+
 ```typescript
 @PaginationQueryFilterDate('createdAt', {
     type: EnumPaginationFilterDateBetweenType.START
@@ -601,16 +661,19 @@ endDate?: Record<string, IPaginationDate>
 ## Ordering
 
 **Default Behavior:**
+
 - Field: `createdAt`
 - Direction: `desc` (descending)
 
 **Query Parameters:**
-```
+
+```bash
 ?orderBy=name&orderDirection=asc
 ```
 
 **Field Whitelist:**
 Must be specified in decorator to prevent SQL injection:
+
 ```typescript
 @PaginationOrder(['createdAt', 'name', 'email'])
 ```
@@ -620,6 +683,7 @@ Must be specified in decorator to prevent SQL injection:
 ### Basic Offset Pagination
 
 **Controller:**
+
 ```typescript
 @Get('/users')
 @ResponsePaging('user.list')
@@ -635,6 +699,7 @@ async listUsers(
 ```
 
 **Service:**
+
 ```typescript
 async getListOffset(
     pagination: IPaginationQueryOffsetParams
@@ -649,6 +714,7 @@ async getListOffset(
 ```
 
 **Repository:**
+
 ```typescript
 async findWithPaginationOffset(
     pagination: IPaginationQueryOffsetParams
@@ -668,13 +734,15 @@ async findWithPaginationOffset(
 ```
 
 **API Request:**
-```
+
+```bash
 GET /users?page=1&perPage=20&search=john&orderBy=name&orderDirection=asc
 ```
 
 ### Cursor Pagination
 
 **Controller:**
+
 ```typescript
 @Get('/users')
 @ResponsePaging('user.list')
@@ -690,6 +758,7 @@ async listUsers(
 ```
 
 **Service:**
+
 ```typescript
 async getListCursor(
     pagination: IPaginationQueryCursorParams
@@ -704,6 +773,7 @@ async getListCursor(
 ```
 
 **Repository:**
+
 ```typescript
 async findWithPaginationCursor(
     pagination: IPaginationQueryCursorParams
@@ -723,7 +793,8 @@ async findWithPaginationCursor(
 ```
 
 **API Requests:**
-```
+
+```bash
 # First page
 GET /users?perPage=20&orderBy=name&orderDirection=asc
 
@@ -734,6 +805,7 @@ GET /users?cursor=eyJjdXJzb3I6IjEyMyIsIm9yZGVyQnkiOnsibmFtZSI6ImFzYyJ9fQ==&perPa
 ### With Filters
 
 **Controller:**
+
 ```typescript
 @Get('/users')
 @ResponsePaging('user.list')
@@ -768,6 +840,7 @@ async listUsers(
 ```
 
 **Service:**
+
 ```typescript
 async getListOffset(
     pagination: IPaginationQueryOffsetParams,
@@ -792,6 +865,7 @@ async getListOffset(
 ```
 
 **Repository:**
+
 ```typescript
 async findWithPaginationOffset(
     { where, ...pagination }: IPaginationQueryOffsetParams,
@@ -819,13 +893,15 @@ async findWithPaginationOffset(
 ```
 
 **API Request:**
-```
+
+```bash
 GET /users?page=1&perPage=20&status=ACTIVE,INACTIVE&role=admin&isActive=true&createdAt=2024-01-01
 ```
 
 ### Complete Example
 
 **Controller with all features:**
+
 ```typescript
 @ApiTags('modules.admin.user')
 @Controller({
@@ -890,6 +966,7 @@ export class UserAdminController {
 The Pagination module integrates with the [Doc module][ref-doc-doc] for automatic API documentation.
 
 **Example:**
+
 ```typescript
 @DocResponsePaging<UserListResponseDto>('user.list', {
     dto: UserListResponseDto,
@@ -909,6 +986,7 @@ async list(
 ```
 
 The `@DocResponsePaging` decorator automatically:
+
 - Documents paginated response structure
 - Adds standard pagination query parameters
 - Documents search parameter when provided
@@ -922,109 +1000,32 @@ For detailed Doc module documentation, see [Doc module documentation][ref-doc-do
 ### Performance Considerations
 
 **Offset Pagination:**
+
 - Use for small datasets (< 10,000 items)
 - Avoid large page numbers
 - Slower with large offsets (DB must skip rows)
 - Use when total count is important
 
 **Cursor Pagination:**
+
 - Better for large datasets
 - Consistent performance (indexed lookup)
 - Use for infinite scroll
 - Avoids N+1 count queries
 
-
-
 <!-- REFERENCES -->
 
 <!-- BADGE LINKS -->
 
-[ack-contributors-shield]: https://img.shields.io/github/contributors/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-forks-shield]: https://img.shields.io/github/forks/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-stars-shield]: https://img.shields.io/github/stars/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-issues-shield]: https://img.shields.io/github/issues/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-license-shield]: https://img.shields.io/github/license/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[nestjs-shield]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
-[nodejs-shield]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white
-[typescript-shield]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
-[mongodb-shield]: https://img.shields.io/badge/MongoDB-white?style=for-the-badge&logo=mongodb&logoColor=4EA94B
-[jwt-shield]: https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white
-[jest-shield]: https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white
-[pnpm-shield]: https://img.shields.io/badge/pnpm-%232C8EBB.svg?style=for-the-badge&logo=pnpm&logoColor=white&color=F9AD00
-[docker-shield]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[github-shield]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white
-
 <!-- CONTACTS -->
-
-[ref-author-linkedin]: https://linkedin.com/in/andrechristikan
-[ref-author-email]: mailto:andrechristikan@gmail.com
-[ref-author-github]: https://github.com/andrechristikan
-[ref-author-paypal]: https://www.paypal.me/andrechristikan
-[ref-author-kofi]: https://ko-fi.com/andrechristikan
 
 <!-- Repo LINKS -->
 
-[ref-ack]: https://github.com/andrechristikan/ack-nestjs-boilerplate
-[ref-ack-issues]: https://github.com/andrechristikan/ack-nestjs-boilerplate/issues
-[ref-ack-stars]: https://github.com/andrechristikan/ack-nestjs-boilerplate/stargazers
-[ref-ack-forks]: https://github.com/andrechristikan/ack-nestjs-boilerplate/network/members
-[ref-ack-contributors]: https://github.com/andrechristikan/ack-nestjs-boilerplate/graphs/contributors
-[ref-ack-license]: LICENSE.md
-
 <!-- THIRD PARTY -->
 
-[ref-nestjs]: http://nestjs.com
-[ref-nestjs-swagger]: https://docs.nestjs.com/openapi/introduction
-[ref-nestjs-swagger-types]: https://docs.nestjs.com/openapi/types-and-parameters
-[ref-nestjs-i18n]: https://nestjs-i18n.com
-[ref-prisma]: https://www.prisma.io
-[ref-prisma-mongodb]: https://www.prisma.io/docs/orm/overview/databases/mongodb#commonalities-with-other-database-provider
-[ref-prisma-setup]: https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project#switching-databases
-[ref-mongodb]: https://docs.mongodb.com/
-[ref-redis]: https://redis.io
-[ref-bullmq]: https://bullmq.io
-[ref-nodejs]: https://nodejs.org/
-[ref-typescript]: https://www.typescriptlang.org/
-[ref-docker]: https://docs.docker.com
-[ref-dockercompose]: https://docs.docker.com/compose/
-[ref-pnpm]: https://pnpm.io
-[ref-12factor]: https://12factor.net
-[ref-commander]: https://nest-commander.jaymcdoniel.dev
-[ref-package-json]: package.json
-[ref-jwt]: https://jwt.io
-[ref-jest]: https://jestjs.io/docs/getting-started
-[ref-git]: https://git-scm.com
-[ref-google-console]: https://console.cloud.google.com/
-[ref-google-client-secret]: https://developers.google.com/identity/protocols/oauth2
-
-[ref-doc-root]: ../readme.md
-[ref-doc-activity-log]: activity-log.md
-[ref-doc-authentication]: authentication.md
-[ref-doc-authorization]: authorization.md
-[ref-doc-cache]: cache.md
-[ref-doc-configuration]: configuration.md
 [ref-doc-database]: database.md
-[ref-doc-environment]: environment.md
-[ref-doc-feature-flag]: feature-flag.md
-[ref-doc-file-upload]: file-upload.md
-[ref-doc-handling-error]: handling-error.md
-[ref-doc-installation]: installation.md
-[ref-doc-logger]: logger.md
-[ref-doc-message]: message.md
-[ref-doc-pagination]: pagination.md
-[ref-doc-project-structure]: project-structure.md
-[ref-doc-queue]: queue.md
 [ref-doc-request-validation]: request-validation.md
 [ref-doc-response]: response.md
-[ref-doc-security-and-middleware]: security-and-middleware.md
 [ref-doc-doc]: doc.md
-[ref-doc-third-party-integration]: third-party-integration.md
-[ref-doc-presign]: presign.md
-[ref-doc-term-policy]: term-policy.md
-[ref-doc-two-factor]: two-factor.md
 
 <!-- CONTRIBUTOR -->
-
-[ref-contributor-gzerox]: https://github.com/Gzerox
-[ref-contributor-ak2g]: https://github.com/ak2g

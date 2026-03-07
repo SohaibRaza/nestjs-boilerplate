@@ -1,6 +1,7 @@
 # Authorization Documentation
 
-This documentation explains the features and usage of: 
+This documentation explains the features and usage of:
+
 - **UserProtected**: Located at `src/modules/user/decorators`
 - **RoleProtected**: Located at `src/modules/role/decorators`
 - **PolicyAbilityProtected**: Located at `src/modules/policy/decorators`
@@ -18,7 +19,7 @@ The system is built using NestJS guards and decorators, making it easy to apply 
 - [Environment Documentation][ref-doc-environment] - For Redis environment variables
 - [Authentication Documentation][ref-doc-authentication] - For understand authentication system
 - [Activity Log Documentation][ref-doc-activity-log] - For tracking authorization-related user activities
-- [Term Policy Document][ref-doc-term-policy] - For managing user acceptance of terms and policies 
+- [Term Policy Document][ref-doc-term-policy] - For managing user acceptance of terms and policies
 
 ## Table of Contents
 
@@ -69,6 +70,7 @@ The system is built using NestJS guards and decorators, making it easy to apply 
 **Method decorator** that applies `UserGuard` to route handlers.
 
 **Parameters:**
+
 - `isVerified` (boolean, optional): Whether to require email verification. Default: `true`
 
 **Usage:**
@@ -174,9 +176,11 @@ flowchart TD
 **Method decorator** that applies `RoleGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredRoles` (EnumRoleType[]): One or more role types required to access the route
 
 **Available Role Types:**
+
 - `EnumRoleType.superAdmin` - Super administrator with unrestricted access
 - `EnumRoleType.admin` - Administrator role
 - `EnumRoleType.user` - Standard user role
@@ -271,7 +275,6 @@ flowchart TD
 - Incorrect ordering will result in runtime errors
 - Users with `superAdmin` role type have unrestricted access to all `@RoleProtected` routes, regardless of the specified required roles. The guard returns an empty abilities array for super admins, as they bypass ability checks.
 
-
 ## Policy Ability Protected
 
 `PolicyAbilityProtected` implements fine-grained, permission-based access control using CASL (an isomorphic authorization library). It allows you to define specific actions (read, create, update, delete, manage) that users can perform on specific subjects (resources like users, roles, settings, etc.).
@@ -283,9 +286,11 @@ flowchart TD
 **Method decorator** that applies `PolicyAbilityGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredAbilities` (RoleAbilityRequestDto[]): One or more policy ability objects defining required permissions
 
 **Available Policy Actions:**
+
 - `EnumPolicyAction.manage` - Full control over a subject
 - `EnumPolicyAction.read` - Read/view permission
 - `EnumPolicyAction.create` - Create new resources
@@ -293,6 +298,7 @@ flowchart TD
 - `EnumPolicyAction.delete` - Remove resources
 
 **Available Policy Subjects:**
+
 - `EnumPolicySubject.all` - All resources
 - `EnumPolicySubject.apiKey` - API key management
 - `EnumPolicySubject.role` - Role management
@@ -432,9 +438,11 @@ For more detailed information about term policies, see [Term Policy Document][re
 **Method decorator** that applies `TermPolicyGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredTermPolicies` (EnumTermPolicyType[], optional): One or more term policy types that must be accepted. If not provided, defaults to `termsOfService` and `privacy`
 
 **Available Term Policy Types:**
+
 - `EnumTermPolicyType.termsOfService` - Terms of Service acceptance
 - `EnumTermPolicyType.privacy` - Privacy Policy acceptance
 - `EnumTermPolicyType.cookies` - Cookies Policy acceptance
@@ -576,10 +584,12 @@ Custom roles are created through the admin role management endpoints. The API do
 **Ability Structure:**
 
 Each ability consists of:
+
 - **subject**: The resource type (e.g., user, role, apiKey, session, termPolicy, activityLog)
 - **action**: Array of allowed actions (manage, read, create, update, delete)
 
 **Available subjects and actions are defined in:**
+
 - `EnumPolicySubject`: all, apiKey, role, user, session, activityLog, passwordHistory, termPolicy, futureFlag
 - `EnumPolicyAction`: manage, read, create, update, delete
 
@@ -612,97 +622,24 @@ flowchart LR
 - **Role names must be unique** - You cannot create two roles with the same name
 - **Roles cannot be deleted if in use** - You must first reassign users to different roles before deleting
 
-
 <!-- REFERENCES -->
 
 <!-- BADGE LINKS -->
 
-[ack-contributors-shield]: https://img.shields.io/github/contributors/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-forks-shield]: https://img.shields.io/github/forks/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-stars-shield]: https://img.shields.io/github/stars/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-issues-shield]: https://img.shields.io/github/issues/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-license-shield]: https://img.shields.io/github/license/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[nestjs-shield]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
-[nodejs-shield]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white
-[typescript-shield]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
-[mongodb-shield]: https://img.shields.io/badge/MongoDB-white?style=for-the-badge&logo=mongodb&logoColor=4EA94B
-[jwt-shield]: https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white
-[jest-shield]: https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white
-[pnpm-shield]: https://img.shields.io/badge/pnpm-%232C8EBB.svg?style=for-the-badge&logo=pnpm&logoColor=white&color=F9AD00
-[docker-shield]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[github-shield]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white
-
 <!-- CONTACTS -->
 
-[ref-author-linkedin]: https://linkedin.com/in/andrechristikan
-[ref-author-email]: mailto:andrechristikan@gmail.com
-[ref-author-github]: https://github.com/andrechristikan
-[ref-author-paypal]: https://www.paypal.me/andrechristikan
-[ref-author-kofi]: https://ko-fi.com/andrechristikan
-
 <!-- Repo LINKS -->
-
-[ref-ack]: https://github.com/andrechristikan/ack-nestjs-boilerplate
-[ref-ack-issues]: https://github.com/andrechristikan/ack-nestjs-boilerplate/issues
-[ref-ack-stars]: https://github.com/andrechristikan/ack-nestjs-boilerplate/stargazers
-[ref-ack-forks]: https://github.com/andrechristikan/ack-nestjs-boilerplate/network/members
-[ref-ack-contributors]: https://github.com/andrechristikan/ack-nestjs-boilerplate/graphs/contributors
-[ref-ack-license]: LICENSE.md
 
 <!-- THIRD PARTY -->
 
 [casl]: https://casl.js.org/
-[ref-nestjs-swagger]: https://docs.nestjs.com/openapi/introduction
-[ref-nestjs-swagger-types]: https://docs.nestjs.com/openapi/types-and-parameters
-[ref-nestjs]: http://nestjs.com
-[ref-prisma]: https://www.prisma.io
-[ref-mongodb]: https://docs.mongodb.com/
-[ref-redis]: https://redis.io
-[ref-bullmq]: https://bullmq.io
-[ref-nodejs]: https://nodejs.org/
-[ref-typescript]: https://www.typescriptlang.org/
-[ref-docker]: https://docs.docker.com
-[ref-dockercompose]: https://docs.docker.com/compose/
-[ref-pnpm]: https://pnpm.io
-[ref-12factor]: https://12factor.net
-[ref-commander]: https://nest-commander.jaymcdoniel.dev
-[ref-package-json]: package.json
-[ref-jwt]: https://jwt.io
-[ref-jest]: https://jestjs.io/docs/getting-started
-[ref-git]: https://git-scm.com
-[ref-google-console]: https://console.cloud.google.com/
-[ref-google-client-secret]: https://developers.google.com/identity/protocols/oauth2
 
 <!-- DOCUMENTS -->
 
-[ref-doc-root]: ../readme.md
 [ref-doc-activity-log]: activity-log.md
 [ref-doc-authentication]: authentication.md
-[ref-doc-authorization]: authorization.md
-[ref-doc-cache]: cache.md
 [ref-doc-configuration]: configuration.md
-[ref-doc-database]: database.md
 [ref-doc-environment]: environment.md
-[ref-doc-feature-flag]: feature-flag.md
-[ref-doc-file-upload]: file-upload.md
-[ref-doc-handling-error]: handling-error.md
-[ref-doc-installation]: installation.md
-[ref-doc-logger]: logger.md
-[ref-doc-message]: message.md
-[ref-doc-pagination]: pagination.md
-[ref-doc-project-structure]: project-structure.md
-[ref-doc-queue]: queue.md
-[ref-doc-request-validation]: request-validation.md
-[ref-doc-response]: response.md
-[ref-doc-security-and-middleware]: security-and-middleware.md
-[ref-doc-doc]: doc.md
-[ref-doc-third-party-integration]: third-party-integration.md
-[ref-doc-presign]: presign.md
 [ref-doc-term-policy]: term-policy.md
-[ref-doc-two-factor]: two-factor.md
 
 <!-- CONTRIBUTOR -->
-
-[ref-contributor-gzerox]: https://github.com/Gzerox
-[ref-contributor-ak2g]: https://github.com/ak2g

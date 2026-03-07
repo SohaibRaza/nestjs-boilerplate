@@ -1,15 +1,17 @@
 # Authentication Documentation
 
 This documentation explains the features and usage of:
+
 - **Authentication Module**: Located at `src/modules/auth`
 - **Session Module**: Located at `src/modules/session`
 - **ApiKey Module**: Located at `src/modules/api-key`
 
 ## Overview
 
-This document provides a comprehensive overview of authentication and session management in the ACK NestJS Boilerplate. 
+This document provides a comprehensive overview of authentication and session management in the ACK NestJS Boilerplate.
 
 It covers:
+
 - **Password**: Passwords are securely hashed (bcrypt), have configurable expiration and rotation, login attempt limits, history tracking, and support for reset/change/temporary password with session invalidation.
 - **JWT Authentication**: Stateless authentication using access and refresh tokens with ES256/ES512 algorithms, configurable expiration, and security mechanisms such as JWT ID (jti) validation for session tracking.
 - **Session Management**: Dual storage strategy using Redis for high-performance validation and automatic expiration, and database for session listing, management, and audit trail. Sessions are validated on every API request via jti matching and can be revoked instantly.
@@ -29,56 +31,56 @@ Configuration for tokens, sessions, password, social providers, and API keys is 
 - [Overview](#overview)
 - [Related Documents](#related-documents)
 - [Password](#password)
-    - [Password Configuration](#password-configuration)
-    - [Password Flow](#password-flow)
+  - [Password Configuration](#password-configuration)
+  - [Password Flow](#password-flow)
 - [JWT Authentication](#jwt-authentication)
-    - [JWT Configuration](#jwt-configuration)
-    - [JWT Flow](#jwt-flow)
-        - [JWT Access Token Flow](#jwt-access-token-flow)
-        - [JWT Refresh Token Flow](#jwt-refresh-token-flow)
-    - [JWT Tokens](#jwt-tokens)
-        - [JWT Access Token](#jwt-access-token)
-        - [JWT Refresh Token](#jwt-refresh-token)
-    - [JWT Payload Structure](#jwt-payload-structure)
-        - [JWT Access Token Payload](#jwt-access-token-payload)
-        - [JWT Refresh Token Payload](#jwt-refresh-token-payload)
-    - [Usage](#usage)
-        - [Protecting Endpoints](#protecting-endpoints)
-        - [Getting JWT Payload](#getting-jwt-payload)
-        - [Getting Raw Token](#getting-raw-token)
-    - [Security: JWT ID (jti)](#security-jwt-id-jti)
-        - [How it Works](#how-it-works)
+  - [JWT Configuration](#jwt-configuration)
+  - [JWT Flow](#jwt-flow)
+    - [JWT Access Token Flow](#jwt-access-token-flow)
+    - [JWT Refresh Token Flow](#jwt-refresh-token-flow)
+  - [JWT Tokens](#jwt-tokens)
+    - [JWT Access Token](#jwt-access-token)
+    - [JWT Refresh Token](#jwt-refresh-token)
+  - [JWT Payload Structure](#jwt-payload-structure)
+    - [JWT Access Token Payload](#jwt-access-token-payload)
+    - [JWT Refresh Token Payload](#jwt-refresh-token-payload)
+  - [Usage](#usage)
+    - [Protecting Endpoints](#protecting-endpoints)
+    - [Getting JWT Payload](#getting-jwt-payload)
+    - [Getting Raw Token](#getting-raw-token)
+  - [Security: JWT ID (jti)](#security-jwt-id-jti)
+    - [How it Works](#how-it-works)
 - [Social Authentication](#social-authentication)
-    - [Social Authentication Flow](#social-authentication-flow)
-    - [Google Authentication](#google-authentication)
-        - [Configuration](#configuration)
-        - [Setup Google OAuth 2.0](#setup-google-oauth-20)
-        - [Usage](#usage-1)
-    - [Apple Authentication](#apple-authentication)
-        - [Configuration](#configuration-1)
-        - [Setup Apple Sign In](#setup-apple-sign-in)
-        - [Usage](#usage-2)
+  - [Social Authentication Flow](#social-authentication-flow)
+  - [Google Authentication](#google-authentication)
+    - [Configuration](#configuration)
+    - [Setup Google OAuth 2.0](#setup-google-oauth-20)
+    - [Usage](#usage-1)
+  - [Apple Authentication](#apple-authentication)
+    - [Configuration](#configuration-1)
+    - [Setup Apple Sign In](#setup-apple-sign-in)
+    - [Usage](#usage-2)
 - [Two-Factor Authentication (TOTP)](#two-factor-authentication-totp)
-    - [Configuration](#configuration-2)
-    - [Flow](#flow)
+  - [Configuration](#configuration-2)
+  - [Flow](#flow)
 - [API Key Authentication](#api-key-authentication)
-    - [Configuration](#configuration-3)
-    - [API Key Types](#api-key-types)
-        - [Default API Key](#default-api-key)
-        - [System API Key](#system-api-key)
-    - [Request Format](#request-format)
-    - [Usage](#usage-3)
-        - [Protecting Endpoints](#protecting-endpoints-1)
-        - [Getting API Key Payload](#getting-api-key-payload)
-    - [API Key Authentication Flow](#api-key-authentication-flow)
+  - [Configuration](#configuration-3)
+  - [API Key Types](#api-key-types)
+    - [Default API Key](#default-api-key)
+    - [System API Key](#system-api-key)
+  - [Request Format](#request-format)
+  - [Usage](#usage-3)
+    - [Protecting Endpoints](#protecting-endpoints-1)
+    - [Getting API Key Payload](#getting-api-key-payload)
+  - [API Key Authentication Flow](#api-key-authentication-flow)
 - [Session Management](#session-management)
-    - [Session Storage](#session-storage)
-        - [Redis (Primary - Validation)](#redis-primary---validation)
-        - [Database (Secondary - Management)](#database-secondary---management)
-        - [How They Work Together](#how-they-work-together)
-    - [Session Lifecycle](#session-lifecycle)
-    - [Session Validation Flow](#session-validation-flow)
-    - [What Happens on Revocation](#what-happens-on-revocation)
+  - [Session Storage](#session-storage)
+    - [Redis (Primary - Validation)](#redis-primary---validation)
+    - [Database (Secondary - Management)](#database-secondary---management)
+    - [How They Work Together](#how-they-work-together)
+  - [Session Lifecycle](#session-lifecycle)
+  - [Session Validation Flow](#session-validation-flow)
+  - [What Happens on Revocation](#what-happens-on-revocation)
 
 ## Password
 
@@ -340,7 +342,7 @@ sequenceDiagram
 
 #### JWT Access Token
 
-A short-lived token used to authenticate API requests. 
+A short-lived token used to authenticate API requests.
 
 - **Algorithm**: ES256 (ECDSA using P-256 and SHA-256)
 - **Validity**: Configured in `auth.config.ts` (default: 1 hour)
@@ -537,6 +539,7 @@ A unique identifier (32-character random string) generated during login and toke
 Social authentication allows users to sign in using their Google or Apple accounts. The backend validates the OAuth tokens provided by the client and extracts user information to create a session, similar to credential-based authentication.
 
 **Supported Providers:**
+
 - Google OAuth 2.0
 - Apple Sign In
 
@@ -630,6 +633,7 @@ export default registerAs(
 ```
 
 **Environment Variables:**
+
 - `AUTH_SOCIAL_GOOGLE_CLIENT_ID`: Google OAuth 2.0 client ID
 - `AUTH_SOCIAL_GOOGLE_CLIENT_SECRET`: Google OAuth 2.0 client secret
 
@@ -683,6 +687,7 @@ export default registerAs(
 ```
 
 **Environment Variables:**
+
 - `AUTH_SOCIAL_APPLE_CLIENT_ID`: Apple service ID
 - `AUTH_SOCIAL_APPLE_SIGN_IN_CLIENT_ID`: Apple sign-in client ID
 
@@ -742,6 +747,7 @@ See [Two-Factor Documentation][ref-doc-two-factor] for detailed.
 API Key authentication provides a simple, stateless authentication mechanism for machine-to-machine communication and system integrations. Unlike JWT tokens, API keys don't require session management and are validated directly against the database/cache.
 
 **Use Cases:**
+
 - External system integrations
 - Webhook endpoints
 - System-to-system communication
@@ -765,6 +771,7 @@ export default registerAs(
 ```
 
 **Configuration Options:**
+
 - `header`: Header name for API key (`x-api-key`)
 - `cachePrefixKey`: Redis cache prefix for API key caching
 
@@ -775,6 +782,7 @@ export default registerAs(
 Default API keys are used for standard external integrations and third-party access.
 
 **Characteristics:**
+
 - Type: `EnumApiKeyType.default`
 - Purpose: General-purpose API access
 - Use Case: External clients, third-party integrations
@@ -782,11 +790,13 @@ Default API keys are used for standard external integrations and third-party acc
 - Cache: Cached in Redis for performance
 
 **Guard Decorator:**
+
 ```typescript
 @ApiKeyProtected()
 ```
 
 **Example Usage:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/api/external/data')
@@ -800,6 +810,7 @@ async getExternalData(@ApiKeyPayload() apiKey: ApiKey) {
 System API keys are used for internal system operations that bypass standard authentication.
 
 **Characteristics:**
+
 - Type: `EnumApiKeyType.system`
 - Purpose: System-level operations
 - Use Case: Internal services, background jobs, system maintenance
@@ -807,11 +818,13 @@ System API keys are used for internal system operations that bypass standard aut
 - Cache: Cached in Redis for performance
 
 **Guard Decorator:**
+
 ```typescript
 @ApiKeySystemProtected()
 ```
 
 **Example Usage:**
+
 ```typescript
 @ApiKeySystemProtected()
 @Post('/api/system/maintenance')
@@ -827,11 +840,13 @@ async runMaintenance(@ApiKeyPayload() apiKey: ApiKey) {
 API keys are sent via the `x-api-key` header with the format `${key}:${secret}`:
 
 **Header Format:**
-```
+
+```text
 x-api-key: ${key}:${secret}
 ```
 
 **Format Rules:**
+
 - Pattern: `key:secret`
 - Separator: Colon (`:`)
 - Both key and secret are required
@@ -879,6 +894,7 @@ async runMaintenance(@ApiKeyPayload() apiKey: ApiKey) {
 Access the full API key data using `@ApiKeyPayload()` decorator:
 
 **Full Payload:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/resource')
@@ -894,6 +910,7 @@ async getResource(@ApiKeyPayload() apiKey: ApiKey) {
 ```
 
 **Specific Fields:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/resource')
@@ -971,6 +988,7 @@ sequenceDiagram
 Session management handles user authentication sessions across multiple devices and locations. It provides visibility and control over active sessions, allowing users and administrators to monitor and revoke access as needed.
 
 This implementation uses a **dual storage strategy**:
+
 - **Redis**: High-performance session validation and automatic expiration
 - **Database**: Session listing, management, and audit trail
 
@@ -983,6 +1001,7 @@ Used for high-speed session validation for **both access and refresh tokens**.
 **Critical Behavior**: Every API call with an access token will check Redis. If the session is not found in Redis or the jti doesn't match, the request is rejected immediately, even if the token signature is valid.
 
 **Data Stored:**
+
 ```typescript
 {
     sessionId: string;
@@ -993,17 +1012,20 @@ Used for high-speed session validation for **both access and refresh tokens**.
 ```
 
 **Redis Key Pattern:**
-```
+
+```text
 User:{userId}:Session:{sessionId}
 ```
 
 **TTL Behavior:**
+
 - Initial TTL: Follows refresh token expiration from `auth.config.ts` (default: 30 days)
 - TTL Source: `AUTH_JWT_REFRESH_TOKEN_EXPIRED` environment variable
 - TTL Behavior: **NOT extended** on token refresh - remains at initial value from login
 - Auto Cleanup: Expired sessions are automatically removed by Redis when TTL expires
 
 **Example:**
+
 - If `AUTH_JWT_REFRESH_TOKEN_EXPIRED=30d`, Redis TTL = 30 days
 - If `AUTH_JWT_REFRESH_TOKEN_EXPIRED=7d`, Redis TTL = 7 days
 - Token refresh updates jti but does NOT reset the TTL
@@ -1013,12 +1035,14 @@ User:{userId}:Session:{sessionId}
 Used for session listing and management purposes.
 
 **When Updated:**
+
 - Created during login with initial jti
 - Updated when session jti is rotated during token refresh
 - Updated when session is revoked
 - Can be queried to show user's active sessions across devices
 
 **Not Used For:**
+
 - Token validation (Redis handles this via jti matching)
 - Real-time validation during API requests
 
@@ -1152,91 +1176,24 @@ Special thanks to [Gzerox][ref-contributor-gzerox] for providing the idea and co
 
 <!-- BADGE LINKS -->
 
-[ack-contributors-shield]: https://img.shields.io/github/contributors/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-forks-shield]: https://img.shields.io/github/forks/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-stars-shield]: https://img.shields.io/github/stars/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-issues-shield]: https://img.shields.io/github/issues/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[ack-license-shield]: https://img.shields.io/github/license/andrechristikan/ack-nestjs-boilerplate?style=for-the-badge
-[nestjs-shield]: https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white
-[nodejs-shield]: https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white
-[typescript-shield]: https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white
-[mongodb-shield]: https://img.shields.io/badge/MongoDB-white?style=for-the-badge&logo=mongodb&logoColor=4EA94B
-[jwt-shield]: https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white
-[jest-shield]: https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white
-[pnpm-shield]: https://img.shields.io/badge/pnpm-%232C8EBB.svg?style=for-the-badge&logo=pnpm&logoColor=white&color=F9AD00
-[docker-shield]: https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white
-[github-shield]: https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white
-[linkedin-shield]: https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white
-
 <!-- CONTACTS -->
-
-[ref-author-linkedin]: https://linkedin.com/in/andrechristikan
-[ref-author-email]: mailto:andrechristikan@gmail.com
-[ref-author-github]: https://github.com/andrechristikan
-[ref-author-paypal]: https://www.paypal.me/andrechristikan
-[ref-author-kofi]: https://ko-fi.com/andrechristikan
 
 <!-- Repo LINKS -->
 
-[ref-ack]: https://github.com/andrechristikan/ack-nestjs-boilerplate
-[ref-ack-issues]: https://github.com/andrechristikan/ack-nestjs-boilerplate/issues
-[ref-ack-stars]: https://github.com/andrechristikan/ack-nestjs-boilerplate/stargazers
-[ref-ack-forks]: https://github.com/andrechristikan/ack-nestjs-boilerplate/network/members
-[ref-ack-contributors]: https://github.com/andrechristikan/ack-nestjs-boilerplate/graphs/contributors
-[ref-ack-license]: LICENSE.md
-
 <!-- THIRD PARTY -->
 
-[ref-nestjs]: http://nestjs.com
-[ref-nestjs-swagger]: https://docs.nestjs.com/openapi/introduction
-[ref-nestjs-swagger-types]: https://docs.nestjs.com/openapi/types-and-parameters
-[ref-prisma]: https://www.prisma.io
-[ref-mongodb]: https://docs.mongodb.com/
-[ref-redis]: https://redis.io
-[ref-bullmq]: https://bullmq.io
-[ref-nodejs]: https://nodejs.org/
-[ref-typescript]: https://www.typescriptlang.org/
-[ref-docker]: https://docs.docker.com
-[ref-dockercompose]: https://docs.docker.com/compose/
-[ref-pnpm]: https://pnpm.io
-[ref-12factor]: https://12factor.net
-[ref-commander]: https://nest-commander.jaymcdoniel.dev
-[ref-package-json]: package.json
 [ref-jwt]: https://jwt.io
-[ref-jest]: https://jestjs.io/docs/getting-started
-[ref-git]: https://git-scm.com
 [ref-google-console]: https://console.cloud.google.com/
 [ref-google-client-secret]: https://developers.google.com/identity/protocols/oauth2
 
 <!-- DOCUMENTS -->
 
-[ref-doc-root]: ../readme.md
-[ref-doc-activity-log]: activity-log.md
-[ref-doc-authentication]: authentication.md
-[ref-doc-authorization]: authorization.md
 [ref-doc-cache]: cache.md
 [ref-doc-configuration]: configuration.md
-[ref-doc-database]: database.md
 [ref-doc-environment]: environment.md
-[ref-doc-feature-flag]: feature-flag.md
-[ref-doc-file-upload]: file-upload.md
-[ref-doc-handling-error]: handling-error.md
 [ref-doc-installation]: installation.md
-[ref-doc-logger]: logger.md
-[ref-doc-message]: message.md
-[ref-doc-pagination]: pagination.md
-[ref-doc-project-structure]: project-structure.md
-[ref-doc-queue]: queue.md
-[ref-doc-request-validation]: request-validation.md
-[ref-doc-response]: response.md
-[ref-doc-security-and-middleware]: security-and-middleware.md
-[ref-doc-doc]: doc.md
-[ref-doc-third-party-integration]: third-party-integration.md
-[ref-doc-presign]: presign.md
-[ref-doc-term-policy]: term-policy.md
 [ref-doc-two-factor]: two-factor.md
 
 <!-- CONTRIBUTOR -->
 
 [ref-contributor-gzerox]: https://github.com/Gzerox
-[ref-contributor-ak2g]: https://github.com/ak2g
