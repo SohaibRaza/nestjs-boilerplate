@@ -1,7 +1,7 @@
 import './instrument';
 
-import helmet from '@fastify/helmet';
 import compress from '@fastify/compress';
+import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import { Logger, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -12,7 +12,6 @@ import {
 } from '@nestjs/platform-fastify';
 import { plainToInstance } from 'class-transformer';
 import { useContainer, validate } from 'class-validator';
-import { FastifyRequest } from 'fastify';
 import { Logger as PinoLogger } from 'nestjs-pino';
 import { v7 as uuid } from 'uuid';
 
@@ -20,6 +19,8 @@ import { AppModule } from '@app/app.module';
 import { AppEnvDto } from '@app/dtos/app.env.dto';
 import { MessageService } from '@common/message/services/message.service';
 import swaggerInit from 'src/swagger';
+
+import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestFastifyApplication>(
@@ -104,15 +105,15 @@ async function bootstrap(): Promise<void> {
     // --- Fastify Plugins ---
 
     // Helmet: Security headers
-    await app.register(helmet, {
+    await app.register(helmet as any, {
         contentSecurityPolicy: false, // disabled for Swagger UI compatibility
     });
 
     // Compression
-    await app.register(compress);
+    await app.register(compress as any);
 
     // Multipart (file uploads)
-    await app.register(multipart, {
+    await app.register(multipart as any, {
         limits: {
             fileSize:
                 configService.get<number>(
@@ -178,28 +179,27 @@ async function bootstrap(): Promise<void> {
     const fastifyInstance = app.getHttpAdapter().getInstance();
     fastifyInstance.addHook(
         'onRequest',
-        (request: FastifyRequest & { correlationId?: string }, reply, done) => {
+        (request, reply, done) => {
+            const req = request as IRequestApp;
             // Inject correlationId from request header or generate a new UUID
             const headerCorrelationId = request.headers['x-correlation-id'];
             const correlationId =
                 typeof headerCorrelationId === 'string' && headerCorrelationId
                     ? headerCorrelationId
                     : uuid();
-            request.correlationId = correlationId;
+            req.correlationId = correlationId;
             reply.header('x-correlation-id', correlationId);
             reply.header('x-request-id', request.id);
 
             // Start response-time timer
-            (request as FastifyRequest & { __startTime: bigint }).__startTime =
-                process.hrtime.bigint();
+            req.__startTime = process.hrtime.bigint();
 
             done();
         }
     );
 
     fastifyInstance.addHook('onSend', (request, reply, _payload, done) => {
-        const start = (request as FastifyRequest & { __startTime?: bigint })
-            .__startTime;
+        const start = (request as IRequestApp).__startTime;
         if (start) {
             const diff = process.hrtime.bigint() - start;
             const ms = Number(diff) / 1_000_000;

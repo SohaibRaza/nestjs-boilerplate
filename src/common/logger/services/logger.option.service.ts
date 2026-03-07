@@ -118,7 +118,7 @@ export class LoggerOptionService {
     private getReqId(request: IRequestApp): string {
         const headers = request.headers;
         if (!headers) {
-            return request.id as string;
+            return request.id;
         }
 
         for (const header of LoggerRequestIdHeaders) {
@@ -128,7 +128,7 @@ export class LoggerOptionService {
             }
         }
 
-        return request.id as string;
+        return request.id;
     }
 
     /**
@@ -391,7 +391,7 @@ export class LoggerOptionService {
      * @returns {string | null} User ID if authenticated, otherwise null
      */
     private serializeUser(request: IRequestApp): string | null {
-        return (request.user as unknown as { userId: string })?.userId ?? null;
+        return request.user?.userId ?? null;
     }
 
     /**
@@ -432,16 +432,12 @@ export class LoggerOptionService {
                 method: request.method,
                 url: request.url,
                 path: request.url,
-                route: (
-                    request as unknown as { routeOptions?: { url?: string } }
-                ).routeOptions?.url,
+                route: request.routeOptions?.url,
                 userAgent: request.headers['user-agent'],
                 contentType: request.headers?.['content-type'],
                 referer: request.headers.referer,
-                remoteAddress: (request as unknown as { remoteAddress: string })
-                    .remoteAddress,
-                remotePort: (request as unknown as { remotePort: number })
-                    .remotePort,
+                remoteAddress: request.socket.remoteAddress,
+                remotePort: request.socket.remotePort,
                 ip: this.extractClientIP(request),
                 user: this.serializeUser(request),
                 query: this.sanitizeObject(request.query),

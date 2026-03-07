@@ -15,6 +15,7 @@ export interface IRequestApp<
     correlationId: string;
     user?: T;
 
+    __startTime: bigint;
     __apiKey?: ApiKey;
     __user?: IUser;
     __abilities?: RoleAbilityDto[];
