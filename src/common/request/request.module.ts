@@ -8,6 +8,7 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ValidationError } from 'class-validator';
 
 import { RequestValidationException } from '@common/request/exceptions/request.validation.exception';
+import { RequestIdempotencyInterceptor } from '@common/request/interceptors/request.idempotency.interceptor';
 import { RequestTimeoutInterceptor } from '@common/request/interceptors/request.timeout.interceptor';
 import { RequestMiddlewareModule } from '@common/request/request.middleware.module';
 import { IsCustomEmailConstraint } from '@common/request/validations/request.custom-email.validation';
@@ -41,6 +42,10 @@ export class RequestModule {
                 {
                     provide: APP_INTERCEPTOR,
                     useClass: RequestTimeoutInterceptor,
+                },
+                {
+                    provide: APP_INTERCEPTOR,
+                    useClass: RequestIdempotencyInterceptor,
                 },
                 {
                     provide: APP_PIPE,

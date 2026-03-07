@@ -124,6 +124,11 @@ globalPrefix: string
 http: {
   host: string;                   // Server host address
   port: number;                   // Server port number
+  tls: {
+    enable: boolean;              // Enable TLS connection explicitly
+    keyPath: string;              // TLS Key Path from ENV
+    certPath: string;             // TLS Cert Path from ENV
+  };
 }
 ```
 
@@ -415,6 +420,14 @@ body: {
   applicationOctetStream: {
     limitInBytes: number;         // Maximum octet-stream size (from FileSizeInBytes constant)
   };
+}
+```
+
+**`idempotency`** - Idempotent requests handling
+
+```typescript
+idempotency: {
+  ttlInMs: number;                // TTL for cached responses via @Idempotent decorator
 }
 ```
 

@@ -10,9 +10,11 @@ import {
     FastifyAdapter,
     NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import bytes from 'bytes';
 import { plainToInstance } from 'class-transformer';
 import { useContainer, validate } from 'class-validator';
 import { Logger as PinoLogger } from 'nestjs-pino';
+import fs from 'node:fs';
 import { v7 as uuid } from 'uuid';
 
 import { AppModule } from '@app/app.module';
@@ -23,11 +25,25 @@ import swaggerInit from 'src/swagger';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 async function bootstrap(): Promise<void> {
+    const isTlsEnable = process.env.APP_HTTP_TLS_ENABLE === 'true';
+    const httpsOptions = isTlsEnable
+        ? {
+              key: fs.readFileSync(process.env.APP_HTTP_TLS_KEY_PATH || ''),
+              cert: fs.readFileSync(process.env.APP_HTTP_TLS_CERT_PATH || ''),
+          }
+        : undefined;
+
+    const bodyLimit = bytes(
+        process.env.REQUEST_BODY_JSON_LIMIT_IN_BYTES ?? '500kb'
+    );
+
     const app = await NestFactory.create<NestFastifyApplication>(
         AppModule,
         new FastifyAdapter({
             // Generate UUID v7 as request IDs (instead of Fastify's default req-N format)
             genReqId: () => uuid(),
+            bodyLimit,
+            ...(httpsOptions ? { https: httpsOptions } : {}),
         }),
         {
             abortOnError: true,

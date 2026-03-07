@@ -13,3 +13,8 @@ export const RequestCustomTimeoutValueMetaKey =
  * Meta key for request environment.
  */
 export const RequestEnvMetaKey = 'RequestEnvMetaKey';
+
+/**
+ * Meta key for request idempotency.
+ */
+export const RequestIdempotencyMetaKey = 'RequestIdempotencyMetaKey';
