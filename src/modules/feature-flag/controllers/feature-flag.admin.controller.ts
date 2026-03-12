@@ -1,3 +1,7 @@
+import { Body, Controller, Get, Param, Patch, Put } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { EnumRoleType, Prisma } from '@prisma/client';
+
 import { PaginationOffsetQuery } from '@common/pagination/decorators/pagination.decorator';
 import { IPaginationQueryOffsetParams } from '@common/pagination/interfaces/pagination.interface';
 import { RequestRequiredPipe } from '@common/request/pipes/request.required.pipe';
@@ -29,9 +33,6 @@ import {
 import { RoleProtected } from '@modules/role/decorators/role.decorator';
 import { TermPolicyAcceptanceProtected } from '@modules/term-policy/decorators/term-policy.decorator';
 import { UserProtected } from '@modules/user/decorators/user.decorator';
-import { Body, Controller, Get, Param, Patch, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { EnumRoleType, Prisma } from '@prisma/client';
 
 @ApiTags('common.admin.featureFlag')
 @Controller({

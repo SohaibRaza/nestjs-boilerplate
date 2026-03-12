@@ -1,9 +1,10 @@
-import { DatabaseService } from '@common/database/services/database.service';
 import { Injectable } from '@nestjs/common';
 import {
     HealthIndicatorResult,
     HealthIndicatorService,
 } from '@nestjs/terminus';
+
+import { DatabaseService } from '@common/database/services/database.service';
 
 @Injectable()
 export class HealthDatabaseIndicator {
@@ -16,7 +17,7 @@ export class HealthDatabaseIndicator {
         const indicator = this.healthIndicatorService.check(key);
 
         try {
-            await this.databaseService.$runCommandRaw({ ping: 1 });
+            await this.databaseService.$queryRaw`SELECT 1`;
 
             return indicator.up();
         } catch (err: unknown) {

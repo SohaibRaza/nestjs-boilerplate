@@ -1,3 +1,5 @@
+import { Module } from '@nestjs/common';
+
 import { ActivityLogAdminController } from '@modules/activity-log/controllers/activity-log.admin.controller';
 import { ApiKeyAdminController } from '@modules/api-key/controllers/api-key.admin.controller';
 import { DeviceAdminController } from '@modules/device/controllers/device.admin.controller';
@@ -10,7 +12,6 @@ import { SessionAdminController } from '@modules/session/controllers/session.adm
 import { TermPolicyAdminController } from '@modules/term-policy/controllers/term-policy.admin.controller';
 import { UserAdminController } from '@modules/user/controllers/user.admin.controller';
 import { UserModule } from '@modules/user/user.module';
-import { Module } from '@nestjs/common';
 
 /**
  * Admin routes module providing administrative API endpoints.

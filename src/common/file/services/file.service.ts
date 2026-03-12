@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import Mime from 'mime';
+import Papa from 'papaparse';
+
 import { IFileService } from '@common/file/interfaces/file.service.interface';
 import { IFileRandomFilenameOptions } from '@common/file/interfaces/file.interface';
 import { HelperService } from '@common/helper/services/helper.service';
-import Mime from 'mime';
-import Papa from 'papaparse';
 
 /**
  * Service for handling file operations such as CSV parsing, random filename generation,

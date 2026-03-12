@@ -1,9 +1,10 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { passportJwtSecret } from 'jwks-rsa';
 import { Algorithm } from 'jsonwebtoken';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
 import { IAuthJwtRefreshTokenPayload } from '@modules/auth/interfaces/auth.interface';
 import { AuthJwtRefreshGuardKey } from '@modules/auth/constants/auth.constant';
 import { AuthService } from '@modules/auth/services/auth.service';

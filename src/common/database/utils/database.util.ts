@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import ObjectID from 'bson-objectid';
+import { createId } from '@paralleldrive/cuid2';
 
 /**
  * Database utility service providing common database operations.
  *
  * This injectable service provides utility methods for database-related operations,
- * including ID generation using BSON ObjectID format. The generated IDs are
- * compatible with MongoDB ObjectID format and provide unique identifiers
- * for database records.
+ * including ID generation using CUID2 format. The generated IDs are
+ * URL-safe, collision-resistant, and well-suited as primary keys in PostgreSQL.
  *
  * @class DatabaseUtil
  * @injectable
@@ -16,29 +15,27 @@ import ObjectID from 'bson-objectid';
 @Injectable()
 export class DatabaseUtil {
     /**
-     * Checks if the provided ID string is a valid BSON ObjectID.
+     * Checks if the provided ID string is a valid non-empty string.
      *
-     * Utilizes the BSON ObjectID library's isValid method to determine
-     * if the given string conforms to the ObjectID format.
+     * In the PostgreSQL / CUID2 world, any non-empty string that fits within
+     * the expected length range (1–36 chars) is considered valid.
      *
      * @param {string} id - The ID string to validate
-     * @returns {boolean} True if the ID is a valid ObjectID, false otherwise
+     * @returns {boolean} True if the ID is a valid non-empty string
      */
     checkIdIsValid(id: string): boolean {
-        return ObjectID.isValid(id);
+        return typeof id === 'string' && id.length > 0 && id.length <= 36;
     }
 
     /**
-     * Creates a new unique identifier using BSON ObjectID.
+     * Creates a new unique identifier using CUID2.
      *
-     * Generates a new ObjectID and converts it to a hexadecimal string format.
-     * The generated ID is unique and follows the BSON ObjectID specification,
-     * making it suitable for use as primary keys in database records.
+     * Generates a collision-resistant, URL-safe, sortable identifier.
      *
-     * @returns {string} A 24-character hexadecimal string representing the ObjectID
+     * @returns {string} A CUID2 string identifier
      */
     createId(): string {
-        return ObjectID().toHexString();
+        return createId();
     }
 
     /**

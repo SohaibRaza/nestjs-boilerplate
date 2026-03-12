@@ -8,17 +8,17 @@ ACK NestJS Boilerplate implements a comprehensive security and middleware layer 
 
 ```typescript
 consumer
-  .apply(
-    RequestRequestIdMiddleware,      // 1. Request & Correlation IDs
-    RequestHelmetMiddleware,         // 2. Security headers
-    RequestBodyParserMiddleware,     // 3. Body parsing
-    RequestCorsMiddleware,           // 4. CORS handling
-    RequestUrlVersionMiddleware,     // 5. API version extraction
-    RequestResponseTimeMiddleware,   // 6. Response time tracking
-    RequestCustomLanguageMiddleware, // 7. Language detection
-    RequestCompressionMiddleware     // 8. Response compression
-  )
-  .forRoutes('{*wildcard}');
+    .apply(
+        RequestRequestIdMiddleware, // 1. Request & Correlation IDs
+        RequestHelmetMiddleware, // 2. Security headers
+        RequestBodyParserMiddleware, // 3. Body parsing
+        RequestCorsMiddleware, // 4. CORS handling
+        RequestUrlVersionMiddleware, // 5. API version extraction
+        RequestResponseTimeMiddleware, // 6. Response time tracking
+        RequestCustomLanguageMiddleware, // 7. Language detection
+        RequestCompressionMiddleware // 8. Response compression
+    )
+    .forRoutes('{*wildcard}');
 ```
 
 ## Related Documents
@@ -51,7 +51,6 @@ consumer
   - [@RequestGeoLocation](#requestgeolocation)
   - [@RequestUserAgent](#requestuseragent)
 
-
 ## Authentication & Authorization
 
 ACK NestJS Boilerplate includes comprehensive authentication and authorization systems. See dedicated documentation:
@@ -72,18 +71,22 @@ Applies protective HTTP headers using [Helmet][ref-helmet].
 Prevents abuse using [Throttler][ref-throttler].
 
 **Implementation:**
+
 ```typescript
 ThrottlerModule.forRootAsync({
-  useFactory: (config: ConfigService) => ({
-    throttlers: [{
-      ttl: config.get<number>('request.throttle.ttlInMs'),
-      limit: config.get<number>('request.throttle.limit'),
-    }],
-  }),
-})
+    useFactory: (config: ConfigService) => ({
+        throttlers: [
+            {
+                ttl: config.get<number>('request.throttle.ttlInMs'),
+                limit: config.get<number>('request.throttle.limit'),
+            },
+        ],
+    }),
+});
 ```
 
 **Skip Rate Limiting:**
+
 ```typescript
 @SkipThrottle()
 @Get('/unlimited')
@@ -99,6 +102,7 @@ Manages cross-origin resource sharing.
 **Implementation:** `RequestCorsMiddleware`
 
 **Features:**
+
 - Dynamic origin validation
 - Automatic credential handling
 - Configurable methods and headers
@@ -113,6 +117,7 @@ Restricts endpoint access based on environment.
 **Implementation:** `RequestEnvGuard`
 
 **Usage:**
+
 ```typescript
 @RequestEnvProtected(EnumAppEnvironment.DEVELOPMENT)
 @Get('/debug')
@@ -128,12 +133,13 @@ Generates unique identifiers for request tracking.
 **Implementation:** `RequestRequestIdMiddleware`
 
 **Request Properties:**
+
 ```typescript
 interface IRequestApp extends Request {
-  id: string;            // UUID v7 request ID
-  correlationId: string; // Correlation ID for distributed tracing
-  __version: string;     // API version
-  __language: string;    // Language preference
+    id: string; // UUID v7 request ID
+    correlationId: string; // Correlation ID for distributed tracing
+    __version: string; // API version
+    __language: string; // Language preference
 }
 ```
 
@@ -144,6 +150,7 @@ Parses request bodies based on content-type.
 **Implementation:** `RequestBodyParserMiddleware`
 
 **Supported Content Types:**
+
 - `application/json`
 - `application/x-www-form-urlencoded`
 - `text/*`
@@ -159,14 +166,16 @@ Extracts API version from URLs.
 **Implementation:** `RequestUrlVersionMiddleware`
 
 **URL Pattern:**
-```
+
+```text
 /{globalPrefix}/{versionPrefix}{version}/resource
 Example: /api/v1/users
 ```
 
 **Request Property:**
+
 ```typescript
-req.__version  // Extracted version number
+req.__version; // Extracted version number
 ```
 
 **Configuration:** See [Configuration][ref-doc-configuration]
@@ -178,14 +187,16 @@ Processes `x-custom-lang` header for internationalization.
 **Implementation:** `RequestCustomLanguageMiddleware`
 
 **Usage:**
+
 ```bash
 # Request header
 x-custom-lang: id
 ```
 
 **Request Property:**
+
 ```typescript
-req.__language  // Validated language code
+req.__language; // Validated language code
 ```
 
 **Configuration:** See [Configuration][ref-doc-configuration]
@@ -205,7 +216,8 @@ Measures request duration using [response-time][ref-response-time].
 **Implementation:** `RequestResponseTimeMiddleware`
 
 **Header Example:**
-```
+
+```text
 X-Response-Time: 123.456ms
 ```
 
@@ -216,11 +228,15 @@ Prevents long-running requests.
 **Implementation:** `RequestTimeoutInterceptor`
 
 **Global Registration:**
+
 ```typescript
-app.useGlobalInterceptors(new RequestTimeoutInterceptor(configService, reflector));
+app.useGlobalInterceptors(
+    new RequestTimeoutInterceptor(configService, reflector)
+);
 ```
 
 **Custom Timeout:**
+
 ```typescript
 @RequestTimeout('60s')
 @Get('/long-running')
@@ -238,11 +254,13 @@ async operation() {}
 Sets custom timeout for specific endpoints.
 
 **Signature:**
+
 ```typescript
 RequestTimeout(seconds: ms.StringValue): MethodDecorator
 ```
 
 **Example:**
+
 ```typescript
 @RequestTimeout('2m')
 @Post('/process')
@@ -254,11 +272,13 @@ async processData() {}
 Restricts endpoint access based on environment.
 
 **Signature:**
+
 ```typescript
 RequestEnvProtected(...envs: EnumAppEnvironment[]): MethodDecorator
 ```
 
 **Example:**
+
 ```typescript
 @RequestEnvProtected(EnumAppEnvironment.DEVELOPMENT)
 @Get('/admin/clear-cache')
@@ -270,11 +290,13 @@ async clearCache() {}
 Extracts real client IP address from request using [nestjs-real-ip][ref-nestjs-real-ip].
 
 **Signature:**
+
 ```typescript
 RequestIPAddress(): ParameterDecorator
 ```
 
 **Example:**
+
 ```typescript
 @Get('/check-ip')
 async checkIP(@RequestIPAddress() ip: string) {
@@ -287,11 +309,13 @@ async checkIP(@RequestIPAddress() ip: string) {
 Extracts geolocation information from the client's IP address using `geoip-lite`.
 
 **Signature:**
+
 ```typescript
 RequestGeoLocation(): ParameterDecorator
 ```
 
 **Example:**
+
 ```typescript
 @Get('/geo-info')
 async getGeoInfo(@RequestGeoLocation() geoLocation: GeoLocation | null) {
@@ -306,11 +330,13 @@ async getGeoInfo(@RequestGeoLocation() geoLocation: GeoLocation | null) {
 Parses User-Agent information using [ua-parser-js][ref-ua-parser-js].
 
 **Signature:**
+
 ```typescript
 RequestUserAgent(): ParameterDecorator
 ```
 
 **Example:**
+
 ```typescript
 @Get('/device-info')
 async getDeviceInfo(@RequestUserAgent() userAgent: UAParser.IResult) {
@@ -323,19 +349,16 @@ async getDeviceInfo(@RequestUserAgent() userAgent: UAParser.IResult) {
 ```
 
 **Response Structure:**
+
 ```typescript
 interface IResult {
-  browser: { name?: string; version?: string };
-  os: { name?: string; version?: string };
-  device: { model?: string; type?: string; vendor?: string };
-  engine: { name?: string; version?: string };
-  cpu: { architecture?: string };
+    browser: { name?: string; version?: string };
+    os: { name?: string; version?: string };
+    device: { model?: string; type?: string; vendor?: string };
+    engine: { name?: string; version?: string };
+    cpu: { architecture?: string };
 }
 ```
-
-
-
-
 
 <!-- REFERENCES -->
 
@@ -346,7 +369,6 @@ interface IResult {
 [ref-ms]: https://github.com/vercel/ms
 [ref-nestjs-real-ip]: https://github.com/p0vidl0/nestjs-real-ip
 [ref-ua-parser-js]: https://github.com/faisalman/ua-parser-js
-
 [ref-doc-authentication]: authentication.md
 [ref-doc-authorization]: authorization.md
 [ref-doc-configuration]: configuration.md

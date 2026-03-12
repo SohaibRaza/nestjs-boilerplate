@@ -1,3 +1,5 @@
+import { FeatureFlag } from '@prisma/client';
+
 import {
     IPaginationQueryCursorParams,
     IPaginationQueryOffsetParams,

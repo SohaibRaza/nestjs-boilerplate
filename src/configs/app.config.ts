@@ -18,6 +18,11 @@ export interface IConfigApp {
     http: {
         host: string;
         port: number;
+        tls: {
+            enable: boolean;
+            keyPath: string;
+            certPath: string;
+        };
     };
     urlVersion: {
         enable: boolean;
@@ -45,6 +50,11 @@ export default registerAs(
         http: {
             host: process.env.HTTP_HOST ?? 'localhost',
             port: process.env.HTTP_PORT ? +process.env.HTTP_PORT : 3000,
+            tls: {
+                enable: process.env.APP_HTTP_TLS_ENABLE === 'true',
+                keyPath: process.env.APP_HTTP_TLS_KEY_PATH ?? '',
+                certPath: process.env.APP_HTTP_TLS_CERT_PATH ?? '',
+            },
         },
         urlVersion: {
             enable: process.env.URL_VERSIONING_ENABLE === 'true',

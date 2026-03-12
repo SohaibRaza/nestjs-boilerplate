@@ -1,6 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NextFunction, Response } from 'express';
+import { FastifyReply } from 'fastify';
+
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { HelperService } from '@common/helper/services/helper.service';
 
@@ -24,14 +25,14 @@ export class RequestCustomLanguageMiddleware implements NestMiddleware {
     /**
      * Processes incoming requests to detect and validate custom language preferences.
      *
-     * @param req - The Express request object extended with custom properties
-     * @param _res - The Express response object
+     * @param req - The Fastify request object extended with custom properties
+     * @param _res - The Fastify reply object
      * @param next - The next middleware function
      */
     async use(
         req: IRequestApp,
-        _res: Response,
-        next: NextFunction
+        _res: FastifyReply,
+        next: () => void
     ): Promise<void> {
         let customLang: string =
             this.configService.get<string>('message.language');

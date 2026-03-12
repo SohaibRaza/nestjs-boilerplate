@@ -1,6 +1,7 @@
 # Cache Documentation
 
 This documentation explains the features and usage of:
+
 - **Cache Module**: Located at `src/common/cache`
 - **Redis Module**: Located at `src/common/redis`
 
@@ -36,7 +37,6 @@ This application uses **cache-manager v6** which migrated to **Keyv** as the uni
   - [Injecting Cache Providers](#injecting-cache-providers)
   - [Cache Operations](#cache-operations)
 
-
 ## Principles & Patterns
 
 ### DRY & Singleton Pattern
@@ -47,7 +47,7 @@ This application uses **cache-manager v6** which migrated to **Keyv** as the uni
 
 **Example:**
 
-```
+```text
 ❌ Without DRY:
 UserService → Creates Redis connection 1
 ProductService → Creates Redis connection 2
@@ -61,6 +61,7 @@ All services → Inject and reuse the same connection
 ### Global Module Pattern
 
 `RedisCacheModule` and `CacheMainModule` are marked as `@Global()`:
+
 - Providers automatically available everywhere
 - No need to import in feature modules
 
@@ -68,7 +69,7 @@ All services → Inject and reuse the same connection
 
 ### Module Dependency Flow
 
-```
+```text
 CommonModule
     ├── RedisCacheModule (Global)
     │   └── Creates: RedisClientCachedProvider
@@ -91,6 +92,7 @@ CommonModule
 **Scope:** Global (available everywhere)
 
 **Configuration:**
+
 ```typescript
 createKeyv(
     { url: 'redis://localhost:6379' },
@@ -114,6 +116,7 @@ createKeyv(
 **Depends on:** `RedisClientCachedProvider`
 
 **Usage:**
+
 ```typescript
 export class UserService {
     constructor(
@@ -133,6 +136,7 @@ export class UserService {
 **Depends on:** `RedisClientCachedProvider` (shares same Redis connection)
 
 **Usage:**
+
 ```typescript
 export class SessionService {
     constructor(
@@ -182,6 +186,7 @@ export class CommonModule {}
 ### Injecting Cache Providers
 
 **Global cache:**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -192,6 +197,7 @@ export class UserService {
 ```
 
 **Session cache:**
+
 ```typescript
 @Injectable()
 export class SessionService {
@@ -204,9 +210,9 @@ export class SessionService {
 ### Cache Operations
 
 For cache operations (set, get, delete, etc.), see:
+
 - [NestJS Caching][ref-nestjs-caching]
 - [cache-manager][ref-cache-manager]
-
 
 <!-- REFERENCES -->
 

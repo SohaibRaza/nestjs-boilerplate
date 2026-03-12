@@ -1,10 +1,11 @@
-import { EnumAwsS3Accessibility } from '@common/aws/enums/aws.enum';
-import { AwsS3Service } from '@common/aws/services/aws.s3.service';
 import { Injectable } from '@nestjs/common';
 import {
     HealthIndicatorResult,
     HealthIndicatorService,
 } from '@nestjs/terminus';
+
+import { EnumAwsS3Accessibility } from '@common/aws/enums/aws.enum';
+import { AwsS3Service } from '@common/aws/services/aws.s3.service';
 
 @Injectable()
 export class HealthAwsS3BucketIndicator {

@@ -1,6 +1,7 @@
 # File Upload Documentation
 
 This documentation explains the features and usage of:
+
 - **File Module**: Located at `src/common/file`
 - **Aws S3 Module**: Located at `src/common/aws` 
 
@@ -11,7 +12,6 @@ The file upload module provides a comprehensive solution for handling file uploa
 The module supports:
 
 **Direct Upload**: Traditional multipart form-data upload where files are sent through the backend server. Ideal for small to medium files and when you need immediate server-side processing.
-
 
 ## Related Documentation
 
@@ -48,10 +48,12 @@ The module supports:
 Handles single file upload with configurable field name and size limits.
 
 **Parameters:**
+
 - `options.field` (optional): Field name in form-data (default: `'file'`)
 - `options.fileSize` (optional): Maximum file size in bytes (default: `FileSizeInBytes`)
 
 **Example:**
+
 ```typescript
 @FileUploadSingle({ field: 'photo', fileSize: bytes('5mb') })
 ```
@@ -61,11 +63,13 @@ Handles single file upload with configurable field name and size limits.
 Handles multiple files upload with the same field name.
 
 **Parameters:**
+
 - `options.field` (optional): Field name in form-data (default: `'files'`)
 - `options.maxFiles` (optional): Maximum number of files (default: `3`)
 - `options.fileSize` (optional): Maximum file size per file in bytes (default: `FileSizeInBytes`)
 
 **Example:**
+
 ```typescript
 @FileUploadMultiple({ field: 'documents', maxFiles: 5 })
 ```
@@ -75,12 +79,14 @@ Handles multiple files upload with the same field name.
 Handles multiple files from different form fields.
 
 **Parameters:**
+
 - `fields`: Array of field configurations
   - `field`: Field name
   - `maxFiles`: Maximum files for this field
 - `options.fileSize` (optional): Maximum file size per file in bytes (default: `FileSizeInBytes`)
 
 **Example:**
+
 ```typescript
 @FileUploadMultipleFields(
   [
@@ -115,6 +121,7 @@ File extension enums for validation. These enums are used with `FileExtensionPip
 - `EnumFileExtension`: Combined type of all file extensions
 
 **When to Use:**
+
 - Combine multiple enums for flexible validation: `[EnumFileExtensionImage.jpg, EnumFileExtensionDocument.pdf]`
 - Use specific enum for strict type control: only `EnumFileExtensionImage` values
 - CSV enum is typically used with `FileCsvParsePipe` for data import features
@@ -129,6 +136,7 @@ Validates uploaded file extensions against allowed types. This pipe checks the f
 Pass an array of allowed file extensions from the enum constants. Works with both single file and multiple files uploads.
 
 **Throws:**
+
 - `UnsupportedMediaTypeException`: When file extension is not in the allowed list
 
 ### FileCsvParsePipe
@@ -139,11 +147,13 @@ Parses CSV (.csv) files into structured data array with rows and columns. This p
 Array of parsed row objects `T[]`
 
 **Supports:**
+
 - CSV files (.csv) with semicolon delimiter
 - Headers in first row become object property names
 - Empty lines are automatically skipped
 
 **Throws:**
+
 - `UnprocessableEntityException`: Empty buffer or missing file
 - `UnsupportedMediaTypeException`: Invalid file extension
 
@@ -152,6 +162,7 @@ Array of parsed row objects `T[]`
 Transforms and validates CSV data using DTO classes with class-validator decorators. This pipe applies validation rules to each row of imported data and provides detailed error messages.
 
 **How it Works:**
+
 1. Receives parsed data from `FileCsvParsePipe`
 2. Transforms each row into the specified DTO class
 3. Validates using class-validator decorators
@@ -159,9 +170,11 @@ Transforms and validates CSV data using DTO classes with class-validator decorat
 5. Throws `FileImportException` if validation fails
 
 **Parameters:**
+
 - DTO class for row validation
 
 **Throws:**
+
 - `FileImportException`: Contains detailed validation errors with row context
 
 ## CSV Import Flow
@@ -410,7 +423,7 @@ Thrown during CSV validation with detailed error context. This exception provide
 ### Common Errors
 
 | Error Type | Status Code | Message | Description |
-|------------|-------------|---------|-------------|
+| ---------- | ----------- | ------- | ----------- |
 | Invalid Extension | 5011 | `file.error.extensionInvalid` | File extension not in allowed list |
 | Empty File | 5010 | `file.error.required` | File buffer is empty or missing |
 | Invalid Format | 5011 | `file.error.extensionInvalid` | File passed to CSV pipe is not a `.csv` file |
@@ -475,7 +488,6 @@ Add custom validation messages in your i18n language files for any class-validat
 ```
 
 See [Message Documentation][ref-doc-message] for complete language configuration details.
-
 
 <!-- REFERENCES -->
 

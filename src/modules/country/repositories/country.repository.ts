@@ -1,9 +1,10 @@
+import { Injectable } from '@nestjs/common';
+import { Country, Prisma } from '@prisma/client';
+
 import { DatabaseService } from '@common/database/services/database.service';
 import { IPaginationQueryOffsetParams } from '@common/pagination/interfaces/pagination.interface';
 import { PaginationService } from '@common/pagination/services/pagination.service';
 import { IResponsePagingReturn } from '@common/response/interfaces/response.interface';
-import { Injectable } from '@nestjs/common';
-import { Country, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CountryRepository {

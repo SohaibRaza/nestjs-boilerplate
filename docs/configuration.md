@@ -72,29 +72,34 @@ This configuration handles the core application settings including environment d
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`name`** - Application name used throughout the system
+
 ```typescript
 name: string
 ```
 
 **`env`** - Current environment (development, production, staging, local)
+
 ```typescript
 env: EnumAppEnvironment
 ```
 
 **`timezone`** - Default timezone for date operations
+
 ```typescript
 timezone: string
 ```
 
 **`version`** - Application version from package.json
+
 ```typescript
 version: string
 ```
 
 **`author`** - Author information from package.json
+
 ```typescript
 author: {
   name: string;                   // Author name
@@ -103,24 +108,33 @@ author: {
 ```
 
 **`url`** - Repository URL from package.json
+
 ```typescript
 url: string
 ```
 
 **`globalPrefix`** - Global API prefix (default: '/api')
+
 ```typescript
 globalPrefix: string
 ```
 
 **`http`** - HTTP server configuration
+
 ```typescript
 http: {
   host: string;                   // Server host address
   port: number;                   // Server port number
+  tls: {
+    enable: boolean;              // Enable TLS connection explicitly
+    keyPath: string;              // TLS Key Path from ENV
+    certPath: string;             // TLS Cert Path from ENV
+  };
 }
 ```
 
 **`urlVersion`** - API versioning configuration
+
 ```typescript
 urlVersion: {
   enable: boolean;                // Enable URL versioning
@@ -130,6 +144,7 @@ urlVersion: {
 ```
 
 **`encryptionSecretKey`** - AES-256 encryption secret key
+
 ```typescript
 encryptionSecretKey: string     // Secret key used to derive AES-256 encryption key for sensitive data
 ```
@@ -143,9 +158,10 @@ This configuration manages JWT authentication settings including token configura
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`jwt`** - JWT authentication configuration
+
 ```typescript
 jwt: {
   accessToken: {
@@ -172,6 +188,7 @@ jwt: {
 ```
 
 **`password`** - Password policy configuration
+
 ```typescript
 password: {
   attempt: boolean;               // Enable login attempt tracking
@@ -184,6 +201,7 @@ password: {
 ```
 
 **`twoFactor`** - Two-factor authentication configuration
+
 ```typescript
 twoFactor: {
   issuer: string;                 // Issuer name for OTP (TOTP)
@@ -206,6 +224,7 @@ twoFactor: {
 ```
 
 **`apple`** - Apple OAuth configuration
+
 ```typescript
 apple: {
   header: string;                 // HTTP header for Apple auth
@@ -216,6 +235,7 @@ apple: {
 ```
 
 **`google`** - Google OAuth configuration
+
 ```typescript
 google: {
   header: string;                 // HTTP header for Google auth
@@ -226,6 +246,7 @@ google: {
 ```
 
 **`xApiKey`** - API Key authentication configuration
+
 ```typescript
 xApiKey: {
   header: string;                 // HTTP header for API key
@@ -242,14 +263,16 @@ This configuration manages database connection settings for MongoDB.
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`url`** - Database connection string
+
 ```typescript
 url: string                     // MongoDB connection URL
 ```
 
 **`debug`** - Database debug mode
+
 ```typescript
 debug: boolean                  // Enable/disable database query logging
 ```
@@ -263,9 +286,10 @@ This configuration handles AWS service integration including S3 and SES services
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`s3`** - S3 service configuration
+
 ```typescript
 s3: {
   multipartExpiredInDay: number;  // Multipart upload expiration in days (default: 3)
@@ -296,6 +320,7 @@ s3: {
 ```
 
 > **IAM Configuration Notes**:
+>
 > - The `iam.key` and `iam.secret` are used for standard IAM user credentials
 > - The `iam.arn` is used for IAM role assumption (recommended for production)
 > - When using IAM roles, temporary credentials are automatically rotated
@@ -303,6 +328,7 @@ s3: {
 > - Base URLs are auto-generated as `https://{bucket}.s3.{region}.amazonaws.com`
 
 **`ses`** - Simple Email Service configuration
+
 ```typescript
 ses: {
   iam: {
@@ -315,6 +341,7 @@ ses: {
 ```
 
 > **SES IAM Configuration**:
+>
 > - Similar to S3, SES supports both standard credentials and IAM role-based access
 > - Using IAM roles (`iam.arn`) is recommended for better security
 > - Credentials are used for sending emails and managing SES operations
@@ -328,39 +355,46 @@ This configuration manages logging settings using Pino logger with customizable 
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`enable`** - Enable/disable logging
+
 ```typescript
 enable: boolean                 // Turn logging on/off
 ```
 
 **`level`** - Log level configuration
+
 ```typescript
 level: string                   // Log levels: silent, trace, debug, info, warn, error, fatal
 ```
 
 **`intoFile`** - File logging option
+
 ```typescript
 intoFile: boolean               // Whether to write logs to files
 ```
 
 **`filePath`** - Log file directory
+
 ```typescript
 filePath: string                // Directory path for log files
 ```
 
 **`auto`** - Automatic logging features
+
 ```typescript
 auto: boolean                   // Enable automatic request/response logging
 ```
 
 **`prettier`** - Log formatting option
+
 ```typescript
 prettier: boolean               // Format logs for better readability
 ```
 
 **`sentry`** - Sentry integration configuration
+
 ```typescript
 sentry: {
   dsn?: string;                 // Sentry DSN for error tracking
@@ -377,9 +411,10 @@ This configuration handles HTTP request settings including body size limits, COR
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`body`** - Request body size limits
+
 ```typescript
 body: {
   json: {
@@ -397,12 +432,22 @@ body: {
 }
 ```
 
+**`idempotency`** - Idempotent requests handling
+
+```typescript
+idempotency: {
+  ttlInMs: number;                // TTL for cached responses via @Idempotent decorator
+}
+```
+
 **`timeoutInMs`** - Request timeout setting
+
 ```typescript
 timeoutInMs: number             // Request timeout in milliseconds (default: 30000ms)
 ```
 
 **`cors`** - CORS configuration
+
 ```typescript
 cors: {
   allowedMethod: string[];        // Allowed HTTP methods (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
@@ -412,12 +457,14 @@ cors: {
 ```
 
 > **CORS Configuration Notes**:
+>
 > - `allowedOrigin` is populated from `CORS_ALLOWED_ORIGIN` environment variable
 > - Multiple origins can be specified using comma separation
 > - Subdomain wildcards are supported (e.g., `*.example.com`)
 > - Default headers include standard headers plus custom headers like `x-api-key`, `x-timezone`, etc.
 
 **`throttle`** - Rate limiting configuration
+
 ```typescript
 throttle: {
   ttlInMs: number;                // Time window in milliseconds (default: 500ms)
@@ -434,9 +481,10 @@ This configuration manages Redis connection settings for caching and queue opera
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`cache`** - Cache Redis configuration
+
 ```typescript
 cache: {
   url: string;                    // Redis URL for caching
@@ -446,6 +494,7 @@ cache: {
 ```
 
 **`queue`** - Queue Redis configuration
+
 ```typescript
 queue: {
   url: string;                    // Redis URL for queues
@@ -460,25 +509,27 @@ queue: {
 
 This configuration handles user-related settings including username patterns and file upload paths.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`usernamePrefix`** - Username generation prefix
+
 ```typescript
 usernamePrefix: string          // Prefix for auto-generated usernames (default: 'user')
 ```
 
 **`usernamePattern`** - Username validation pattern
+
 ```typescript
 usernamePattern: RegExp         // Regex pattern for valid usernames
 ```
 
 **`uploadPhotoProfilePath`** - User profile photo upload path template
+
 ```typescript
 uploadPhotoProfilePath: string  // Path template for user profile photo uploads
 ```
 
 ### Documentation Configuration
-
 
 **File**: `src/configs/doc.config.ts`
 **Interface**: `IConfigDoc`
@@ -487,24 +538,28 @@ This configuration manages API documentation settings for Swagger/OpenAPI.
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`name`** - Documentation title
+
 ```typescript
 name: string                    // API documentation title
 ```
 
 **`description`** - Documentation description
+
 ```typescript
 description: string             // API documentation description
 ```
 
 **`prefix`** - Documentation URL prefix
+
 ```typescript
 prefix: string                  // URL prefix for API documentation (default: '/docs')
 ```
 
 **`version`** - Static Swagger version
+
 ```typescript
 version: string                 // Static version for Swagger documentation (default: '3.1.0')
 ```
@@ -518,14 +573,16 @@ This configuration handles application messaging and internationalization settin
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`availableLanguage`** - Supported languages
+
 ```typescript
 availableLanguage: string[]     // List of supported language codes
 ```
 
 **`language`** - Default language
+
 ```typescript
 language: string                // Default application language
 ```
@@ -539,24 +596,28 @@ This configuration manages default email addresses for system communications. Em
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`noreply`** - No-reply email address
+
 ```typescript
 noreply: string                 // No-reply email address for system emails
 ```
 
 **`support`** - Support email address
+
 ```typescript
 support: string                 // Support/contact email address
 ```
 
 **`admin`** - Admin email address
+
 ```typescript
 admin: string                   // Administrator email address
 ```
 
 **`batchSize`** - Email batch size
+
 ```typescript
 batchSize: number               // Maximum number of emails per batch (default: 100)
 ```
@@ -568,34 +629,40 @@ batchSize: number               // Maximum number of emails per batch (default: 
 
 This configuration handles user verification processes including email verification.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`expiredInMinutes`** - Verification expiration time
+
 ```typescript
 expiredInMinutes: number        // Verification expiration time in minutes
 ```
 
 **`otpLength`** - OTP code length
+
 ```typescript
 otpLength: number               // Length of OTP verification code
 ```
 
 **`tokenLength`** - Verification token length
+
 ```typescript
 tokenLength: number             // Length of verification token
 ```
 
 **`linkBaseUrl`** - Verification link base URL
+
 ```typescript
 linkBaseUrl: string             // Base URL for verification links
 ```
 
 **`resendInMinutes`** - Resend cooldown period
+
 ```typescript
 resendInMinutes: number         // Minimum time between resend attempts
 ```
 
 **`reference`** - Verification reference configuration
+
 ```typescript
 reference: {
   prefix: string;               // Prefix for verification references
@@ -610,29 +677,34 @@ reference: {
 
 This configuration manages password reset functionality and security policies.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`expiredInMinutes`** - Reset link expiration
+
 ```typescript
 expiredInMinutes: number        // Password reset expiration in minutes
 ```
 
 **`tokenLength`** - Reset token length
+
 ```typescript
 tokenLength: number             // Length of password reset token
 ```
 
 **`linkBaseUrl`** - Reset link base URL
+
 ```typescript
 linkBaseUrl: string             // Base URL for password reset links
 ```
 
 **`resendInMinutes`** - Resend cooldown period
+
 ```typescript
 resendInMinutes: number         // Minimum time between resend attempts
 ```
 
 **`reference`** - Reset reference configuration
+
 ```typescript
 reference: {
   prefix: string;               // Prefix for reset references
@@ -649,14 +721,16 @@ This configuration handles home page and organization information.
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`name`** - Organization/application name
+
 ```typescript
 name: string                    // Display name for organization/application
 ```
 
 **`url`** - Organization/home URL
+
 ```typescript
 url: string                     // URL for organization/home page
 ```
@@ -668,9 +742,10 @@ url: string                     // URL for organization/home page
 
 This configuration manages user session key patterns for Redis storage.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`keyPattern`** - Session key pattern
+
 ```typescript
 keyPattern: string              // Redis key pattern for user sessions
 ```
@@ -682,19 +757,22 @@ keyPattern: string              // Redis key pattern for user sessions
 
 This configuration handles terms of service and privacy policy file management.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`uploadContentPath`** - Upload path pattern for policy content
+
 ```typescript
 uploadContentPath: string       // Path pattern for uploading policy content files
 ```
 
 **`contentPublicPath`** - Public path for policy content
+
 ```typescript
 contentPublicPath: string       // Public path for accessing policy content
 ```
 
 **`filenamePattern`** - Filename pattern for policy files
+
 ```typescript
 filenamePattern: string         // Pattern for policy file names
 ```
@@ -706,14 +784,16 @@ filenamePattern: string         // Pattern for policy file names
 
 This configuration manages feature flag caching settings.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`cachePrefixKey`** - Cache prefix for feature flags
+
 ```typescript
 cachePrefixKey: string          // Redis cache prefix for feature flag data
 ```
 
 **`cacheTtlMs`** - Cache TTL for feature flags
+
 ```typescript
 cacheTtlMs: number              // Cache TTL in milliseconds for feature flag data
 ```
@@ -725,9 +805,10 @@ cacheTtlMs: number              // Cache TTL in milliseconds for feature flag da
 
 This configuration handles API response caching settings.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`cachePrefix`** - Cache prefix for API responses
+
 ```typescript
 cachePrefix: string             // Cache prefix for API response data
 ```
@@ -741,25 +822,27 @@ This configuration manages Firebase integration settings for push notification d
 
 > **Environment Variables**: See [Environment Documentation](environment.md) for detailed environment variable configuration.
 
-#### Configuration Keys:
+#### Configuration Keys
 
 **`projectId`** - Firebase project ID
+
 ```typescript
 projectId?: string              // Firebase project ID from Firebase console
 ```
 
 **`clientEmail`** - Firebase service account email
+
 ```typescript
 clientEmail?: string            // Firebase service account client email
 ```
 
 **`privateKey`** - Firebase service account private key
+
 ```typescript
 privateKey?: string             // Base64-encoded DER PKCS8 private key (from Firebase Console service account JSON)
 ```
 
 > **Note**: All Firebase config fields are optional. They are required only when push notification features are enabled. The `FirebaseConfig` is registered in `src/configs/index.ts` alongside other config modules.
-
 
 <!-- REFERENCES -->
 

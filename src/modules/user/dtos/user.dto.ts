@@ -51,7 +51,7 @@ export class UserDto extends DatabaseDto {
 
     @ApiProperty({
         required: true,
-        example: faker.database.mongodbObjectId(),
+        example: faker.string.uuid(),
     })
     roleId: string;
 
@@ -110,7 +110,7 @@ export class UserDto extends DatabaseDto {
 
     @ApiProperty({
         required: true,
-        example: faker.database.mongodbObjectId(),
+        example: faker.string.uuid(),
     })
     countryId: string;
 

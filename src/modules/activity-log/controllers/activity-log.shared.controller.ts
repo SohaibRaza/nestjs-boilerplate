@@ -1,3 +1,6 @@
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { PaginationCursorQuery } from '@common/pagination/decorators/pagination.decorator';
 import { IPaginationQueryCursorParams } from '@common/pagination/interfaces/pagination.interface';
 import { ResponsePaging } from '@common/response/decorators/response.decorator';
@@ -13,8 +16,6 @@ import {
 } from '@modules/auth/decorators/auth.jwt.decorator';
 import { TermPolicyAcceptanceProtected } from '@modules/term-policy/decorators/term-policy.decorator';
 import { UserProtected } from '@modules/user/decorators/user.decorator';
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('modules.shared.user.activityLog')
 @Controller({

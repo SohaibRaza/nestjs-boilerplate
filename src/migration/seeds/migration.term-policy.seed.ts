@@ -1,3 +1,8 @@
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { EnumTermPolicyStatus } from '@prisma/client';
+import { Command } from 'nest-commander';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { DatabaseService } from '@common/database/services/database.service';
 import { DatabaseUtil } from '@common/database/utils/database.util';
@@ -5,10 +10,6 @@ import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { migrationTermPolicyData } from '@migration/data/migration.term-policy.data';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
 import { TermPolicyCreateRequestDto } from '@modules/term-policy/dtos/request/term-policy.create.request.dto';
-import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { EnumTermPolicyStatus } from '@prisma/client';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'termPolicy',
@@ -68,8 +69,6 @@ export class MigrationTermPolicySeed
         }
 
         this.logger.log('TermPolicies seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -78,7 +77,5 @@ export class MigrationTermPolicySeed
         await this.databaseService.termPolicy.deleteMany({});
 
         this.logger.log('TermPolicies removed successfully.');
-
-        return;
     }
 }

@@ -35,6 +35,7 @@ ACK NestJS Boilerplate standardizes API responses through decorators that automa
 Standard API response decorator with optional caching.
 
 **Parameters:**
+
 - `messagePath` (string): Path to response message for localization
 - `options` (optional): Configuration options
   - `cache` (boolean | object): Enable caching
@@ -106,11 +107,13 @@ async updateUser(@Param('id') id: string, @Body() dto: UpdateUserDto): Promise<I
 Paginated API response decorator with optional caching. Supports both offset-based and cursor-based pagination.
 
 **Parameters:**
+
 - `messagePath` (string): Path to response message for localization
 - `options` (optional): Configuration options
   - `cache` (boolean | object): Enable caching
 
 **Requirements:**
+
 - Request must include pagination parameters (see [Pagination Documentation][ref-doc-pagination])
 - Response must implement `IResponsePagingReturn<T>` interface
 - Must specify pagination `type`: `'offset'` or `'cursor'`
@@ -170,6 +173,7 @@ File download response decorator that handles CSV and PDF file downloads with pr
 **Parameters:** None
 
 **Requirements:**
+
 - Response must implement `IResponseFileReturn` interface (union of `IResponseCsvReturn` | `IResponsePdfReturn`)
 - Must specify `extension`: `EnumFileExtensionDocument.csv` or `EnumFileExtensionDocument.pdf`
 - CSV data must be a string (pre-converted to CSV format)
@@ -413,8 +417,6 @@ All responses automatically include these headers (set by interceptors):
 - `x-repo-version`: Repository version
 - `x-request-id`: Unique request identifier
 - `x-correlation-id`: Request correlation identifier
-
-
 
 <!-- REFERENCES -->
 

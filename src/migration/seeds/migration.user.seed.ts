@@ -1,13 +1,4 @@
-import { EnumAppEnvironment } from '@app/enums/app.enum';
-import { DatabaseService } from '@common/database/services/database.service';
-import { DatabaseUtil } from '@common/database/utils/database.util';
-import { HelperService } from '@common/helper/services/helper.service';
 import { faker } from '@faker-js/faker';
-import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
-import { migrationUserData } from '@migration/data/migration.user.data';
-import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
-import { AuthUtil } from '@modules/auth/utils/auth.util';
-import { UserUtil } from '@modules/user/utils/user.util';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -24,6 +15,16 @@ import {
 } from '@prisma/client';
 import { Command } from 'nest-commander';
 import { UAParser } from 'ua-parser-js';
+
+import { EnumAppEnvironment } from '@app/enums/app.enum';
+import { DatabaseService } from '@common/database/services/database.service';
+import { DatabaseUtil } from '@common/database/utils/database.util';
+import { HelperService } from '@common/helper/services/helper.service';
+import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
+import { migrationUserData } from '@migration/data/migration.user.data';
+import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
+import { AuthUtil } from '@modules/auth/utils/auth.util';
+import { UserUtil } from '@modules/user/utils/user.util';
 
 @Command({
     name: 'user',
@@ -267,8 +268,6 @@ export class MigrationUserSeed
         }
 
         this.logger.log('Users seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -293,7 +292,5 @@ export class MigrationUserSeed
         }
 
         this.logger.log('Users removed completed.');
-
-        return;
     }
 }

@@ -1,6 +1,21 @@
 import { EnumFileExtension } from '@common/file/enums/file.enum';
 
-export type IFile = Express.Multer.File;
+/**
+ * Represents an uploaded file from fastify-multer.
+ * Compatible with Express.Multer.File shape for backward compatibility.
+ */
+export interface IFile {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    size: number;
+    destination?: string;
+    filename?: string;
+    path?: string;
+    buffer?: Buffer;
+    stream?: NodeJS.ReadableStream;
+}
 
 export interface IFileUploadSingle {
     field: string;

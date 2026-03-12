@@ -1,0 +1,20 @@
+{
+    "error": {
+        "invalidPerPage": "'perPage' پیرامیٹر 1 اور {maxPerPage} کے درمیان ہونا چاہیے۔",
+        "invalidCursorPaginationParams": "غلط کرسر صفحہ بندی پیرامیٹرز فراہم کیے گئے۔",
+        "invalidOffsetPaginationParams": "غلط آفسیٹ صفحہ بندی پیرامیٹرز فراہم کیے گئے۔",
+        "cursorTooLong": "کرسر کی لمبائی {maxCursorLength} حروف سے زیادہ نہیں ہونی چاہیے۔",
+        "invalidCursorFormat": "فراہم کردہ کرسر درست فارمیٹ میں نہیں ہے۔",
+        "invalidPage": "'page' پیرامیٹر ایک مثبت عدد صحیح ہونا چاہیے اور زیادہ سے زیادہ {maxPage}۔",
+        "filterInvalidValueEnum": "'{property}' فراہم کردہ قدر غلط ہے۔ اجازت یافتہ اقدار ہیں: {allowedValues}۔",
+        "filterInvalidValue": "'{property}' فراہم کردہ قدر غلط ہے۔",
+        "orderByNotAllowed": "'orderBy' فیلڈ '{field}' اجازت یافتہ نہیں ہے۔ اجازت یافتہ فیلڈز ہیں: {allowedFields}۔",
+        "pageExceedsMaximum": "'page' پیرامیٹر زیادہ سے زیادہ اجازت یافتہ قدر {maxPage} سے تجاوز کر گیا۔ موصول: {receivedPage}۔",
+        "pageCannotBeLessThanOne": "'page' پیرامیٹر {minPage} سے کم نہیں ہو سکتا۔ موصول: {receivedPage}۔",
+        "perPageExceedsMaximum": "'perPage' پیرامیٹر زیادہ سے زیادہ اجازت یافتہ قدر {maxPerPage} سے تجاوز کر گیا۔ موصول: {receivedPerPage}۔",
+        "perPageCannotBeLessThanOne": "'perPage' پیرامیٹر {minPerPage} سے کم نہیں ہو سکتا۔ موصول: {receivedPerPage}۔",
+        "invalidCursorData": "فراہم کردہ کرسر ڈیٹا غلط ہے۔",
+        "failedToEncodeCursor": "کرسر ڈیٹا انکوڈ کرنے میں ناکامی۔",
+        "failedToDecodeCursor": "کرسر ڈیٹا ڈی کوڈ کرنے میں ناکامی۔"
+    }
+}

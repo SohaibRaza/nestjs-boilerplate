@@ -9,6 +9,7 @@ This documentation explains the features and usage of **Activity Log Module**: L
 Activity Log is a system to record successful user activities in the application. It supports self activity recording.
 
 **Notes:**
+
 - Activity logs are **only recorded for successful requests**. Failed requests are not logged.
 - `@ActivityLog` decorator is **only implemented for admin endpoints**.
 - `@ActivityLog` decorator **requires** `@AuthJwtAccessProtected` decorator to be present.
@@ -56,6 +57,7 @@ sequenceDiagram
 ## Data
 
 Each activity log contains:
+
 - **userId** - User who performed or was affected
 - **action** - Type of activity (enum)
 - **ipAddress** - Request IP address
@@ -130,6 +132,7 @@ async blockUser(userId: string): Promise<IResponseReturn> {
 **Guidelines:**
 
 Never include sensitive data:
+
 ```typescript
 metadataActivityLog: {
     password: "secret123",        // Never!
@@ -210,7 +213,6 @@ async blockUser(userId: string): Promise<IResponseReturn> {
   }
 }
 ```
-
 
 <!-- REFERENCES -->
 

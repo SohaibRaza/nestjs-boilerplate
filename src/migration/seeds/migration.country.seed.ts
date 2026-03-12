@@ -1,12 +1,13 @@
+import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Command } from 'nest-commander';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { DatabaseService } from '@common/database/services/database.service';
 import { MigrationSeedBase } from '@migration/bases/migration.seed.base';
 import { migrationCountryData } from '@migration/data/migration.country.data';
 import { IMigrationSeed } from '@migration/interfaces/migration.seed.interface';
 import { CountryRequestDto } from '@modules/country/dtos/request/country.request.dto';
-import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Command } from 'nest-commander';
 
 @Command({
     name: 'country',
@@ -54,8 +55,6 @@ export class MigrationCountrySeed
         }
 
         this.logger.log('Countries seeded successfully.');
-
-        return;
     }
 
     async remove(): Promise<void> {
@@ -71,7 +70,5 @@ export class MigrationCountrySeed
         }
 
         this.logger.log('Countries removed successfully.');
-
-        return;
     }
 }

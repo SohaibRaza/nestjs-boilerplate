@@ -7,7 +7,8 @@ import {
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
+
 import { HelperService } from '@common/helper/services/helper.service';
 import { MessageService } from '@common/message/services/message.service';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
@@ -40,7 +41,7 @@ export class AppGeneralFilter implements ExceptionFilter {
      */
     async catch(exception: unknown, host: ArgumentsHost): Promise<void> {
         const ctx: HttpArgumentsHost = host.switchToHttp();
-        const response: Response = ctx.getResponse<Response>();
+        const response: FastifyReply = ctx.getResponse<FastifyReply>();
         const request: IRequestApp = ctx.getRequest<IRequestApp>();
 
         this.sendToSentry(exception);
@@ -65,7 +66,7 @@ export class AppGeneralFilter implements ExceptionFilter {
             language: xLanguage,
             timestamp: xTimestamp,
             timezone: xTimezone,
-            path: request.path,
+            path: request.url,
             version: xVersion,
             repoVersion: xRepoVersion,
             requestId: xRequestId,
@@ -83,17 +84,15 @@ export class AppGeneralFilter implements ExceptionFilter {
         };
 
         response
-            .setHeader('x-custom-lang', xLanguage)
-            .setHeader('x-timestamp', xTimestamp)
-            .setHeader('x-timezone', xTimezone)
-            .setHeader('x-version', xVersion)
-            .setHeader('x-repo-version', xRepoVersion)
-            .setHeader('x-request-id', xRequestId)
-            .setHeader('x-correlation-id', xCorrelationId)
-            .status(statusHttp)
-            .json(responseBody);
-
-        return;
+            .header('x-custom-lang', xLanguage)
+            .header('x-timestamp', xTimestamp)
+            .header('x-timezone', xTimezone)
+            .header('x-version', xVersion)
+            .header('x-repo-version', xRepoVersion)
+            .header('x-request-id', xRequestId)
+            .header('x-correlation-id', xCorrelationId)
+            .code(statusHttp)
+            .send(responseBody);
     }
 
     /**
@@ -109,7 +108,5 @@ export class AppGeneralFilter implements ExceptionFilter {
         } catch (error: unknown) {
             this.logger.error(error, 'Failed to send exception to Sentry');
         }
-
-        return;
     }
 }

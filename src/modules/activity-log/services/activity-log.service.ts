@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common';
+
 import {
     IPaginationQueryCursorParams,
     IPaginationQueryOffsetParams,
@@ -8,7 +10,6 @@ import { ActivityLogResponseDto } from '@modules/activity-log/dtos/response/acti
 import { IActivityLogService } from '@modules/activity-log/interfaces/activity-log.service.interface';
 import { ActivityLogRepository } from '@modules/activity-log/repositories/activity-log.repository';
 import { ActivityLogUtil } from '@modules/activity-log/utils/activity-log.util';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ActivityLogService implements IActivityLogService {

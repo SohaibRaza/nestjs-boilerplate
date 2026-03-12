@@ -1,4 +1,12 @@
 import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+    ServiceUnavailableException,
+} from '@nestjs/common';
+
+import {
     IPaginationQueryCursorParams,
     IPaginationQueryOffsetParams,
 } from '@common/pagination/interfaces/pagination.interface';
@@ -16,13 +24,6 @@ import { IFeatureFlagMetadata } from '@modules/feature-flag/interfaces/feature-f
 import { IFeatureFlagService } from '@modules/feature-flag/interfaces/feature-flag.service.interface';
 import { FeatureFlagRepository } from '@modules/feature-flag/repositories/feature-flag.repository';
 import { FeatureFlagUtil } from '@modules/feature-flag/utils/feature-flag.util';
-import {
-    BadRequestException,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
-    ServiceUnavailableException,
-} from '@nestjs/common';
 
 @Injectable()
 export class FeatureFlagService implements IFeatureFlagService {

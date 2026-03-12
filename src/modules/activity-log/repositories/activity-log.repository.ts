@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+import { ActivityLog, EnumActivityLogAction, Prisma } from '@prisma/client';
+
 import { DatabaseService } from '@common/database/services/database.service';
 import { DatabaseUtil } from '@common/database/utils/database.util';
 import {
@@ -12,8 +15,6 @@ import {
     IActivityLog,
     IActivityLogMetadata,
 } from '@modules/activity-log/interfaces/activity-log.interface';
-import { Injectable } from '@nestjs/common';
-import { ActivityLog, EnumActivityLogAction, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ActivityLogRepository {

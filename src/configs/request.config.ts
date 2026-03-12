@@ -10,6 +10,9 @@ export interface IConfigRequest {
         urlencoded: { limitInBytes: number };
         applicationOctetStream: { limitInBytes: number };
     };
+    idempotency: {
+        ttlInMs: number;
+    };
     timeoutInMs: number;
     cors: {
         allowedMethod: string[];
@@ -27,17 +30,28 @@ export default registerAs(
     (): IConfigRequest => ({
         body: {
             json: {
-                limitInBytes: bytes('500kb'),
+                limitInBytes: bytes(
+                    process.env.REQUEST_BODY_JSON_LIMIT_IN_BYTES ?? '500kb'
+                ),
             },
             text: {
-                limitInBytes: bytes('1mb'),
+                limitInBytes: bytes(
+                    process.env.REQUEST_BODY_TEXT_LIMIT_IN_BYTES ?? '1mb'
+                ),
             },
             urlencoded: {
-                limitInBytes: bytes('1mb'),
+                limitInBytes: bytes(
+                    process.env.REQUEST_BODY_URLENCODED_LIMIT_IN_BYTES ?? '1mb'
+                ),
             },
             applicationOctetStream: {
                 limitInBytes: FileSizeInBytes,
             },
+        },
+        idempotency: {
+            ttlInMs: process.env.REQUEST_IDEMPOTENCY_TTL_IN_MS
+                ? Number.parseInt(process.env.REQUEST_IDEMPOTENCY_TTL_IN_MS)
+                : ms('10s'),
         },
         timeoutInMs: ms('30s'),
         cors: {

@@ -32,6 +32,7 @@ AWS S3 presigned URLs for downloads enable secure, temporary access to private S
 ### Implementation
 
 **Step 1 - Request DTO:**
+
 ```typescript
 export class UserGetPhotoProfilePresignRequestDto {
   @ApiProperty({
@@ -46,6 +47,7 @@ export class UserGetPhotoProfilePresignRequestDto {
 ```
 
 **Step 2 - Controller Endpoint:**
+
 ```typescript
 @Controller('users')
 export class UserController {
@@ -66,6 +68,7 @@ export class UserController {
 ```
 
 **Step 3 - Service Implementation:**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -98,6 +101,7 @@ export class UserService {
 ```
 
 **Step 4 - Client-Side Download:**
+
 ```typescript
 async function downloadPhotoWithPresign(key: string) {
   try {
@@ -147,6 +151,7 @@ async function downloadPhotoWithPresign(key: string) {
 ```
 
 ### Configuration Options
+
 ```typescript
 interface IAwsS3PresignGetItemOptions {
   access?: EnumAwsS3Accessibility; // public or private
@@ -155,6 +160,7 @@ interface IAwsS3PresignGetItemOptions {
 ```
 
 ### Response Structure
+
 ```typescript
 interface AwsS3PresignDto {
   presignUrl: string;    // The presigned URL for download
@@ -166,6 +172,7 @@ interface AwsS3PresignDto {
 ```
 
 ### Usage Examples
+
 ```typescript
 // Example 1: Generate presign URL for private file (5 minutes)
 const presign = await awsS3Service.presignGetItem(
@@ -191,6 +198,7 @@ const buffer = await response.arrayBuffer();
 ```
 
 ### Flow Diagram
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -246,6 +254,7 @@ AWS S3 presigned URLs enable secure client-side direct uploads to S3 without exp
 ### Implementation
 
 **Step 1 - Request DTO:**
+
 ```typescript
 export class UserGeneratePhotoProfileRequestDto {
   @ApiProperty({
@@ -298,6 +307,7 @@ export class UserUpdateProfilePhotoRequestDto {
 ```
 
 **Step 2 - Controller Endpoints:**
+
 ```typescript
 @Controller('users')
 export class UserController {
@@ -334,6 +344,7 @@ export class UserController {
 ```
 
 **Step 3 - Service Implementation:**
+
 ```typescript
 @Injectable()
 export class UserService {
@@ -384,6 +395,7 @@ export class UserService {
 ```
 
 **Step 4 - Client-Side Upload:**
+
 ```typescript
 async function uploadPhotoSimple(file: File) {
   try {
@@ -437,6 +449,7 @@ async function uploadPhotoSimple(file: File) {
 ```
 
 ### Configuration Options
+
 ```typescript
 interface IAwsS3PresignPutItemOptions {
   access?: EnumAwsS3Accessibility; // public or private
@@ -446,6 +459,7 @@ interface IAwsS3PresignPutItemOptions {
 ```
 
 ### Response Structure
+
 ```typescript
 interface AwsS3PresignDto {
   presignUrl: string;    // The presigned URL for upload
@@ -457,6 +471,7 @@ interface AwsS3PresignDto {
 ```
 
 ### Flow Diagram
+
 ```mermaid
 sequenceDiagram
     participant Client
@@ -523,7 +538,6 @@ sequenceDiagram
    - Backend maps presign data to `AwsS3Dto`
    - Repository updates user profile with S3 file reference
    - Transaction logged with IP address and user agent for audit trail
-
 
 <!-- REFERENCES -->
 

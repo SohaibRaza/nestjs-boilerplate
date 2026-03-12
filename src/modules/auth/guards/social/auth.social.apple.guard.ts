@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { IAuthSocialPayload } from '@modules/auth/interfaces/auth.interface';
 import { AuthService } from '@modules/auth/services/auth.service';

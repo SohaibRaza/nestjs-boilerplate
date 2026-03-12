@@ -4,21 +4,21 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { HttpArgumentsHost } from '@nestjs/common/interfaces';
+import { EnumActivityLogAction, UserAgent } from '@prisma/client';
+import { getClientIp } from '@supercharge/request-ip';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { Reflector } from '@nestjs/core';
-import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { UAParser } from 'ua-parser-js';
-import { getClientIp } from '@supercharge/request-ip';
-import { ActivityLogRepository } from '@modules/activity-log/repositories/activity-log.repository';
+
 import {
     ActivityLogActionMetaKey,
     ActivityLogMetadataMetaKey,
 } from '@modules/activity-log/constants/activity-log.constant';
-import { EnumActivityLogAction, UserAgent } from '@prisma/client';
 import { IActivityLogMetadata } from '@modules/activity-log/interfaces/activity-log.interface';
-import { Response } from 'express';
+import { ActivityLogRepository } from '@modules/activity-log/repositories/activity-log.repository';
+import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { IResponseActivityLogReturn } from '@common/response/interfaces/response.interface';
 import geoIp from 'geoip-lite';
 

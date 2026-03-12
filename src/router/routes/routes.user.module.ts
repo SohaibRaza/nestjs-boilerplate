@@ -1,6 +1,7 @@
+import { Module } from '@nestjs/common';
+
 import { UserUserController } from '@modules/user/controllers/user.user.controller';
 import { UserModule } from '@modules/user/user.module';
-import { Module } from '@nestjs/common';
 
 /**
  * User routes module that provides user-specific endpoints.

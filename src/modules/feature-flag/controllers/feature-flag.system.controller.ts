@@ -1,3 +1,6 @@
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
 import { PaginationCursorQuery } from '@common/pagination/decorators/pagination.decorator';
 import { IPaginationQueryCursorParams } from '@common/pagination/interfaces/pagination.interface';
 import { ResponsePaging } from '@common/response/decorators/response.decorator';
@@ -8,8 +11,6 @@ import { FeatureFlagDefaultAvailableSearch } from '@modules/feature-flag/constan
 import { FeatureFlagSystemListDoc } from '@modules/feature-flag/docs/feature-flag.system.doc';
 import { FeatureFlagResponseDto } from '@modules/feature-flag/dtos/response/feature-flag.response';
 import { FeatureFlagService } from '@modules/feature-flag/services/feature-flag.service';
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('modules.shared.featureFlag')
 @Controller({

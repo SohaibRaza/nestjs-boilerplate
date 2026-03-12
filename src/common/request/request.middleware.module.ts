@@ -6,19 +6,18 @@ import {
     ThrottlerModule,
     ThrottlerModuleOptions,
 } from '@nestjs/throttler';
-import { RequestRequestIdMiddleware } from '@common/request/middlewares/request.request-id.middleware';
-import { RequestHelmetMiddleware } from '@common/request/middlewares/request.helmet.middleware';
-import { RequestBodyParserMiddleware } from '@common/request/middlewares/request.body-parser.middleware';
-import { RequestCorsMiddleware } from '@common/request/middlewares/request.cors.middleware';
-import { RequestUrlVersionMiddleware } from '@common/request/middlewares/request.url-version.middleware';
-import { RequestResponseTimeMiddleware } from '@common/request/middlewares/request.response-time.middleware';
-import { RequestCustomLanguageMiddleware } from '@common/request/middlewares/request.custom-language.middleware';
-import { RequestCompressionMiddleware } from '@common/request/middlewares/request.compression.middleware';
 import { SentryModule } from '@sentry/nestjs/setup';
+
+import { RequestRequestIdMiddleware } from '@common/request/middlewares/request.request-id.middleware';
+import { RequestUrlVersionMiddleware } from '@common/request/middlewares/request.url-version.middleware';
+import { RequestCustomLanguageMiddleware } from '@common/request/middlewares/request.custom-language.middleware';
 
 /**
  * Central middleware configuration module for HTTP request/response processing.
- * Configures security, performance optimization, and monitoring.
+ * Configures throttling and custom NestJS middlewares.
+ *
+ * Note: Helmet, CORS, Compression, Body Parser, and Response-Time are now registered
+ * as Fastify plugins in main.ts instead of NestJS middlewares.
  */
 @Module({
     controllers: [],
@@ -48,6 +47,7 @@ import { SentryModule } from '@sentry/nestjs/setup';
 export class RequestMiddlewareModule implements NestModule {
     /**
      * Configures the middleware processing pipeline for all HTTP requests.
+     * Only includes middlewares compatible with Fastify's NestMiddleware interface.
      *
      * @param consumer - NestJS middleware consumer for applying middleware to routes
      */
@@ -55,13 +55,8 @@ export class RequestMiddlewareModule implements NestModule {
         consumer
             .apply(
                 RequestRequestIdMiddleware,
-                RequestHelmetMiddleware,
-                RequestBodyParserMiddleware,
-                RequestCorsMiddleware,
                 RequestUrlVersionMiddleware,
-                RequestResponseTimeMiddleware,
-                RequestCustomLanguageMiddleware,
-                RequestCompressionMiddleware
+                RequestCustomLanguageMiddleware
             )
             .forRoutes('{*wildcard}');
     }

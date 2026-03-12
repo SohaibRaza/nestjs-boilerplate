@@ -5,6 +5,7 @@
 Two-Factor Authentication (2FA) adds an additional security layer to user authentication using Time-based One-Time Password (TOTP) algorithm. This implementation supports both authenticator apps (Google Authenticator, Authy, etc.) and backup codes for account recovery.
 
 **Key Features:**
+
 - TOTP-based verification (RFC 6238 compliant)
 - 8 one-time backup codes for recovery
 - Admin-controlled force setup
@@ -26,30 +27,31 @@ Two-Factor Authentication (2FA) adds an additional security layer to user authen
 - [Overview](#overview)
 - [Related Documents](#related-documents)
 - [Configuration](#configuration)
-    - [Environment Variables](#environment-variables)
-    - [Configuration Details](#configuration-details)
+  - [Environment Variables](#environment-variables)
+  - [Configuration Details](#configuration-details)
 - [Security Features](#security-features)
-    - [Failed Attempts Protection](#failed-attempts-protection)
-    - [Temporary Lock Mechanism](#temporary-lock-mechanism)
+  - [Failed Attempts Protection](#failed-attempts-protection)
+  - [Temporary Lock Mechanism](#temporary-lock-mechanism)
 - [Where 2FA is Used](#where-2fa-is-used)
-    - [Shared Endpoints (User Operations)](#shared-endpoints-user-operations)
-    - [Public Endpoints](#public-endpoints)
-    - [Admin Endpoints](#admin-endpoints)
+  - [Shared Endpoints (User Operations)](#shared-endpoints-user-operations)
+  - [Public Endpoints](#public-endpoints)
+  - [Admin Endpoints](#admin-endpoints)
 - [Authentication Flows](#authentication-flows)
-    - [Setup Flow](#setup-flow)
-    - [Login Flow (2FA Enabled)](#login-flow-2fa-enabled)
-    - [Admin Force Setup Flow](#admin-force-setup-flow)
-    - [Backup Code Usage Flow](#backup-code-usage-flow)
-    - [Temporary Lock Flow](#temporary-lock-flow)
-    - [Admin Reset 2FA Flow](#admin-reset-2fa-flow)
-    - [Password Operations with 2FA Flow](#password-operations-with-2fa-flow)
+  - [Setup Flow](#setup-flow)
+  - [Login Flow (2FA Enabled)](#login-flow-2fa-enabled)
+  - [Admin Force Setup Flow](#admin-force-setup-flow)
+  - [Backup Code Usage Flow](#backup-code-usage-flow)
+  - [Temporary Lock Flow](#temporary-lock-flow)
+  - [Admin Reset 2FA Flow](#admin-reset-2fa-flow)
+  - [Password Operations with 2FA Flow](#password-operations-with-2fa-flow)
 - [Error Handling](#error-handling)
-    - [HTTP Status Codes](#http-status-codes)
+  - [HTTP Status Codes](#http-status-codes)
 - [Contribution](#contribution)
 
 ## Configuration
 
 ### Environment Variables
+
 ```env
 AUTH_TWO_FACTOR_ISSUER=YourAppName
 AUTH_TWO_FACTOR_ENCRYPTION_KEY=your-32-character-encryption-key-here
@@ -60,7 +62,7 @@ AUTH_TWO_FACTOR_ENCRYPTION_KEY=your-32-character-encryption-key-here
 Located in `src/configs/auth.config.ts`:
 
 | Setting | Value | Description |
-|---------|-------|-------------|
+| ------- | ----- | ----------- |
 | `issuer` | `YourAppName` | Displayed in authenticator apps |
 | `digits` | `6` | TOTP code length (standard) |
 | `periodInSeconds` | `30` | Time window in seconds |
@@ -79,12 +81,14 @@ Located in `src/configs/auth.config.ts`:
 The system tracks failed 2FA verification attempts to protect against brute force attacks:
 
 **How it works:**
+
 - Each failed TOTP code or backup code verification increments the attempt counter
 - Counter is stored in the `TwoFactor.attempt` field
 - Counter resets to 0 when user successfully verifies with valid code or backup code
 - Both TOTP codes and backup codes share the same counter (combined limit)
 
 **Counter tracking:**
+
 ```
 Attempt 1 (TOTP failed) → attempt = 1
 Attempt 2 (Backup code failed) → attempt = 2
@@ -97,6 +101,7 @@ Attempt 4 (TOTP success) → attempt = 0 (reset)
 When a user reaches the maximum allowed attempts (5 failed verifications), the system temporarily locks 2FA verification with exponential backoff.
 
 **How it works:**
+
 1. Lock check happens **before** verification attempt
 2. If locked, return error with `retryAfterSeconds` (HTTP 429)
 3. If not locked, proceed with verification
@@ -109,15 +114,18 @@ When a user reaches the maximum allowed attempts (5 failed verifications), the s
 6. Lock duration increases exponentially based on attempt count
 
 **Lock timing:**
+
 - Lock is set **after** the 5th failed attempt
 - Lock prevents **next** verification attempt
 - User receives HTTP 429 on **next** attempt (not the 5th)
 
 **Lock duration calculation:**
+
 - Formula: `TTL = 2^(attempt / maxAttempt) × lockAttemptDuration`
 - Base lock duration: 2 minutes (configurable via `lockAttemptDuration`)
 
 **Lock duration examples:**
+
 ```
 After 5th failed attempt (attempt=5):
   TTL = 2^(5/5) × 2 minutes = 2^1 × 2 = 4 minutes
@@ -130,6 +138,7 @@ After 7th failed attempt (attempt=7):
 ```
 
 **User experience flow:**
+
 1. User enters wrong code 5 times → gets HTTP 401 (invalid code)
 2. Lock is set in background
 3. User tries again (6th attempt) → gets HTTP 429 with `retryAfterSeconds: 240` (4 minutes)
@@ -139,6 +148,7 @@ After 7th failed attempt (attempt=7):
 7. If fails again, new lock with longer duration (exponential backoff)
 
 **Recovery process:**
+
 - Lock automatically expires after TTL duration (no admin intervention needed)
 - Attempt counter persists in database until successful verification
 - Each subsequent lock (after retry) increases duration exponentially
@@ -148,7 +158,9 @@ After 7th failed attempt (attempt=7):
 ## Where 2FA is Used
 
 ### Shared Endpoints (User Operations)
+
 **2FA Management:**
+
 - `GET /shared/user/2fa/status` - Check current 2FA status
 - `POST /shared/user/2fa/setup` - Get TOTP secret and otpauthUrl
 - `POST /shared/user/2fa/enable` - Enable 2FA with code verification
@@ -156,10 +168,13 @@ After 7th failed attempt (attempt=7):
 - `POST /shared/user/2fa/regenerate-backup-codes` - Regenerate backup codes
 
 **Password Operations (require 2FA if enabled):**
+
 - `PATCH /shared/user/change-password` - **Change password (requires 2FA verification if enabled)**
 
 ### Public Endpoints
+
 **Login Flow:**
+
 - `POST /public/user/login/credential` - Login with email/password
 - `POST /public/user/login/social/google` - Login with Google OAuth
 - `POST /public/user/login/social/apple` - Login with Apple Sign In
@@ -167,9 +182,11 @@ After 7th failed attempt (attempt=7):
 - `POST /public/user/login/2fa/enable` - Complete forced 2FA setup during login
 
 **Password Recovery (require 2FA if enabled):**
+
 - `PUT /public/user/password/reset` - **Reset password (requires 2FA verification if enabled)**
 
 ### Admin Endpoints
+
 - `PATCH /admin/user/update/:userId/2fa/reset` - Force reset user's 2FA (clears lock and resets attempts)
 
 **Note:** See Swagger documentation for detailed request/response schemas.
@@ -179,6 +196,7 @@ After 7th failed attempt (attempt=7):
 ### Setup Flow
 
 User enables 2FA for their account:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -204,6 +222,7 @@ sequenceDiagram
 ### Login Flow (2FA Enabled)
 
 User logs in with 2FA enabled:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -247,6 +266,7 @@ sequenceDiagram
 ### Admin Force Setup Flow
 
 Admin forces user to setup 2FA on next login:
+
 ```mermaid
 sequenceDiagram
     participant Admin
@@ -275,6 +295,7 @@ sequenceDiagram
 ### Backup Code Usage Flow
 
 User uses backup code when authenticator app is unavailable:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -313,6 +334,7 @@ sequenceDiagram
 ### Temporary Lock Flow
 
 System behavior when user reaches maximum attempts:
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -352,6 +374,7 @@ sequenceDiagram
 ### Admin Reset 2FA Flow
 
 Admin can force reset user's 2FA if needed (optional, user can also wait for lock to expire):
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -386,6 +409,7 @@ sequenceDiagram
 When user has 2FA enabled, password operations require additional verification:
 
 **Change Password:**
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -426,6 +450,7 @@ sequenceDiagram
 ```
 
 **Reset Password (Forgot Password):**
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -466,6 +491,7 @@ sequenceDiagram
 ```
 
 **Disable 2FA:**
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -499,7 +525,7 @@ sequenceDiagram
 ### HTTP Status Codes
 
 | Status | Error Code | Description |
-|--------|------------|-------------|
+| ------ | ---------- | ----------- |
 | 400 | `twoFactorNotEnabled` | 2FA not enabled for this user |
 | 400 | `twoFactorAlreadyEnabled` | 2FA already active |
 | 400 | `twoFactorRequiredSetup` | Must complete setup first |

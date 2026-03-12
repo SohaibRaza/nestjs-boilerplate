@@ -1,28 +1,31 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestApplication } from '@nestjs/core';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { writeFileSync } from 'fs';
+import { writeFileSync } from 'node:fs';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { MessageService } from '@common/message/services/message.service';
 
-export default async function (app: NestApplication): Promise<void> {
+export default async function swagger(
+    app: NestFastifyApplication
+): Promise<void> {
     const configService = app.get(ConfigService);
     const messageService = app.get(MessageService);
 
-    const env: string = configService.get<string>('app.env')!;
+    const env: string = configService.get<string>('app.env');
     const appName: string = configService.get<string>('app.name');
     const appVersion: string = configService.get<string>('app.version');
-    const appUrl: string = configService.get<string>('app.url')!;
+    const appUrl: string = configService.get<string>('app.url');
 
-    const appAuthorName: string = configService.get<string>('app.author.name')!;
+    const appAuthorName: string = configService.get<string>('app.author.name');
     const appAuthorEmail: string =
-        configService.get<string>('app.author.email')!;
+        configService.get<string>('app.author.email');
 
-    const docName: string = configService.get<string>('doc.name')!;
-    const docDesc: string = configService.get<string>('doc.description')!;
-    const docVersion: string = configService.get<string>('doc.version')!;
-    const docPrefix: string = configService.get<string>('doc.prefix')!;
+    const docName: string = configService.get<string>('doc.name');
+    const docDesc: string = configService.get<string>('doc.description');
+    const docVersion: string = configService.get<string>('doc.version');
+    const docPrefix: string = configService.get<string>('doc.prefix');
 
     const logger = new Logger(`${appName}-Doc`);
 

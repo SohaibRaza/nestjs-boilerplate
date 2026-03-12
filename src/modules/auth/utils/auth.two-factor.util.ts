@@ -1,3 +1,15 @@
+import { Cache } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'node:crypto';
+import {
+    HashAlgorithm,
+    OTPStrategy,
+    generateSecret,
+    generateURI,
+    verifySync,
+} from 'otplib';
+
 import { CacheMainProvider } from '@common/cache/constants/cache.constant';
 import { HelperService } from '@common/helper/services/helper.service';
 import { TwoFactor } from '@generated/prisma-client';
@@ -12,17 +24,6 @@ import {
     IAuthTwoFactorVerifyResult,
 } from '@modules/auth/interfaces/auth.interface';
 import { IUser } from '@modules/user/interfaces/user.interface';
-import { Cache } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { randomBytes } from 'crypto';
-import {
-    HashAlgorithm,
-    OTPStrategy,
-    generateSecret,
-    generateURI,
-    verifySync,
-} from 'otplib';
 
 /**
  * Utility class for Two-Factor Authentication (2FA) operations.
@@ -298,7 +299,7 @@ export class AuthTwoFactorUtil {
             };
         } else if (
             method === EnumAuthTwoFactorMethod.backupCodes &&
-            twoFactor.backupCodes.length === 0
+            (twoFactor.backupCodes as string[]).length === 0
         ) {
             return {
                 isValid: false,
@@ -323,7 +324,7 @@ export class AuthTwoFactorUtil {
         }
 
         const backupValidation = this.verifyBackupCode(
-            twoFactor.backupCodes,
+            twoFactor.backupCodes as string[],
             normalizedCode
         );
         if (!backupValidation.isValid) {
@@ -333,7 +334,9 @@ export class AuthTwoFactorUtil {
             };
         }
 
-        const updatedTwoFactorBackupCodes = [...twoFactor.backupCodes];
+        const updatedTwoFactorBackupCodes = [
+            ...(twoFactor.backupCodes as string[]),
+        ];
         updatedTwoFactorBackupCodes.splice(backupValidation.index, 1);
 
         return {

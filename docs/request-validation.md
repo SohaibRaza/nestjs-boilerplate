@@ -64,7 +64,8 @@ new ValidationPipe({
 ```
 
 **Processing flow**:
-```
+
+```text
 Request received
     ↓
 ValidationPipe validates DTO
@@ -327,6 +328,7 @@ export class CreateRangeDto {
 
 **LessThanOtherProperty**
 Validates field is less than another field:
+
 ```typescript
 export class CreateDiscountDto {
   @IsNumber()
@@ -436,6 +438,7 @@ See [File Upload][ref-doc-file-upload] for file extension and Csv validation pip
 When validation fails, `MessageService` processes errors through `setValidationMessage()`:
 
 **Process**:
+
 1. Extract constraint keys from `ValidationError` using `extractConstraints()`
 2. Handle nested validation errors by traversing children with `processNestedValidationError()`
 3. Reconstruct full property path for nested objects (e.g., `address.street`)
@@ -483,6 +486,7 @@ setValidationMessage(
 ```
 
 **Message Resolution Strategy**:
+
 1. **Primary**: Tries to resolve from `request.error.{constraint}` path
 2. **Fallback**: If translation not found (message equals path), uses raw message from class-validator
 
@@ -503,6 +507,7 @@ Error messages are translated using [nestjs-i18n][ref-nestjs-i18n] through [Mess
 **Message path pattern**: `request.error.{constraintName}`
 
 **Example message file** (`en/request.json`):
+
 ```json
 {
   "error": {
@@ -533,6 +538,7 @@ defaultMessage(validationArguments?: ValidationArguments): string {
 ```
 
 **Final response** (handled by `AppValidationFilter`):
+
 ```json
 {
   "statusCode": 5030,
@@ -563,9 +569,6 @@ defaultMessage(validationArguments?: ValidationArguments): string {
 ```
 
 See [Handling Error][ref-doc-handling-error] for complete error handling flow.
-
-
-
 
 <!-- REFERENCES -->
 

@@ -1,7 +1,8 @@
-import { FeatureFlagKeyPathMetaKey } from '@modules/feature-flag/constants/feature-flag.constant';
-import { FeatureFlagService } from '@modules/feature-flag/services/feature-flag.service';
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+
+import { FeatureFlagKeyPathMetaKey } from '@modules/feature-flag/constants/feature-flag.constant';
+import { FeatureFlagService } from '@modules/feature-flag/services/feature-flag.service';
 
 /**
  * Guard that validates feature flag activation status.

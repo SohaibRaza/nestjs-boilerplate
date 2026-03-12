@@ -8,16 +8,17 @@ import {
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import * as Sentry from '@sentry/nestjs';
+import { FastifyReply } from 'fastify';
+
 import { IAppException } from '@app/interfaces/app.interface';
 import { HelperService } from '@common/helper/services/helper.service';
+import { EnumMessageLanguage } from '@common/message/enums/message.enum';
+import { IMessageProperties } from '@common/message/interfaces/message.interface';
 import { MessageService } from '@common/message/services/message.service';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { ResponseMetadataDto } from '@common/response/dtos/response.dto';
 import { ResponseErrorDto } from '@common/response/dtos/response.error.dto';
-import { IMessageProperties } from '@common/message/interfaces/message.interface';
-import { EnumMessageLanguage } from '@common/message/enums/message.enum';
-import * as Sentry from '@sentry/nestjs';
 
 /**
  * HTTP exception filter that handles HttpException instances.
@@ -48,17 +49,14 @@ export class AppHttpFilter implements ExceptionFilter {
      */
     async catch(exception: HttpException, host: ArgumentsHost): Promise<void> {
         const ctx: HttpArgumentsHost = host.switchToHttp();
-        const response: Response = ctx.getResponse<Response>();
+        const response: FastifyReply = ctx.getResponse<FastifyReply>();
         const request: IRequestApp = ctx.getRequest<IRequestApp>();
 
         if (
-            !request.path.startsWith(this.globalPrefix) &&
-            !request.path.startsWith(this.docPrefix)
+            !request.url.startsWith(this.globalPrefix) &&
+            !request.url.startsWith(this.docPrefix)
         ) {
-            response.redirect(
-                HttpStatus.PERMANENT_REDIRECT,
-                `${this.globalPrefix}/public/hello`
-            );
+            response.redirect(`${this.globalPrefix}/public/hello`);
 
             return;
         }
@@ -87,7 +85,7 @@ export class AppHttpFilter implements ExceptionFilter {
             language: xLanguage,
             timestamp: xTimestamp,
             timezone: xTimezone,
-            path: request.path,
+            path: request.url,
             version: xVersion,
             repoVersion: xRepoVersion,
             requestId: xRequestId,
@@ -124,15 +122,15 @@ export class AppHttpFilter implements ExceptionFilter {
         };
 
         response
-            .setHeader('x-custom-lang', xLanguage)
-            .setHeader('x-timestamp', xTimestamp)
-            .setHeader('x-timezone', xTimezone)
-            .setHeader('x-version', xVersion)
-            .setHeader('x-repo-version', xRepoVersion)
-            .setHeader('x-request-id', xRequestId)
-            .setHeader('x-correlation-id', xCorrelationId)
-            .status(statusHttp)
-            .json(responseBody);
+            .header('x-custom-lang', xLanguage)
+            .header('x-timestamp', xTimestamp)
+            .header('x-timezone', xTimezone)
+            .header('x-version', xVersion)
+            .header('x-repo-version', xRepoVersion)
+            .header('x-request-id', xRequestId)
+            .header('x-correlation-id', xCorrelationId)
+            .code(statusHttp)
+            .send(responseBody);
 
         return;
     }

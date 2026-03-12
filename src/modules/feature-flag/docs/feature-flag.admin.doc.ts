@@ -1,3 +1,5 @@
+import { applyDecorators } from '@nestjs/common';
+
 import {
     Doc,
     DocAuth,
@@ -14,7 +16,6 @@ import {
 import { FeatureFlagUpdateMetadataRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-metadata.request';
 import { FeatureFlagUpdateStatusRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-status.request';
 import { FeatureFlagResponseDto } from '@modules/feature-flag/dtos/response/feature-flag.response';
-import { applyDecorators } from '@nestjs/common';
 
 export function FeatureFlagAdminListDoc(): MethodDecorator {
     return applyDecorators(

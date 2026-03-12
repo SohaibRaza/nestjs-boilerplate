@@ -4,7 +4,7 @@ This documentation explains the features and usage of **Message Module**: Locate
 
 ## Overview
 
-Message Service provides internationalization (i18n) support using [nestjs-i18n][ref-nestjs-i18n] to manage multi-language messages. All message files are stored in `src/languages/{language}` directory in JSON format. Currently, only English (`en`) is available.
+Message Service provides internationalization (i18n) support using [nestjs-i18n][ref-nestjs-i18n] to manage multi-language messages. All message files are stored in `src/languages/{language}` directory in JSON format. Currently supported languages are English (`en`) and Urdu (`ur`).
 
 The `MessageModule` is imported globally via `CommonModule` in `src/common/common.module.ts`, making `MessageService` available throughout the application without additional imports.
 
@@ -36,6 +36,7 @@ The `MessageModule` is imported globally via `CommonModule` in `src/common/commo
 Default language is configured via environment variable:
 
 ```bash
+# Available languages: en (English), ur (Urdu)
 APP_LANGUAGE=en
 ```
 
@@ -47,7 +48,7 @@ export default registerAs(
     'message',
     (): IConfigMessage => ({
         availableLanguage: Object.values(EnumMessageLanguage),
-        language: process.env.APP_LANGUAGE ?? EnumMessageLanguage.EN,
+        language: process.env.APP_LANGUAGE ?? EnumMessageLanguage.en,
     })
 );
 ```
@@ -57,6 +58,7 @@ Language options are defined in the enum:
 ```typescript
 export enum EnumMessageLanguage {
     en = 'en',
+    ur = 'ur',
 }
 ```
 
@@ -179,7 +181,7 @@ Override default language using the `customLanguage` option:
 
 ```typescript
 const message = this.messageService.setMessage('user.welcome', {
-    customLanguage: 'id' // Indonesian
+    customLanguage: 'ur' // Urdu
 });
 ```
 
@@ -188,7 +190,7 @@ Request-specific language can be set via the `x-custom-lang` header:
 ```typescript
 await axios.get('http://localhost:3000/api/users', {
     headers: {
-        'x-custom-lang': 'id'
+        'x-custom-lang': 'ur'
     }
 });
 ```
@@ -321,27 +323,34 @@ class UserDto {
 1. Create a new language directory:
 
 ```bash
-mkdir -p src/languages/id
+mkdir -p src/languages/{lang_code}
 ```
 
-2. Copy and translate JSON files:
+1. Copy and translate JSON files:
 
 ```bash
-cp src/languages/en/*.json src/languages/id/
+cp src/languages/en/*.json src/languages/{lang_code}/
 ```
 
-3. Update the enum:
+1. Update the enum:
 
 ```typescript
 export enum EnumMessageLanguage {
     en = 'en',
-    id = 'id', // Add new language
+    id = 'id',
+    ur = 'ur',
+    // Add new language code here
 }
 ```
 
-4. Restart the application to load new language files.
+1. Restart the application to load new language files.
 
+**Best Practices:**
 
+- Maintain identical key structure across all languages — every key in `en/` must exist in every other language directory.
+- Preserve variable placeholders (e.g., `{property}`, `{value}`, `{name}`) exactly as-is in translations.
+- Use professional, contextually appropriate translations — avoid mechanical transliteration.
+- For RTL languages (Arabic, Urdu, Hebrew), the text direction is handled by the client; the backend returns plain translated strings.
 
 <!-- REFERENCES -->
 

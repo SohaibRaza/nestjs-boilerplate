@@ -1,6 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { FastifyReply } from 'fastify';
 import { Params } from 'nestjs-pino';
+import { IncomingMessage } from 'node:http';
+import { Options } from 'pino-http';
+import stripAnsi from 'strip-ansi';
+
 import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { HelperService } from '@common/helper/services/helper.service';
 import {
@@ -10,12 +15,9 @@ import {
     LoggerSensitiveFields,
     LoggerSensitivePaths,
 } from '@common/logger/constants/logger.constant';
-import { IRequestApp } from '@common/request/interfaces/request.interface';
-import { Response } from 'express';
-import { LoggerDebugInfo } from '@common/logger/interfaces/logger.interface';
-import stripAnsi from 'strip-ansi';
 import { EnumLoggerSeverity } from '@common/logger/enums/logger.enum';
-import { Options } from 'pino-http';
+import { LoggerDebugInfo } from '@common/logger/interfaces/logger.interface';
+import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 /**
  * Service responsible for configuring logger options for the application.
@@ -71,11 +73,11 @@ export class LoggerOptionService {
         this.sensitiveFields = new Set(
             LoggerSensitiveFields.map(field => field.toLowerCase())
         );
-        this.sensitivePaths = LoggerSensitivePaths.map(path =>
+        this.sensitivePaths = LoggerSensitivePaths.flatMap(path =>
             LoggerSensitiveFields.map(field =>
                 field.includes('-') ? `${path}["${field}"]` : `${path}.${field}`
             )
-        ).flat();
+        );
     }
 
     /**
@@ -86,7 +88,8 @@ export class LoggerOptionService {
     async createOptions(): Promise<Params> {
         return {
             pinoHttp: {
-                genReqId: this.getReqId,
+                genReqId: (req: IncomingMessage) =>
+                    this.getReqId(req as unknown as IRequestApp),
                 formatters: {
                     log: this.createLogFormatter(),
                 },
@@ -99,7 +102,9 @@ export class LoggerOptionService {
                 level: this.enable ? this.level : 'silent',
                 redact: this.createRedactionConfig(),
                 serializers: this.createSerializers(),
-                autoLogging: this.createAutoLoggingConfig(),
+                autoLogging: this.createAutoLoggingConfig() as
+                    | boolean
+                    | { ignore: (req: IncomingMessage) => boolean },
             },
         };
     }
@@ -113,7 +118,7 @@ export class LoggerOptionService {
     private getReqId(request: IRequestApp): string {
         const headers = request.headers;
         if (!headers) {
-            return request.id as string;
+            return request.id;
         }
 
         for (const header of LoggerRequestIdHeaders) {
@@ -123,7 +128,7 @@ export class LoggerOptionService {
             }
         }
 
-        return request.id as string;
+        return request.id;
     }
 
     /**
@@ -146,7 +151,7 @@ export class LoggerOptionService {
                     translateTime: 'SYS:standard',
                     messageFormat: '[{context}] {msg}',
                     ignore: 'context',
-                    singleLine: false,
+                    singleLine: true, // for single line log. set to false for JSON log.
                 },
             });
         }
@@ -173,7 +178,7 @@ export class LoggerOptionService {
      * @param {unknown} message - The message to sanitize
      * @returns {string | unknown} Sanitized string or original value if not a string
      */
-    private sanitizeMessage(message: unknown): string | unknown {
+    private sanitizeMessage(message: unknown): unknown {
         if (typeof message === 'string') {
             return stripAnsi(message)
                 .replaceAll(/[~→]/g, '')
@@ -272,7 +277,7 @@ export class LoggerOptionService {
      */
     private createSerializers(): {
         req: (request: IRequestApp) => Record<string, unknown>;
-        res: (response: Response) => Record<string, unknown>;
+        res: (response: FastifyReply) => Record<string, unknown>;
         err: (error: Error) => Record<string, unknown>;
     } {
         return {
@@ -353,11 +358,11 @@ export class LoggerOptionService {
      */
     private extractClientIP(request: IRequestApp): string {
         if (request.ip) {
-            return request.ip as string;
+            return request.ip;
         }
 
         if (request.socket?.remoteAddress) {
-            return request.socket.remoteAddress as string;
+            return request.socket.remoteAddress;
         }
 
         const headers = request.headers;
@@ -386,7 +391,7 @@ export class LoggerOptionService {
      * @returns {string | null} User ID if authenticated, otherwise null
      */
     private serializeUser(request: IRequestApp): string | null {
-        return (request.user as unknown as { userId: string })?.userId ?? null;
+        return request.user?.userId ?? null;
     }
 
     /**
@@ -426,15 +431,13 @@ export class LoggerOptionService {
                 id: request.id,
                 method: request.method,
                 url: request.url,
-                path: request.path,
-                route: request.route?.path,
+                path: request.url,
+                route: request.routeOptions?.url,
                 userAgent: request.headers['user-agent'],
                 contentType: request.headers?.['content-type'],
                 referer: request.headers.referer,
-                remoteAddress: (request as unknown as { remoteAddress: string })
-                    .remoteAddress,
-                remotePort: (request as unknown as { remotePort: number })
-                    .remotePort,
+                remoteAddress: request.socket.remoteAddress,
+                remotePort: request.socket.remotePort,
                 ip: this.extractClientIP(request),
                 user: this.serializeUser(request),
                 query: this.sanitizeObject(request.query),
@@ -450,9 +453,9 @@ export class LoggerOptionService {
      * @returns {(response: Response) => Record<string, unknown>} Serializer function for HTTP responses
      */
     private createResponseSerializer(): (
-        response: Response
+        response: FastifyReply
     ) => Record<string, unknown> {
-        return (response: Response) => {
+        return (response: FastifyReply) => {
             return {
                 httpCode: response.statusCode,
                 contentLength: response.getHeader('content-length'),
@@ -483,11 +486,18 @@ export class LoggerOptionService {
 
             if (error instanceof HttpException) {
                 const response = error.getResponse() as { _error?: unknown };
+                let stack = defaultError.stack;
+
+                if (response._error) {
+                    stack =
+                        typeof response._error === 'string'
+                            ? response._error
+                            : JSON.stringify(response._error);
+                }
+
                 return {
                     ...defaultError,
-                    stack: response._error
-                        ? String(response._error)
-                        : defaultError.stack,
+                    stack,
                 };
             }
 

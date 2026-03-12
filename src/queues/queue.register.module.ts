@@ -1,7 +1,8 @@
-import { EnumAppEnvironment } from '@app/enums/app.enum';
 import { BullModule } from '@nestjs/bullmq';
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { EnumAppEnvironment } from '@app/enums/app.enum';
 import {
     QueueConfigKey,
     QueueProcessorConfigKey,

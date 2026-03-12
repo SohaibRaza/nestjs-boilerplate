@@ -28,7 +28,7 @@ Feature flag module provides dynamic feature management for controlling applicat
 Feature flags provided in `src/migration/data/migration.feature-flag.data.ts`:
 
 | Key | Description | Rollout | Metadata |
-|-----|-------------|---------|----------|
+| --- | ----------- | ------- | -------- |
 | `loginWithGoogle` | Enable login with Google | 100% | `signUpAllowed: true` |
 | `loginWithApple` | Enable login with Apple | 100% | `signUpAllowed: true` |
 | `loginWithCredential` | Enable login with Credential | 100% | - |
@@ -139,12 +139,14 @@ Metadata provides granular control within a single feature flag:
 ```
 
 **Constraints:**
+
 - No nested objects allowed
 - Supports types: `boolean`, `number`, `string`
 - Metadata keys cannot be added/removed (schema consistency)
 - Only values can be modified
 
 **Nested Key Access:**
+
 ```typescript
 // Check both feature AND metadata
 @FeatureFlagProtected('changePassword.forgotAllowed')
@@ -155,6 +157,7 @@ When using nested keys, metadata value **must** be boolean.
 ## Rollout Percentage
 
 Controls gradual feature deployment using deterministic hashing:
+
 ```typescript
 {
   key: 'newFeature',
@@ -163,12 +166,14 @@ Controls gradual feature deployment using deterministic hashing:
 ```
 
 **How it works:**
+
 1. User identifier (userId) is hashed using MD5
 2. Hash converted to percentage (0-99)
 3. Compared against `rolloutPercent`
 4. Same user always gets same result (deterministic)
 
 **Use cases:**
+
 - A/B testing
 - Gradual rollouts
 - Canary deployments
@@ -176,6 +181,7 @@ Controls gradual feature deployment using deterministic hashing:
 ## Caching
 
 Feature flags are cached for performance. Configuration in `src/configs/feature-flag.config.ts`:
+
 ```typescript
 {
   cachePrefixKey: 'FeatureFlag',
@@ -184,6 +190,7 @@ Feature flags are cached for performance. Configuration in `src/configs/feature-
 ```
 
 **Cache operations:**
+
 - Automatic cache on first read
 - Cache invalidation on updates
 - Key format: `FeatureFlag:{key}`
@@ -197,11 +204,9 @@ See [Cache Documentation][ref-doc-cache] for cache system details.
 - Metadata keys cannot be modified (add/remove)
 - Only values can be updated: `isEnable`, `rolloutPercent`, metadata values
 
-
 ## Contribution
 
 Special thanks to [Gzerox][ref-contributor-gzerox] for main contributor for this feature.
-
 
 <!-- REFERENCES -->
 

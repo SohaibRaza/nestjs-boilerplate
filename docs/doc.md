@@ -7,6 +7,7 @@ This documentation explains the features and usage of **Doc Module**: Located at
 This module provides decorators for API documentation using [Swagger/OpenAPI][ref-nestjs-swagger]. It creates standardized, consistent API documentation with minimal boilerplate code.
 
 Features:
+
 - Standardized API documentation structure
 - Automatic error response documentation
 - Built-in pagination support
@@ -47,7 +48,6 @@ Features:
   - [Complete Public Endpoint](#complete-public-endpoint)
   - [Paginated List Endpoint](#paginated-list-endpoint)
   - [File Upload Endpoint](#file-upload-endpoint)
-
 
 ## Decorators
 
@@ -239,16 +239,16 @@ Documents paginated response with automatic pagination parameters.
 **Auto-includes:**
 
 - Standard pagination query parameters (depends on type):
-    - **Offset type (default)**:
-        - `perPage` - Data per page (max: 100)
-        - `page` - Page number (max: 20)
-    - **Cursor type**:
-        - `perPage` - Data per page (max: 100)
-        - `cursor` - The pagination cursor returned from the previous request
+  - **Offset type (default)**:
+    - `perPage` - Data per page (max: 100)
+    - `page` - Page number (max: 20)
+  - **Cursor type**:
+    - `perPage` - Data per page (max: 100)
+    - `cursor` - The pagination cursor returned from the previous request
 - Optional search query when `availableSearch` provided
 - Optional ordering queries when `availableOrder` provided:
-    - `orderBy` - Field to order by
-    - `orderDirection` - ASC or DESC
+  - `orderBy` - Field to order by
+  - `orderDirection` - ASC or DESC
 
 **Usage:**
 
@@ -346,16 +346,16 @@ Documents authorization guards and forbidden responses.
 **Parameters:**
 
 - `options?: IDocGuardOptions`
-    - `role?: boolean` - Role-based guard
-    - `policy?: boolean` - Policy-based guard
-    - `termPolicy?: boolean` - Term policy acceptance guard
+  - `role?: boolean` - Role-based guard
+  - `policy?: boolean` - Policy-based guard
+  - `termPolicy?: boolean` - Term policy acceptance guard
 
 **Auto-includes:**
 
 - Forbidden error responses (403) based on guard types:
-    - If `role` is true, documents forbidden response for role-based access control.
-    - If `policy` is true, documents forbidden response for policy-based access control.
-    - If `termPolicy` is true, documents forbidden response for term policy acceptance.
+  - If `role` is true, documents forbidden response for role-based access control.
+  - If `policy` is true, documents forbidden response for policy-based access control.
+  - If `termPolicy` is true, documents forbidden response for term policy acceptance.
 
 **Usage:**
 
@@ -431,6 +431,7 @@ DocOneOf(
 **Detailed Examples:**
 
 For complete examples of `DocOneOf` usage in combination with other decorators, see:
+
 - [ApiKey Admin Documentation](../src/modules/api-key/docs/api-key.admin.doc.ts)
 
 ### DocAnyOf
@@ -526,6 +527,7 @@ The `@ApiProperty` decorator from `@nestjs/swagger` documents DTO properties. It
 For complete options reference, see [NestJS Swagger Types documentation][ref-nestjs-swagger-types].
 
 Common options:
+
 - `description?: string` - Property description
 - `example?: any` - Example value
 - `required?: boolean` - Mark as required
@@ -704,7 +706,6 @@ async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
 ```
 
 For more information about NestJS Swagger integration, see the [official NestJS documentation][ref-nestjs-swagger].
-
 
 <!-- REFERENCES -->
 

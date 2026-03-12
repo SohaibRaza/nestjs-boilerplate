@@ -1,3 +1,5 @@
+import { Module } from '@nestjs/common';
+
 import { ActivityLogSharedController } from '@modules/activity-log/controllers/activity-log.shared.controller';
 import { DeviceSharedController } from '@modules/device/controllers/device.shared.controller';
 import { DeviceModule } from '@modules/device/device.module';
@@ -8,7 +10,6 @@ import { SessionSharedController } from '@modules/session/controllers/session.sh
 import { TermPolicySharedController } from '@modules/term-policy/controllers/term-policy.shared.controller';
 import { UserSharedController } from '@modules/user/controllers/user.shared.controller';
 import { UserModule } from '@modules/user/user.module';
-import { Module } from '@nestjs/common';
 
 /**
  * Shared routes module providing endpoints accessible by multiple user types.

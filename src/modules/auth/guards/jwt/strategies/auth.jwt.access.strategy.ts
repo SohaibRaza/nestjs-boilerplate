@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { passportJwtSecret } from 'jwks-rsa';
 import { Algorithm } from 'jsonwebtoken';
+
 import { IAuthJwtAccessTokenPayload } from '@modules/auth/interfaces/auth.interface';
 import { AuthJwtAccessGuardKey } from '@modules/auth/constants/auth.constant';
 import { AuthService } from '@modules/auth/services/auth.service';

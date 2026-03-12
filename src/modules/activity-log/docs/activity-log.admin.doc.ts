@@ -1,3 +1,5 @@
+import { applyDecorators } from '@nestjs/common';
+
 import {
     Doc,
     DocAuth,
@@ -7,7 +9,6 @@ import {
 } from '@common/doc/decorators/doc.decorator';
 import { ActivityLogResponseDto } from '@modules/activity-log/dtos/response/activity-log.response.dto';
 import { UserDocParamsId } from '@modules/user/constants/user.doc.constant';
-import { applyDecorators } from '@nestjs/common';
 
 export function ActivityLogAdminListDoc(): MethodDecorator {
     return applyDecorators(

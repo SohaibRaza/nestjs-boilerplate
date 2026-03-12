@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NextFunction, Response } from 'express';
+import { FastifyReply } from 'fastify';
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 
 /**
@@ -31,16 +31,16 @@ export class RequestUrlVersionMiddleware implements NestMiddleware {
     /**
      * Processes incoming requests to extract and validate API version information.
      *
-     * @param req - The Express request object extended with custom properties
-     * @param _res - The Express response object
+     * @param req - The Fastify request object extended with custom properties
+     * @param _res - The Fastify reply object
      * @param next - The next middleware function
      */
     async use(
         req: IRequestApp,
-        _res: Response,
-        next: NextFunction
+        _res: FastifyReply,
+        next: () => void
     ): Promise<void> {
-        const originalUrl: string = req.originalUrl;
+        const originalUrl: string = req.url;
         let version = this.urlVersion;
         if (
             this.urlVersionEnable &&

@@ -1,6 +1,7 @@
 import { CommandFactory } from 'nest-commander';
-import { MigrationModule } from '@migration/migration.module';
 import { Logger as LoggerPino } from 'nestjs-pino';
+
+import { MigrationModule } from '@migration/migration.module';
 
 async function bootstrap(): Promise<void> {
     const app = await CommandFactory.createWithoutRunning(MigrationModule, {

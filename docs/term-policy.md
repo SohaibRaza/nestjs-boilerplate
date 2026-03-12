@@ -62,6 +62,7 @@ Each type can have multiple versions. Users must accept the latest published ver
 Term policies follow a two-stage status:
 
 ### Draft Status
+
 - Policy created by admin
 - Content files stored in **private S3 bucket**
 - Can be edited, updated, or deleted
@@ -69,6 +70,7 @@ Term policies follow a two-stage status:
 - Path: `{uploadContentPath}/{type}/{version}/{language}.hbs`
 
 ### Published Status
+
 - Policy published by admin
 - Content files moved to **public S3 bucket**
 - Cannot be edited or deleted
@@ -254,6 +256,7 @@ Publish policy and invalidate all user acceptances:
 ```typescript
 PATCH /term-policy/publish/:termPolicyId
 ```
+
 **Critical**: Publishing sets `termPolicy[type]` to `false` for all users, requiring re-acceptance. Once published, policy cannot be edited or deleted.
 
 ### List Policies
@@ -271,6 +274,7 @@ Delete draft policy and remove S3 content:
 ```typescript
 DELETE /term-policy/delete/:termPolicyId
 ```
+
 Only draft policies can be deleted.
 
 ## TermPolicyAcceptanceProtected
@@ -386,6 +390,7 @@ src/migration/seeds/migration.template-term-policy.seed.ts
 ```
 
 This seed file provides:
+
 - Sample term policies for all types
 - Multi-language content examples
 - Published policy setup
@@ -395,10 +400,6 @@ For detailed migration and seeding instructions, see [Database Documentation][re
 ## Contribution
 
 Special thanks to [Gzerox][ref-contributor-gzerox] for contributing to the Term Policy module implementation.
-
-
-
-
 
 <!-- REFERENCES -->
 

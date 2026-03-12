@@ -48,6 +48,7 @@ export interface IConfigRedis {
 ```
 
 Environment variables:
+
 - `QUEUE_REDIS_URL`: Redis connection URL (default: `redis://localhost:6379`)
 - `APP_NAME`: Application name for connection naming
 - `APP_ENV`: Application environment for connection naming
@@ -70,6 +71,7 @@ Currently available queues defined in `src/queues/enums/queue.enum.ts`:
 - `EnumQueue.notificationPush`: Push notification processing queue
 
 Queue priorities defined in `EnumQueuePriority`:
+
 - `high`: 1
 - `medium`: 5
 - `low`: 10
@@ -88,7 +90,9 @@ export class NotificationPushUtil {
         private readonly notificationPushQueue: Queue
     ) {}
 
-    async sendNewDeviceLogin(payload: INotificationPushWorkerPayload): Promise<void> {
+    async sendNewDeviceLogin(
+        payload: INotificationPushWorkerPayload
+    ): Promise<void> {
         await this.notificationPushQueue.add(
             EnumNotificationPushProcess.newDeviceLogin,
             payload,
@@ -135,7 +139,7 @@ export enum EnumQueue {
 }
 ```
 
-2. Register queue in `src/queues/queue.register.module.ts`:
+1. Register queue in `src/queues/queue.register.module.ts`:
 
 ```typescript
 static forRoot(): DynamicModule {
@@ -181,10 +185,15 @@ export class NotificationPushProcessor extends QueueProcessorBase {
             switch (job.name) {
                 case EnumNotificationPushProcess.newDeviceLogin:
                     return this.notificationPushProcessorService.processNewDeviceLogin(
-                        job as Job<INotificationPushWorkerPayload, IQueueResponse>
+                        job as Job<
+                            INotificationPushWorkerPayload,
+                            IQueueResponse
+                        >
                     );
                 default:
-                    return { message: `No processor found for job ${job.name}` };
+                    return {
+                        message: `No processor found for job ${job.name}`,
+                    };
             }
         } catch (error: unknown) {
             this.logger.error(error, 'Failed to process notification push job');
@@ -194,7 +203,7 @@ export class NotificationPushProcessor extends QueueProcessorBase {
 }
 ```
 
-2. Register processor in `src/queues/queue.module.ts`:
+1. Register processor in `src/queues/queue.module.ts`:
 
 ```typescript
 @Module({
@@ -248,9 +257,9 @@ export abstract class QueueProcessorBase extends WorkerHost {
 1. **On Job Failure**: The `onFailed` method is automatically triggered
 2. **Retry Check**: Determines if this is the last retry attempt
 3. **Error Classification**:
-   - `QueueException` with `isFatal: true` → Reports to Sentry
-   - `QueueException` with `isFatal: false` → Does not report to Sentry
-   - Other exceptions → Reports to Sentry (treated as fatal)
+    - `QueueException` with `isFatal: true` → Reports to Sentry
+    - `QueueException` with `isFatal: false` → Does not report to Sentry
+    - Other exceptions → Reports to Sentry (treated as fatal)
 4. **Sentry Reporting**: Only reports on the final retry attempt to avoid duplicate alerts
 
 ## QueueException
@@ -278,11 +287,12 @@ throw new QueueException('Minor validation error');
 ### Behavior
 
 When a job fails:
+
 1. The `QueueProcessorBase` catches the error
 2. On the last retry attempt:
-   - If error is `QueueException` with `isFatal: true` → Reports to Sentry
-   - If error is `QueueException` with `isFatal: false` → Does not report to Sentry
-   - If error is any other exception → Reports to Sentry (treated as fatal)
+    - If error is `QueueException` with `isFatal: true` → Reports to Sentry
+    - If error is `QueueException` with `isFatal: false` → Does not report to Sentry
+    - If error is any other exception → Reports to Sentry (treated as fatal)
 3. On non-last retry attempts → Never reports to Sentry
 
 ## Bull Board Dashboard
@@ -290,6 +300,7 @@ When a job fails:
 ACK NestJS Boilerplate includes Bull Board for queue monitoring and management.
 
 Access the dashboard:
+
 ```bash
 docker-compose up
 ```
@@ -297,10 +308,12 @@ docker-compose up
 Dashboard URL: `http://localhost:3010`
 
 Default credentials:
+
 - Username: `admin`
 - Password: `admin123`
 
 Configuration in `docker-compose.yml`:
+
 ```yaml
 redis-bullboard:
     image: venatum/bull-board:latest
@@ -315,13 +328,9 @@ redis-bullboard:
         - REDIS_DB=1
 ```
 
-
-
-
 <!-- REFERENCES -->
 
 [ref-bullmq]: https://bullmq.io
 [ref-redis]: https://redis.io
-
 [ref-doc-configuration]: configuration.md
 [ref-doc-environment]: environment.md

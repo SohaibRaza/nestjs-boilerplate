@@ -20,28 +20,27 @@ This documentation explains the database architecture and features in ACK NestJS
 - [Migration](#migration)
 - [Generate Database Client](#generate-database-client)
 - [Seeding](#seeding)
-	- [Database Seeds](#database-seeds)
-	- [Template Seeds](#template-seeds)
-	- [AWS S3 Configuration Seed](#aws-s3-configuration-seed)
+  - [Database Seeds](#database-seeds)
+  - [Template Seeds](#template-seeds)
+  - [AWS S3 Configuration Seed](#aws-s3-configuration-seed)
 - [Initial Seeded Data](#initial-seeded-data)
-	- [API Keys](#api-keys)
-	- [Roles](#roles)
-	- [Users](#users)
-	- [Feature Flags](#feature-flags)
-	- [Term Policies](#term-policies)
+ 	- [API Keys](#api-keys)
+ 	- [Roles](#roles)
+ 	- [Users](#users)
+ 	- [Feature Flags](#feature-flags)
+ 	- [Term Policies](#term-policies)
 - [Composite Types](#composite-types)
-	- [GeoLocation](#geolocation)
-	- [UserAgent](#useragent)
-	- [UserTermPolicy](#usertermpolicy)
-	- [UserPhoto](#userphoto)
-	- [RoleAbility](#roleability)
-	- [TermPolicyContent](#termpolicycontent)
+ 	- [GeoLocation](#geolocation)
+ 	- [UserAgent](#useragent)
+ 	- [UserTermPolicy](#usertermpolicy)
+ 	- [UserPhoto](#userphoto)
+ 	- [RoleAbility](#roleability)
+ 	- [TermPolicyContent](#termpolicycontent)
 - [Docker](#docker)
 - [Database Tools](#database-tools)
-	- [Prisma ORM](#prisma-orm)
-	- [Why Prisma for Repository Design Pattern?](#why-prisma-for-repository-design-pattern)
-	- [Change DB with Minimal Effort](#change-db-with-minimal-effort)
-
+  - [Prisma ORM](#prisma-orm)
+  - [Why Prisma for Repository Design Pattern?](#why-prisma-for-repository-design-pattern)
+  - [Change DB with Minimal Effort](#change-db-with-minimal-effort)
 
 ## Prerequisites
 
@@ -57,22 +56,22 @@ In ACK NestJS Boilerplate, you can use the `pnpm db:migrate` script to quickly s
 
 For details, see the official Prisma documentation: [Prisma for MongoDB][ref-prisma-mongodb]
 
-
 ## Generate Database Client
 
 Prisma uses a generated client to provide type-safe database access and query building. You must generate the Prisma Client every time you change your Prisma schema (`prisma/schema.prisma`).
 
 **When to Generate Prisma client?**
+
 - After any change to your Prisma schema (e.g., adding, removing, or updating models/fields).
 - After pulling schema changes from version control.
 
 **How to Generate Prisma Client:**
+
 ```bash
 pnpm db:generate
 ```
 
 This command will read your Prisma schema and generate the client code in `generated/prisma-client`. The generated client is required for your application to interact with the database using Prisma.
-
 
 ## Seeding
 
@@ -83,19 +82,23 @@ Seeding in ACK NestJS Boilerplate is handled using [Commander.js][ref-commander]
 ACK NestJS Boilerplate provides ready-to-use seed scripts to help you quickly initialize or remove data for development and testing. Database seeding is used to populate the database with initial or test data, making development and testing easier.
 
 **Seed Data Location:**
+
 - All seed data is stored in `src/migration/data/*`.
 
 **How to Run All Seeds:**
+
 - `pnpm migration:seed` — runs all seed commands to populate initial data.
 - `pnpm migration:remove` — removes all seeded data from the database.
 - `pnpm migration:fresh` — force-resets the database schema (`prisma db push --force-reset`) then immediately re-seeds all data. Useful during development when you need a clean slate.
 
 **How to Seed/Remove a Specific Module:**
 Run the command:
-   - Seed: `pnpm migration {module} --type seed`
-   - Remove: `pnpm migration {module} --type remove`
+
+- Seed: `pnpm migration {module} --type seed`
+- Remove: `pnpm migration {module} --type remove`
 
 **Available Types:**
+
 - `seed` (add data)
 - `remove` (delete data)
 
@@ -108,12 +111,12 @@ Run the command:
 - `termPolicy`: Inserts term policy documents (cookies, marketing, privacy, terms of service) with version and content.
 - `user`: Inserts initial user accounts (Super Admin, Admin, User) with country, role, and credentials.
 
-
 ### Template Seeds
 
 Template seeding uses the same script and commands as Database Seeds, but is specifically for template files like email and term policies.
 
 **Available Types:**
+
 - `seed` (add template data)
 - `remove` (delete template data)
 
@@ -122,6 +125,7 @@ Template seeding uses the same script and commands as Database Seeds, but is spe
 Every time you run the email template seed, the templates will be inserted into AWS SES automatically.
 
 **How to Run Email Template Seeds:**
+
 - Seed: `pnpm migration template-email-notification --type seed`
 - Remove: `pnpm migration template-email-notification --type remove`
 
@@ -130,9 +134,9 @@ Every time you run the email template seed, the templates will be inserted into 
 Every time you run the term policy template seed, the policy documents will be linked to the database records automatically.
 
 **How to Run Term Policy Template Seeds:**
+
 - Seed: `pnpm migration template-termPolicy --type seed`
 - Remove: `pnpm migration template-termPolicy --type remove` *(no-op — term policy removal is intentionally skipped)*
-
 
 ### AWS S3 Configuration Seed
 
@@ -150,7 +154,7 @@ This script automatically configures essential S3 bucket settings in the correct
 
 **Why Sequential Configuration Matters:**
 
-The configuration must be applied in a specific order because AWS S3 policies have dependencies. 
+The configuration must be applied in a specific order because AWS S3 policies have dependencies.
 For example, you must configure public access blocks before setting bucket policies.
 
 **How to Run:**
@@ -170,16 +174,17 @@ pnpm migration aws-s3-config --type seed
 **Configuration Applied:**
 
 For **Public Buckets**:
+
 - Public read access (`s3:GetObject`) for all objects
 - Full IAM user access for management operations
 - CORS rules allowing GET/HEAD from any origin
 - CORS rules allowing PUT/POST/DELETE from whitelisted origins
 
 For **Private Buckets**:
+
 - Blocks all public access
 - CORS rules only allow whitelisted origins for all methods
 - Full IAM user access required for all operations
-
 
 ## Initial Seeded Data
 
@@ -192,7 +197,7 @@ When you run `pnpm migration:seed`, the following initial data will be created i
 Two API keys are created for authentication and service access:
 
 | Name | Type | Key | Secret | Usage |
-|------|------|-----|--------|-------|
+| ----- | ----- | ----- | ------ | ----- |
 | Api Key Default | `default` | `fyFGb7ywyM37TqDY8nuhAmGW5` | `qbp7LmCxYUTHFwKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For general API access |
 | Api Key System | `system` | `UTDH0fuDMAbd1ZVnwnyrQJd8Q` | `qbp7LmCxYUTHFwKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For system-level operations |
 
@@ -200,11 +205,12 @@ Two API keys are created for authentication and service access:
 
 All generated API keys automatically include an environment prefix to help identify which environment they belong to. The format is:
 
-```
+```text
 {environment}_{random_string}
 ```
 
 **Examples:**
+
 - `local_abc123xyz` - API key for local/development environment
 - `development_def456uvw` - API key for development environment
 - `staging_ghi789rst` - API key for staging environment
@@ -217,7 +223,7 @@ This prefix is automatically added based on the `APP_ENV` environment variable w
 Three user roles are created with different permission levels:
 
 | Role | Type | Description | Abilities |
-|------|------|-------------|-----------|
+| ---- | ---- | ----------- | --------- |
 | superadmin | `superAdmin` | Super Admin Role | Full system access (unrestricted) |
 | admin | `admin` | Admin Role | All CRUD operations on all subjects |
 | user | `user` | User Role | Limited access (no special abilities) |
@@ -241,16 +247,16 @@ The seeded users differ per environment. This is controlled by `migrationUserDat
 
 | Email | Name | Role | Password | Country | Environments |
 |-------|------|------|----------|---------|-------------|
-| superadmin@mail.com | Super Admin | superadmin | `aaAA@123` | ID (Indonesia) | all |
-| admin@mail.com | Admin | admin | `aaAA@123` | ID (Indonesia) | all |
-| user@mail.com | User | user | `aaAA@123` | ID (Indonesia) | `local` only |
+| <superadmin@mail.com> | Super Admin | superadmin | `aaAA@123` | ID (Indonesia) | all |
+| <admin@mail.com> | Admin | admin | `aaAA@123` | ID (Indonesia) | all |
+| <user@mail.com> | User | user | `aaAA@123` | ID (Indonesia) | `local` only |
 
 ### Feature Flags
 
 Five feature flags are created to control authentication and user features:
 
 | Key | Description | Enabled | Rollout | Metadata |
-|-----|-------------|---------|---------|----------|
+| ---- | ----------- | ------- | ------- | -------- |
 | `loginWithGoogle` | Enable login with Google | ✅ Yes | 100% | `signUpAllowed: true` |
 | `loginWithApple` | Enable login with Apple | ✅ Yes | 100% | `signUpAllowed: true` |
 | `loginWithCredential` | Enable login with Credential | ✅ Yes | 100% | - |
@@ -264,7 +270,7 @@ All features are enabled by default with 100% rollout for development convenienc
 Four term policy documents are created:
 
 | Type | Version | Language | Description |
-|------|---------|----------|-------------|
+| ---- | ------- | -------- | ----------- |
 | `cookies` | 1 | EN | Cookie policy document |
 | `marketing` | 1 | EN | Marketing terms document |
 | `privacy` | 1 | EN | Privacy policy document |
@@ -273,7 +279,6 @@ Four term policy documents are created:
 The actual content for these policies is stored as file references in `src/migration/data/term-policy/*`. The files are not automatically linked to the database records. You must run the term policy migration script to link the files and update the content keys in the database.
 
 For more details on how seeding works, see: [Template Seeds](#template-seeds)
-
 
 ## Composite Types
 
@@ -302,6 +307,7 @@ type GeoLocation {
 | `city` | `String` | City name (e.g. `"Jakarta"`) |
 
 **Used in:**
+
 - `Session.geoLocation` — location at login time
 - `ActivityLog.geoLocation` — location when the action was performed
 
@@ -363,6 +369,7 @@ type UserAgentOs {
 | `os` | `UserAgentOs?` | Operating system details |
 
 **Used in:**
+
 - `Session.userAgent` — client info at login time
 - `ActivityLog.userAgent` — client info when the action was performed
 
@@ -391,6 +398,7 @@ type UserTermPolicy {
 | `cookies` | `Boolean` | Has accepted Cookie policy |
 
 **Used in:**
+
 - `User.termPolicy`
 
 ---
@@ -422,6 +430,7 @@ type UserPhoto {
 | `access` | `String` | Access level (`public` or `private`) |
 
 **Used in:**
+
 - `User.photo`
 
 ---
@@ -443,6 +452,7 @@ type RoleAbility {
 | `subject` | `String` | Policy subject (e.g. `"user"`, `"apiKey"`) |
 
 **Used in:**
+
 - `Role.abilities`
 
 See [Authorization Documentation][ref-doc-authorization] for how abilities are evaluated at runtime.
@@ -480,29 +490,33 @@ type TermPolicyContent {
 | `size` | `Int` | File size in bytes |
 
 **Used in:**
-- `TermPolicy.contents`
 
+- `TermPolicy.contents`
 
 ## Docker
 
 Running database commands inside Docker containers from your host machine:
 
 **Generate Prisma Client inside container:**
+
 ```bash
 docker-compose exec apis pnpm db:generate
 ```
 
 **Run database migration inside container:**
+
 ```bash
 docker-compose exec apis pnpm db:migrate
 ```
 
 **Run all seeds inside container:**
+
 ```bash
 docker-compose exec apis pnpm migration:seed
 ```
 
 **Remove all seeded data inside container:**
+
 ```bash
 docker-compose exec apis pnpm migration:remove
 ```
@@ -531,7 +545,7 @@ Prisma, combined with the Repository Pattern, allows you to switch databases wit
 #### Supported Databases
 
 | Database | Best For | Transaction Support |
-|----------|----------|---------------------|
+| -------- | -------- | ------------------- |
 | **MongoDB** | Document-based, flexible schema | ✅ Yes (replica set) |
 | **PostgreSQL** | Relational Database, reliability | ✅ Yes |
 
@@ -540,6 +554,7 @@ Prisma, combined with the Repository Pattern, allows you to switch databases wit
 #### Quick Migration: MongoDB → PostgreSQL
 
 **1. Update Prisma Schema** (`prisma/schema.prisma`):
+
 ```prisma
 // Change provider
 datasource db {
@@ -555,6 +570,7 @@ model User {
 ```
 
 **2. Update Environment** (`.env`):
+
 ```bash
 # From:
 DATABASE_URL=mongodb://localhost:27017/ACKNestJs?replicaSet=rs0
@@ -564,6 +580,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/ACKNestJs
 ```
 
 **3. Generate Migration & Client:**
+
 ```bash
 pnpm prisma migrate dev --name init  # PostgreSQL
 pnpm db:generate                      # Regenerate client
@@ -575,6 +592,7 @@ pnpm db:generate                      # Regenerate client
 - **DatabaseUtil** (`src/common/database/utils/database.util.ts`) - Replace MongoDB `ObjectId` helpers with UUID validators
 
 **5. Re-seed Database:**
+
 ```bash
 pnpm migration:seed
 ```
@@ -584,7 +602,6 @@ pnpm migration:seed
 - [Prisma: Switching Databases][ref-prisma-setup]
 - [Prisma MongoDB Documentation][ref-prisma-mongodb]
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-
 
 <!-- REFERENCES -->
 

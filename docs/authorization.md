@@ -1,6 +1,7 @@
 # Authorization Documentation
 
-This documentation explains the features and usage of: 
+This documentation explains the features and usage of:
+
 - **UserProtected**: Located at `src/modules/user/decorators`
 - **RoleProtected**: Located at `src/modules/role/decorators`
 - **PolicyAbilityProtected**: Located at `src/modules/policy/decorators`
@@ -70,6 +71,7 @@ The system is built using NestJS guards and decorators, making it easy to apply 
 **Method decorator** that applies `UserGuard` to route handlers.
 
 **Parameters:**
+
 - `isVerified` (boolean, optional): Whether to require email verification. Default: `true`
 
 **Usage:**
@@ -175,9 +177,11 @@ flowchart TD
 **Method decorator** that applies `RoleGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredRoles` (EnumRoleType[]): One or more role types required to access the route
 
 **Available Role Types:**
+
 - `EnumRoleType.superAdmin` - Super administrator with unrestricted access
 - `EnumRoleType.admin` - Administrator role
 - `EnumRoleType.user` - Standard user role
@@ -272,7 +276,6 @@ flowchart TD
 - Incorrect ordering will result in runtime errors
 - Users with `superAdmin` role type have unrestricted access to all `@RoleProtected` routes, regardless of the specified required roles. The guard returns an empty abilities array for super admins, as they bypass ability checks.
 
-
 ## Policy Ability Protected
 
 `PolicyAbilityProtected` implements fine-grained, permission-based access control using CASL (an isomorphic authorization library). It allows you to define specific actions (read, create, update, delete, manage) that users can perform on specific subjects (resources like users, roles, settings, etc.).
@@ -284,9 +287,11 @@ flowchart TD
 **Method decorator** that applies `PolicyAbilityGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredAbilities` (RoleAbilityRequestDto[]): One or more policy ability objects defining required permissions
 
 **Available Policy Actions:**
+
 - `EnumPolicyAction.manage` - Full control over a subject
 - `EnumPolicyAction.read` - Read/view permission
 - `EnumPolicyAction.create` - Create new resources
@@ -294,6 +299,7 @@ flowchart TD
 - `EnumPolicyAction.delete` - Remove resources
 
 **Available Policy Subjects:**
+
 - `EnumPolicySubject.all` - All resources
 - `EnumPolicySubject.apiKey` - API key management
 - `EnumPolicySubject.role` - Role management
@@ -434,9 +440,11 @@ For more detailed information about term policies, see [Term Policy Document][re
 **Method decorator** that applies `TermPolicyGuard` to route handlers.
 
 **Parameters:**
+
 - `...requiredTermPolicies` (EnumTermPolicyType[], optional): One or more term policy types that must be accepted. If not provided, defaults to `termsOfService` and `privacy`
 
 **Available Term Policy Types:**
+
 - `EnumTermPolicyType.termsOfService` - Terms of Service acceptance
 - `EnumTermPolicyType.privacy` - Privacy Policy acceptance
 - `EnumTermPolicyType.cookies` - Cookies Policy acceptance
@@ -578,11 +586,14 @@ Custom roles are created through the admin role management endpoints. The API do
 **Ability Structure:**
 
 Each ability consists of:
+
 - **subject**: The resource type (e.g., user, role, apiKey, session, termPolicy, activityLog)
 - **action**: Array of allowed actions (manage, read, create, update, delete)
 
 **Available subjects and actions are defined in:**
+
 - `EnumPolicySubject`: all, apiKey, role, user, session, activityLog, passwordHistory, termPolicy, featureFlag, device
+
 - `EnumPolicyAction`: manage, read, create, update, delete
 
 ### Assigning Roles to Users
@@ -613,7 +624,6 @@ flowchart LR
 
 - **Role names must be unique** - You cannot create two roles with the same name
 - **Roles cannot be deleted if in use** - You must first reassign users to different roles before deleting
-
 
 <!-- REFERENCES -->
 

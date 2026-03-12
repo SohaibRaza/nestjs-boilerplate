@@ -1,15 +1,17 @@
 # Authentication Documentation
 
 This documentation explains the features and usage of:
+
 - **Authentication Module**: Located at `src/modules/auth`
 - **Session Module**: Located at `src/modules/session`
 - **ApiKey Module**: Located at `src/modules/api-key`
 
 ## Overview
 
-This document provides a comprehensive overview of authentication and session management in the ACK NestJS Boilerplate. 
+This document provides a comprehensive overview of authentication and session management in the ACK NestJS Boilerplate.
 
 It covers:
+
 - **Password**: Passwords are securely hashed (bcrypt), have configurable expiration and rotation, login attempt limits, history tracking, and support for reset/change/temporary password with session invalidation.
 - **JWT Authentication**: Stateless authentication using access and refresh tokens with ES256/ES512 algorithms, configurable expiration, and security mechanisms such as JWT ID (jti) validation for session tracking.
 - **Session Management**: Dual storage strategy using Redis for high-performance validation and automatic expiration, and database for session listing, management, and audit trail. Sessions are validated on every API request via jti matching and can be revoked instantly.
@@ -30,56 +32,56 @@ Configuration for tokens, sessions, password, social providers, and API keys is 
 - [Overview](#overview)
 - [Related Documents](#related-documents)
 - [Password](#password)
-    - [Password Configuration](#password-configuration)
-    - [Password Flow](#password-flow)
+  - [Password Configuration](#password-configuration)
+  - [Password Flow](#password-flow)
 - [JWT Authentication](#jwt-authentication)
-    - [JWT Configuration](#jwt-configuration)
-    - [JWT Flow](#jwt-flow)
-        - [JWT Access Token Flow](#jwt-access-token-flow)
-        - [JWT Refresh Token Flow](#jwt-refresh-token-flow)
-    - [JWT Tokens](#jwt-tokens)
-        - [JWT Access Token](#jwt-access-token)
-        - [JWT Refresh Token](#jwt-refresh-token)
-    - [JWT Payload Structure](#jwt-payload-structure)
-        - [JWT Access Token Payload](#jwt-access-token-payload)
-        - [JWT Refresh Token Payload](#jwt-refresh-token-payload)
-    - [Usage](#usage)
-        - [Protecting Endpoints](#protecting-endpoints)
-        - [Getting JWT Payload](#getting-jwt-payload)
-        - [Getting Raw Token](#getting-raw-token)
-    - [Security: JWT ID (jti)](#security-jwt-id-jti)
-        - [How it Works](#how-it-works)
+  - [JWT Configuration](#jwt-configuration)
+  - [JWT Flow](#jwt-flow)
+    - [JWT Access Token Flow](#jwt-access-token-flow)
+    - [JWT Refresh Token Flow](#jwt-refresh-token-flow)
+  - [JWT Tokens](#jwt-tokens)
+    - [JWT Access Token](#jwt-access-token)
+    - [JWT Refresh Token](#jwt-refresh-token)
+  - [JWT Payload Structure](#jwt-payload-structure)
+    - [JWT Access Token Payload](#jwt-access-token-payload)
+    - [JWT Refresh Token Payload](#jwt-refresh-token-payload)
+  - [Usage](#usage)
+    - [Protecting Endpoints](#protecting-endpoints)
+    - [Getting JWT Payload](#getting-jwt-payload)
+    - [Getting Raw Token](#getting-raw-token)
+  - [Security: JWT ID (jti)](#security-jwt-id-jti)
+    - [How it Works](#how-it-works)
 - [Social Authentication](#social-authentication)
-    - [Social Authentication Flow](#social-authentication-flow)
-    - [Google Authentication](#google-authentication)
-        - [Configuration](#configuration)
-        - [Setup Google OAuth 2.0](#setup-google-oauth-20)
-        - [Usage](#usage-1)
-    - [Apple Authentication](#apple-authentication)
-        - [Configuration](#configuration-1)
-        - [Setup Apple Sign In](#setup-apple-sign-in)
-        - [Usage](#usage-2)
+  - [Social Authentication Flow](#social-authentication-flow)
+  - [Google Authentication](#google-authentication)
+    - [Configuration](#configuration)
+    - [Setup Google OAuth 2.0](#setup-google-oauth-20)
+    - [Usage](#usage-1)
+  - [Apple Authentication](#apple-authentication)
+    - [Configuration](#configuration-1)
+    - [Setup Apple Sign In](#setup-apple-sign-in)
+    - [Usage](#usage-2)
 - [Two-Factor Authentication (TOTP)](#two-factor-authentication-totp)
-    - [Configuration](#configuration-2)
-    - [Flow](#flow)
+  - [Configuration](#configuration-2)
+  - [Flow](#flow)
 - [API Key Authentication](#api-key-authentication)
-    - [Configuration](#configuration-3)
-    - [API Key Types](#api-key-types)
-        - [Default API Key](#default-api-key)
-        - [System API Key](#system-api-key)
-    - [Request Format](#request-format)
-    - [Usage](#usage-3)
-        - [Protecting Endpoints](#protecting-endpoints-1)
-        - [Getting API Key Payload](#getting-api-key-payload)
-    - [API Key Authentication Flow](#api-key-authentication-flow)
+  - [Configuration](#configuration-3)
+  - [API Key Types](#api-key-types)
+    - [Default API Key](#default-api-key)
+    - [System API Key](#system-api-key)
+  - [Request Format](#request-format)
+  - [Usage](#usage-3)
+    - [Protecting Endpoints](#protecting-endpoints-1)
+    - [Getting API Key Payload](#getting-api-key-payload)
+  - [API Key Authentication Flow](#api-key-authentication-flow)
 - [Session Management](#session-management)
-    - [Session Storage](#session-storage)
-        - [Redis (Primary - Validation)](#redis-primary---validation)
-        - [Database (Secondary - Management)](#database-secondary---management)
-        - [How They Work Together](#how-they-work-together)
-    - [Session Lifecycle](#session-lifecycle)
-    - [Session Validation Flow](#session-validation-flow)
-    - [What Happens on Revocation](#what-happens-on-revocation)
+  - [Session Storage](#session-storage)
+    - [Redis (Primary - Validation)](#redis-primary---validation)
+    - [Database (Secondary - Management)](#database-secondary---management)
+    - [How They Work Together](#how-they-work-together)
+  - [Session Lifecycle](#session-lifecycle)
+  - [Session Validation Flow](#session-validation-flow)
+  - [What Happens on Revocation](#what-happens-on-revocation)
 
 ## Password
 
@@ -341,7 +343,7 @@ sequenceDiagram
 
 #### JWT Access Token
 
-A short-lived token used to authenticate API requests. 
+A short-lived token used to authenticate API requests.
 
 - **Algorithm**: ES256 (ECDSA using P-256 and SHA-256)
 - **Validity**: Configured in `auth.config.ts` (default: 1 hour)
@@ -538,6 +540,7 @@ A unique identifier (32-character random string) generated during login and toke
 Social authentication allows users to sign in using their Google or Apple accounts. The backend validates the OAuth tokens provided by the client and extracts user information to create a session, similar to credential-based authentication.
 
 **Supported Providers:**
+
 - Google OAuth 2.0
 - Apple Sign In
 
@@ -631,6 +634,7 @@ export default registerAs(
 ```
 
 **Environment Variables:**
+
 - `AUTH_SOCIAL_GOOGLE_CLIENT_ID`: Google OAuth 2.0 client ID
 - `AUTH_SOCIAL_GOOGLE_CLIENT_SECRET`: Google OAuth 2.0 client secret
 
@@ -684,6 +688,7 @@ export default registerAs(
 ```
 
 **Environment Variables:**
+
 - `AUTH_SOCIAL_APPLE_CLIENT_ID`: Apple service ID
 - `AUTH_SOCIAL_APPLE_SIGN_IN_CLIENT_ID`: Apple sign-in client ID
 
@@ -753,6 +758,7 @@ export default registerAs(
 ```
 
 **Configuration Options:**
+
 - `strategy`: OTP strategy — `totp` (time-based)
 - `algorithm`: Hash algorithm used for TOTP generation — `sha1`
 - `periodInSeconds`: Token validity window in seconds (default: `30`)
@@ -788,6 +794,7 @@ See [Two-Factor Documentation][ref-doc-two-factor] for detailed.
 API Key authentication provides a simple, stateless authentication mechanism for machine-to-machine communication and system integrations. Unlike JWT tokens, API keys don't require session management and are validated directly against the database/cache.
 
 **Use Cases:**
+
 - External system integrations
 - Webhook endpoints
 - System-to-system communication
@@ -811,6 +818,7 @@ export default registerAs(
 ```
 
 **Configuration Options:**
+
 - `header`: Header name for API key (`x-api-key`)
 - `cachePrefixKey`: Redis cache prefix for API key caching
 
@@ -821,6 +829,7 @@ export default registerAs(
 Default API keys are used for standard external integrations and third-party access.
 
 **Characteristics:**
+
 - Type: `EnumApiKeyType.default`
 - Purpose: General-purpose API access
 - Use Case: External clients, third-party integrations
@@ -828,11 +837,13 @@ Default API keys are used for standard external integrations and third-party acc
 - Cache: Cached in Redis for performance
 
 **Guard Decorator:**
+
 ```typescript
 @ApiKeyProtected()
 ```
 
 **Example Usage:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/api/external/data')
@@ -846,6 +857,7 @@ async getExternalData(@ApiKeyPayload() apiKey: ApiKey) {
 System API keys are used for internal system operations that bypass standard authentication.
 
 **Characteristics:**
+
 - Type: `EnumApiKeyType.system`
 - Purpose: System-level operations
 - Use Case: Internal services, background jobs, system maintenance
@@ -853,11 +865,13 @@ System API keys are used for internal system operations that bypass standard aut
 - Cache: Cached in Redis for performance
 
 **Guard Decorator:**
+
 ```typescript
 @ApiKeySystemProtected()
 ```
 
 **Example Usage:**
+
 ```typescript
 @ApiKeySystemProtected()
 @Post('/api/system/maintenance')
@@ -873,11 +887,13 @@ async runMaintenance(@ApiKeyPayload() apiKey: ApiKey) {
 API keys are sent via the `x-api-key` header with the format `${key}:${secret}`:
 
 **Header Format:**
-```
+
+```text
 x-api-key: ${key}:${secret}
 ```
 
 **Format Rules:**
+
 - Pattern: `key:secret`
 - Separator: Colon (`:`)
 - Both key and secret are required
@@ -925,6 +941,7 @@ async runMaintenance(@ApiKeyPayload() apiKey: ApiKey) {
 Access the full API key data using `@ApiKeyPayload()` decorator:
 
 **Full Payload:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/resource')
@@ -940,6 +957,7 @@ async getResource(@ApiKeyPayload() apiKey: ApiKey) {
 ```
 
 **Specific Fields:**
+
 ```typescript
 @ApiKeyProtected()
 @Get('/resource')
@@ -1017,6 +1035,7 @@ sequenceDiagram
 Session management handles user authentication sessions across multiple devices and locations. It provides visibility and control over active sessions, allowing users and administrators to monitor and revoke access as needed.
 
 This implementation uses a **dual storage strategy**:
+
 - **Redis**: High-performance session validation and automatic expiration
 - **Database**: Session listing, management, and audit trail
 
@@ -1029,6 +1048,7 @@ Used for high-speed session validation for **both access and refresh tokens**.
 **Critical Behavior**: Every API call with an access token will check Redis. If the session is not found in Redis or the jti doesn't match, the request is rejected immediately, even if the token signature is valid.
 
 **Data Stored:**
+
 ```typescript
 {
     sessionId: string;
@@ -1039,17 +1059,20 @@ Used for high-speed session validation for **both access and refresh tokens**.
 ```
 
 **Redis Key Pattern:**
-```
+
+```text
 User:{userId}:Session:{sessionId}
 ```
 
 **TTL Behavior:**
+
 - Initial TTL: Follows refresh token expiration from `auth.config.ts` (default: 30 days)
 - TTL Source: `AUTH_JWT_REFRESH_TOKEN_EXPIRED` environment variable
 - TTL Behavior: **NOT extended** on token refresh - remains at initial value from login
 - Auto Cleanup: Expired sessions are automatically removed by Redis when TTL expires
 
 **Example:**
+
 - If `AUTH_JWT_REFRESH_TOKEN_EXPIRED=30d`, Redis TTL = 30 days
 - If `AUTH_JWT_REFRESH_TOKEN_EXPIRED=7d`, Redis TTL = 7 days
 - Token refresh updates jti but does NOT reset the TTL
@@ -1059,6 +1082,7 @@ User:{userId}:Session:{sessionId}
 Used for session listing and management purposes.
 
 **Fields Stored:**
+
 - `jti` — JWT ID for session tracking
 - `ipAddress` — Client IP at login time
 - `userAgent` — Parsed user agent (browser, OS, device)
@@ -1067,12 +1091,14 @@ Used for session listing and management purposes.
 - `expiredAt`, `revokedAt`, `isRevoked` — Lifecycle fields
 
 **When Updated:**
+
 - Created during login with initial jti (linked to a Device)
 - Updated when session jti is rotated during token refresh
 - Updated when session is revoked
 - Can be queried to show user's active sessions across devices
 
 **Not Used For:**
+
 - Token validation (Redis handles this via jti matching)
 - Real-time validation during API requests
 

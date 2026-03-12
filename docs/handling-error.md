@@ -40,7 +40,8 @@ ACK NestJS Boilerplate uses 4 specialized exception filters registered globally 
 4. **AppGeneralFilter** - Catches all unhandled exceptions
 
 **Processing flow**:
-```
+
+```text
 Exception thrown
     ↓
 Match specific filter? (validation import/request, HTTP)
@@ -51,6 +52,7 @@ Standardized error response + Sentry (if applicable)
 ```
 
 **Common behavior**:
+
 - Extract metadata from request (language, version, requestId, correlationId)
 - Generate timestamp and timezone information
 - Resolve localized error message using [Message System][ref-doc-message]
@@ -75,7 +77,7 @@ All errors are formatted into `ResponseErrorDto`:
 **Field descriptions**:
 
 | Field | Type | Required | Description |
-|-------|------|----------|-------------|
+| ----- | ---- | -------- | ----------- |
 | `statusCode` | `number` | Yes | Custom status code for error identification |
 | `message` | `string` | Yes | Localized message from [Message System][ref-doc-message] |
 | `metadata` | `ResponseMetadataDto` | Yes | Request/response metadata |
@@ -102,7 +104,7 @@ All errors are formatted into `ResponseErrorDto`:
 **Field sources**:
 
 | Field | Source | Fallback |
-|-------|--------|----------|
+| ----- | ------ | -------- |
 | `language` | `request.__language` | Config `message.language` |
 | `timestamp` | `HelperService.dateGetTimestamp()` | - |
 | `timezone` | `HelperService.dateGetZone()` | - |
@@ -116,7 +118,7 @@ All errors are formatted into `ResponseErrorDto`:
 
 All filters set these headers automatically:
 
-```
+```text
 x-custom-lang: en
 x-timestamp: 1660190937231
 x-timezone: Asia/Jakarta
@@ -137,11 +139,13 @@ x-correlation-id: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
 **Use case**: Fallback for unexpected errors (database crashes, unhandled promise rejections, runtime errors)
 
 **Behavior**:
+
 - Always returns HTTP 500
 - Uses message path `http.500`
 - Sends all exceptions to Sentry
 
 **Response example**:
+
 ```json
 {
   "statusCode": 500,
@@ -161,6 +165,7 @@ x-correlation-id: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
 **Path validation**: Redirects invalid paths (not starting with `globalPrefix` or `docPrefix`) to `{globalPrefix}/public/hello` with HTTP 308
 
 **Custom exception support**: Extracts custom properties if exception response implements `IAppException`:
+
 ```typescript
 interface IAppException<T = unknown> {
   statusCode: number;                         // Custom status code
@@ -176,6 +181,7 @@ interface IAppException<T = unknown> {
 **Sentry integration**: Only sends exceptions with HTTP status ≥ 500
 
 **Response example** (standard):
+
 ```json
 {
   "statusCode": 404,
@@ -185,6 +191,7 @@ interface IAppException<T = unknown> {
 ```
 
 **Response example** (custom):
+
 ```json
 {
   "statusCode": 5100,
@@ -203,11 +210,13 @@ interface IAppException<T = unknown> {
 **Use case**: Request body, query parameters, and path parameters validation failures using [class-validator][ref-class-validator]
 
 **Behavior**:
+
 - Formats field-specific validation errors
 - Uses `MessageService.setValidationMessage()`
 - Does not send to Sentry
 
 **Response example**:
+
 ```json
 {
   "statusCode": 422,
@@ -234,11 +243,13 @@ See [Request Validation][ref-doc-request-validation] for details.
 **Use case**: CSV file import validation failures using [class-validator][ref-class-validator]
 
 **Behavior**:
+
 - Formats row-level validation errors
 - Uses `MessageService.setValidationImportMessage()`
 - Does not send to Sentry
 
 **Response example**:
+
 ```json
 {
   "statusCode": 422,
@@ -289,6 +300,7 @@ throw new BadRequestException({
 ```
 
 **Message file** (`en/user.json`):
+
 ```json
 {
   "error": {
@@ -298,6 +310,7 @@ throw new BadRequestException({
 ```
 
 **Response**:
+
 ```json
 {
   "statusCode": 5100,
@@ -326,6 +339,7 @@ throw new BadRequestException({
 ```
 
 **Response**:
+
 ```json
 {
   "statusCode": 5100,
@@ -338,8 +352,6 @@ throw new BadRequestException({
   "metadata": { ... }
 }
 ```
-
-
 
 <!-- REFERENCES -->
 

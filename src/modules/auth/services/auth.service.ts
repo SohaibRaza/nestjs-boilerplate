@@ -1,3 +1,6 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { TokenPayload } from 'google-auth-library';
+
 import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { EnumAuthStatusCodeError } from '@modules/auth/enums/auth.status-code.enum';
 import {
@@ -9,8 +12,6 @@ import { IAuthService } from '@modules/auth/interfaces/auth.service.interface';
 import { AuthUtil } from '@modules/auth/utils/auth.util';
 import { EnumSessionStatusCodeError } from '@modules/session/enums/session.status-code.enum';
 import { SessionUtil } from '@modules/session/utils/session.util';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { TokenPayload } from 'google-auth-library';
 
 /**
  * Authentication service handling JWT token operations, session validation,

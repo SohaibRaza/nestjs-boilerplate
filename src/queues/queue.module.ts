@@ -1,7 +1,8 @@
+import { Module } from '@nestjs/common';
+
 import { NotificationEmailProcessor } from '@modules/notification/processors/notification.email.processor';
 import { NotificationProcessor } from '@modules/notification/processors/notification.processor';
 import { NotificationPushProcessor } from '@modules/notification/processors/notification.push.processor';
-import { Module } from '@nestjs/common';
 
 /**
  * Module for managing queue processors.
