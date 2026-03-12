@@ -12,6 +12,11 @@ The Pagination module provides a comprehensive solution for handling paginated d
 - **Field ordering**: Validation and transformation of sort parameters
 - **Error handling**: Consistent error responses with detailed context
 
+Ordering support is split across two levels:
+
+- **HTTP query level**: `orderBy` uses `field:direction` format in a single query parameter (e.g., `name:asc`, `createdAt:desc`). Multiple entries can be sent as repeated params.
+- **Service level**: `orderBy` is always an array of order objects (`IPaginationOrderBy[]`)
+
 The module uses a pipe-based architecture with factory functions for maximum flexibility and type safety.
 
 ## Related Documents
@@ -91,9 +96,14 @@ async offset<TReturn, TArgsSelect = unknown, TArgsWhere = unknown>(
 - `repository`: Repository instance implementing IPaginationRepository
 - `args`: Validated pagination parameters from pipe
 
+**`args.orderBy` Support:**
+
+- Always an array: `[{ createdAt: 'desc' }]`, `[{ createdAt: 'desc' }, { name: 'asc' }]`
+
 **Default Values:**
 
-- `orderBy`: `{ createdAt: 'desc' }` - Sort by creation date descending
+- `orderBy`: `[{ createdAt: 'desc' }]` - Sort by creation date descending
+- If omitted, defaults to `PaginationDefaultOrderBy`
 
 **Returns:**
 
@@ -134,17 +144,23 @@ async cursor<TReturn, TArgsSelect = unknown, TArgsWhere = unknown>(
 - `repository`: Repository instance
 - `args`: Validated pagination parameters from pipe
 
+**`args.orderBy` Support:**
+
+- Always an array: `[{ createdAt: 'desc' }]`, `[{ createdAt: 'desc' }, { name: 'asc' }]`
+
 **Default Values:**
 
-- `orderBy`: `{ createdAt: 'desc' }` - Sort by creation date descending
+- `orderBy`: `[{ createdAt: 'desc' }]` - Sort by creation date descending
+- If omitted, defaults to `PaginationDefaultOrderBy`
 - `cursorField`: `'id'` - Field used for cursor positioning
 
 **Cursor Validation:**
 
 - Cursor contains: cursor value, orderBy, and where conditions
-- If `orderBy` or `where` conditions change: throws `BadRequestException` (400)
+- If `orderBy` or `where` conditions change: throws `UnprocessableEntityException` (422)
 - Client must request from beginning if conditions change
 - Prevents stale cursor navigation
+- For array-based ordering, the array order must remain exactly the same between requests
 
 **Returns:**
 
@@ -200,6 +216,12 @@ Decorator for offset-based pagination with search and ordering.
 - Page defaults to 1
 - PerPage defaults to PaginationDefaultPerPage (20)
 
+**Public Query Contract:**
+
+- `orderBy` uses `field:direction` format (e.g., `name:asc`, `createdAt:desc`) in a single query parameter
+- Multiple fields can be sent as repeated params: `?orderBy=name:asc&orderBy=createdAt:desc`
+- `PaginationOrderPipe` parses this into an array of order objects (`[{ field: direction }]`)
+
 **Usage:**
 
 ```typescript
@@ -216,7 +238,7 @@ pagination: IPaginationQueryOffsetParams
 {
     limit: 20,           // from perPage
     skip: 0,            // (page - 1) * perPage
-    orderBy: { ... },   // { createdAt: 'desc' } by default
+    orderBy: [...],     // [{ createdAt: 'desc' }] by default
     where: { ... },     // filters combined here
     select: { ... },    // fields to select
     include: { ... }    // relations to include
@@ -239,6 +261,12 @@ Decorator for cursor-based pagination.
 - If no `orderBy`: sorts by `createdAt: DESC`
 - Cursor is optional (undefined = first page)
 - PerPage defaults to PaginationDefaultPerPage (20)
+
+**Public Query Contract:**
+
+- `orderBy` uses `field:direction` format (e.g., `name:asc`, `createdAt:desc`) in a single query parameter
+- Multiple fields can be sent as repeated params: `?orderBy=name:asc&orderBy=createdAt:desc`
+- `PaginationOrderPipe` parses this into an array of order objects (`[{ field: direction }]`)
 
 **Usage:**
 
@@ -289,7 +317,7 @@ status?: Record<string, IPaginationIn>
 
 **Validation:**
 
-- Throws `BadRequestException` (400) if value not in enum
+- Throws `UnprocessableEntityException` (422) if value not in enum
 - Error code: `5021 (filterInvalidValue)`
 
 ##### @PaginationQueryFilterNinEnum\<T\>
@@ -340,7 +368,7 @@ isActive?: Record<string, IPaginationEqual>
 **Validation:**
 
 - Accepts only 'true' or 'false'
-- Throws `BadRequestException` (400) for invalid boolean
+- Throws `UnprocessableEntityException` (422) for invalid boolean
 
 ##### @PaginationQueryFilterEqualNumber
 
@@ -361,7 +389,7 @@ age?: Record<string, IPaginationEqual>
 **Validation:**
 
 - Parses as float
-- Throws `BadRequestException` (400) for non-numeric value
+- Throws `UnprocessableEntityException` (422) for non-numeric value
 
 ##### @PaginationQueryFilterEqualString
 
@@ -460,7 +488,7 @@ endDate?: Record<string, IPaginationDate>
 **Validation:**
 
 - Accepts ISO format (YYYY-MM-DD, ISO 8601 timestamps)
-- Throws `BadRequestException` (400) for invalid ISO date
+- Throws `UnprocessableEntityException` (422) for invalid ISO date
 
 #### Ordering Configuration
 
@@ -477,24 +505,31 @@ pagination: IPaginationQueryOffsetParams
 
 **Default Behavior:**
 
-- If no `orderBy` query param is sent: falls back to `{ createdAt: 'desc' }`
-- If `availableOrderBy` is omitted: any `orderBy` value is ignored and `createdAt: desc` is used
-- If `orderBy` is not in `availableOrderBy`: throws `BadRequestException` (400)
+- If no `orderBy` query param is sent: falls back to `[{ createdAt: 'desc' }]`
+- If `availableOrderBy` is omitted: any `orderBy` value is ignored and `[{ createdAt: 'desc' }]` is used
+- If the field part of `orderBy` is not in `availableOrderBy`: throws `UnprocessableEntityException` (422)
+- If the direction part of `orderBy` is not `asc` or `desc`: throws `UnprocessableEntityException` (422)
 
 **Query Parameters:**
 
-- `orderBy`: Field name (must be in `availableOrderBy` list)
-- `orderDirection`: `asc` or `desc`
+- `orderBy`: A `field:direction` string (e.g., `name:asc`). Repeat to sort by multiple fields.
 
 **Transforms:**
 
-- Query: `?orderBy=name&orderDirection=asc`
-- To: `{ name: 'asc' }`
+- Query: `?orderBy=name:asc`
+- To: `[{ name: 'asc' }]`
+
+**Internal Service Support:**
+
+- Query helpers only produce a single order object
+- `PaginationService` also accepts manual multi-field ordering in internal code
+- Example: `[{ createdAt: 'desc' }, { name: 'asc' }]`
 
 **Validation:**
 
 - Field must be in allowed list
-- Throws error code: `5020 (orderByNotAllowed)`
+- Invalid field throws error code: `5020 (orderByNotAllowed)`
+- Invalid direction throws error code: `5035 (orderDirectionNotAllowed)`
 
 ## Pagination Strategies
 
@@ -673,11 +708,28 @@ endDate?: Record<string, IPaginationDate>
 - Field: `createdAt`
 - Direction: `desc` (descending)
 
+**HTTP Query Format:**
+
+- `orderBy` uses `field:direction` format in a single query parameter
+- Repeat the parameter to sort by multiple fields
+
 **Query Parameters:**
 
-```bash
-?orderBy=name&orderDirection=asc
 ```
+?orderBy=name:asc
+?orderBy=name:asc&orderBy=createdAt:desc
+```
+
+**Internal Service Format:**
+
+```typescript
+orderBy: [
+    { createdAt: 'desc' },
+    { name: 'asc' }
+]
+```
+
+All `orderBy` values passed to the service and stored in cursors are arrays. The single-element array `[{ createdAt: 'desc' }]` is the typical default.
 
 **Field Whitelist:**
 Must be specified via `availableOrderBy` in the query decorator to prevent injection:
@@ -745,8 +797,8 @@ async findWithPaginationOffset(
 
 **API Request:**
 
-```bash
-GET /users?page=1&perPage=20&search=john&orderBy=name&orderDirection=asc
+```
+GET /users?page=1&perPage=20&search=john&orderBy=name:asc
 ```
 
 ### Cursor Pagination
@@ -806,7 +858,7 @@ async findWithPaginationCursor(
 
 ```bash
 # First page
-GET /users?perPage=20&orderBy=name&orderDirection=asc
+GET /users?perPage=20&orderBy=name:asc
 
 # Next page
 GET /users?cursor=eyJjdXJzb3I6IjEyMyIsIm9yZGVyQnkiOnsibmFtZSI6ImFzYyJ9fQ==&perPage=20

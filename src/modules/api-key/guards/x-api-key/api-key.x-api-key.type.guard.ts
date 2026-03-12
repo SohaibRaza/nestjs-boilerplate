@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { EnumApiKeyType } from '@prisma/client';
 
 import { IRequestApp } from '@common/request/interfaces/request.interface';
+import { EnumApiKeyType } from '@generated/prisma-client';
 import { ApiKeyXTypeMetaKey } from '@modules/api-key/constants/api-key.constant';
 import { ApiKeyService } from '@modules/api-key/services/api-key.service';
 

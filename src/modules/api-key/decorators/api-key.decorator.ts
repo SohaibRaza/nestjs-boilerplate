@@ -5,9 +5,9 @@ import {
     applyDecorators,
     createParamDecorator,
 } from '@nestjs/common';
-import { ApiKey, EnumApiKeyType } from '@prisma/client';
 
 import { IRequestApp } from '@common/request/interfaces/request.interface';
+import { ApiKey, EnumApiKeyType } from '@generated/prisma-client';
 import { ApiKeyXTypeMetaKey } from '@modules/api-key/constants/api-key.constant';
 import { ApiKeyXApiKeyGuard } from '@modules/api-key/guards/x-api-key/api-key.x-api-key.guard';
 import { ApiKeyXApiKeyTypeGuard } from '@modules/api-key/guards/x-api-key/api-key.x-api-key.type.guard';

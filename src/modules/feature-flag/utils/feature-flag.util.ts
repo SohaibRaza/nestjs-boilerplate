@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FeatureFlag } from '@prisma/client';
+import { FeatureFlag } from '@generated/prisma-client';
 import { Cache } from 'cache-manager';
 import { plainToInstance } from 'class-transformer';
 

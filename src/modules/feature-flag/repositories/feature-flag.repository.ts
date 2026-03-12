@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { FeatureFlag, Prisma } from '@prisma/client';
 
 import { DatabaseService } from '@common/database/services/database.service';
 import {
@@ -8,6 +7,7 @@ import {
 } from '@common/pagination/interfaces/pagination.interface';
 import { PaginationService } from '@common/pagination/services/pagination.service';
 import { IResponsePagingReturn } from '@common/response/interfaces/response.interface';
+import { FeatureFlag, Prisma } from '@generated/prisma-client';
 import { FeatureFlagUpdateMetadataRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-metadata.request';
 import { FeatureFlagUpdateStatusRequestDto } from '@modules/feature-flag/dtos/request/feature-flag.update-status.request';
 

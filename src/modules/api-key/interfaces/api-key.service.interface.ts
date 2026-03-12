@@ -1,5 +1,3 @@
-import { ApiKey, EnumApiKeyType, Prisma } from '@prisma/client';
-
 import {
     IPaginationEqual,
     IPaginationIn,
@@ -10,6 +8,7 @@ import {
     IResponsePagingReturn,
     IResponseReturn,
 } from '@common/response/interfaces/response.interface';
+import { ApiKey, EnumApiKeyType, Prisma } from '@generated/prisma-client';
 import { ApiKeyDto } from '@modules/api-key/dtos/api-key.dto';
 import { ApiKeyCreateRequestDto } from '@modules/api-key/dtos/request/api-key.create.request.dto';
 import { ApiKeyUpdateDateRequestDto } from '@modules/api-key/dtos/request/api-key.update-date.request.dto';

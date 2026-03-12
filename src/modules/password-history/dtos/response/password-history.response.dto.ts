@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { EnumPasswordHistoryType } from '@prisma/client';
+import { EnumPasswordHistoryType } from '@generated/prisma-client';
 import { Exclude, Type } from 'class-transformer';
 
 import { DatabaseDto } from '@common/database/dtos/database.dto';

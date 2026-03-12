@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ApiKey, Prisma } from '@prisma/client';
 
 import { DatabaseService } from '@common/database/services/database.service';
 import { EnumPaginationOrderDirectionType } from '@common/pagination/enums/pagination.enum';
@@ -10,6 +9,7 @@ import {
 } from '@common/pagination/interfaces/pagination.interface';
 import { PaginationService } from '@common/pagination/services/pagination.service';
 import { IResponsePagingReturn } from '@common/response/interfaces/response.interface';
+import { ApiKey, Prisma } from '@generated/prisma-client';
 import { ApiKeyCreateRequestDto } from '@modules/api-key/dtos/request/api-key.create.request.dto';
 import { ApiKeyUpdateDateRequestDto } from '@modules/api-key/dtos/request/api-key.update-date.request.dto';
 import { ApiKeyUpdateStatusRequestDto } from '@modules/api-key/dtos/request/api-key.update-status.request.dto';
@@ -43,9 +43,11 @@ export class ApiKeyRepository {
                 ...isActive,
                 ...type,
             },
-            orderBy: {
-                createdAt: EnumPaginationOrderDirectionType.desc,
-            },
+            orderBy: [
+                {
+                    createdAt: EnumPaginationOrderDirectionType.desc,
+                },
+            ],
         });
     }
 

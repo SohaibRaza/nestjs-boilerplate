@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { EnumApiKeyType } from '@prisma/client';
+import { EnumApiKeyType } from '@generated/prisma-client';
 import { Exclude } from 'class-transformer';
 
 import { ApiKeyDto } from '@modules/api-key/dtos/api-key.dto';

@@ -18,7 +18,7 @@ import {
     IAuthPassword,
     IAuthTwoFactorVerifyResult,
 } from '@modules/auth/interfaces/auth.interface';
-import { DeviceDto } from '@modules/device/dtos/device.dto';
+import { DeviceRequestDto } from '@modules/device/dtos/requests/device.request.dto';
 import { IRole } from '@modules/role/interfaces/role.interface';
 import { UserClaimUsernameRequestDto } from '@modules/user/dtos/request/user.claim-username.request.dto';
 import { UserCreateSocialRequestDto } from '@modules/user/dtos/request/user.create-social.request.dto';
@@ -32,6 +32,7 @@ import {
     IUser,
     IUserForgotPasswordCreate,
     IUserLogin,
+    IUserLoginResult,
     IUserProfile,
     IUserVerificationCreate,
 } from '@modules/user/interfaces/user.interface';
@@ -58,7 +59,7 @@ import {
     User,
     UserMobileNumber,
     Verification,
-} from '@prisma/client';
+} from '@generated/prisma-client';
 
 @Injectable()
 export class UserRepository {
@@ -378,6 +379,7 @@ export class UserRepository {
     }
 
     async createByAdmin(
+        userId: string,
         username: string,
         { countryId, email, name }: UserCreateRequestDto,
         {
@@ -405,7 +407,6 @@ export class UserRepository {
             },
         });
 
-        const userId = this.databaseUtil.createId();
         const [user] = await this.databaseService.$transaction([
             this.databaseService.user.create({
                 data: {
@@ -619,6 +620,7 @@ export class UserRepository {
                         data: {
                             isRevoked: true,
                             revokedAt: deletedAt,
+                            revokedById: userId,
                         },
                     },
                 },
@@ -865,6 +867,7 @@ export class UserRepository {
                         data: {
                             isRevoked: true,
                             revokedAt: passwordCreated,
+                            revokedById: updatedBy,
                         },
                     },
                 },
@@ -940,6 +943,7 @@ export class UserRepository {
                         data: {
                             isRevoked: true,
                             revokedAt: passwordCreated,
+                            revokedById: userId,
                         },
                     },
                 },
@@ -949,10 +953,10 @@ export class UserRepository {
 
     async login(
         userId: string,
+        { fingerprint, name, notificationToken, platform }: DeviceRequestDto,
         { loginFrom, loginWith, sessionId, expiredAt, jti }: IUserLogin,
-        { fingerprint, name, notificationToken, platform }: DeviceDto,
         { ipAddress, userAgent, geoLocation }: IRequestLog
-    ): Promise<User> {
+    ): Promise<IUserLoginResult> {
         const today = this.helperService.dateCreate();
 
         let action: EnumActivityLogAction =
@@ -985,15 +989,81 @@ export class UserRepository {
 
         return this.databaseService.$transaction(
             async (tx: Prisma.TransactionClient) => {
-                await tx.device.updateMany({
+                const device = await tx.device.upsert({
                     where: {
-                        notificationToken,
+                        fingerprint,
                     },
-                    data: {
-                        notificationToken: null,
-                        notificationProvider: null,
+                    update: {
+                        name,
+                        platform,
+                        notificationToken,
+                        lastActiveAt: today,
+                        notificationProvider,
+                        updatedBy: userId,
+                    },
+                    create: {
+                        fingerprint,
+                        name,
+                        platform,
+                        notificationToken,
+                        lastActiveAt: today,
+                        notificationProvider,
+                        createdBy: userId,
                     },
                 });
+
+                let isNewDevice = false;
+                let sessionShouldBeInactive = [];
+                let deviceOwnership = await tx.deviceOwnership.findFirst({
+                    where: {
+                        deviceId: device.id,
+                        userId,
+                        isRevoked: false,
+                    },
+                });
+                if (!deviceOwnership) {
+                    isNewDevice = true;
+                    deviceOwnership = await tx.deviceOwnership.create({
+                        data: {
+                            userId,
+                            createdBy: userId,
+                            lastActiveAt: today,
+                            isRevoked: false,
+                            deviceId: device.id,
+                        },
+                    });
+                } else {
+                    const activeSessions = await tx.session.findMany({
+                        where: {
+                            deviceOwnershipId: deviceOwnership.id,
+                            isRevoked: false,
+                            expiredAt: { gte: today },
+                        },
+                    });
+
+                    sessionShouldBeInactive = activeSessions.map(session => ({
+                        id: session.id,
+                    }));
+
+                    [deviceOwnership] = await Promise.all([
+                        tx.deviceOwnership.update({
+                            where: { id: deviceOwnership.id },
+                            data: {
+                                lastActiveAt: today,
+                                updatedBy: userId,
+                            },
+                        }),
+                        tx.session.updateMany({
+                            where: {
+                                id: { in: activeSessions.map(s => s.id) },
+                            },
+                            data: {
+                                isRevoked: true,
+                                revokedAt: today,
+                            },
+                        }),
+                    ]);
+                }
 
                 const user = await tx.user.update({
                     where: { id: userId, deletedAt: null },
@@ -1003,33 +1073,6 @@ export class UserRepository {
                         lastLoginFrom: loginFrom,
                         lastLoginWith: loginWith,
                         updatedBy: userId,
-                        devices: {
-                            upsert: {
-                                where: {
-                                    userId_fingerprint: {
-                                        userId,
-                                        fingerprint,
-                                    },
-                                },
-                                create: {
-                                    fingerprint,
-                                    name,
-                                    platform,
-                                    notificationProvider,
-                                    notificationToken,
-                                    lastActiveAt: today,
-                                    createdBy: userId,
-                                },
-                                update: {
-                                    name,
-                                    platform,
-                                    notificationProvider,
-                                    notificationToken,
-                                    lastActiveAt: today,
-                                    updatedBy: userId,
-                                },
-                            },
-                        },
                         activityLogs: {
                             create: {
                                 action,
@@ -1043,36 +1086,34 @@ export class UserRepository {
                                 createdBy: userId,
                             },
                         },
-                    },
-                });
-
-                await tx.session.create({
-                    data: {
-                        id: sessionId,
-                        jti,
-                        expiredAt,
-                        isRevoked: false,
-                        ipAddress,
-                        userAgent: this.databaseUtil.toPlainObject(userAgent),
-                        geoLocation:
-                            this.databaseUtil.toPlainObject(geoLocation),
-                        user: {
-                            connect: {
-                                id: userId,
-                            },
-                        },
-                        device: {
-                            connect: {
-                                userId_fingerprint: {
-                                    userId,
-                                    fingerprint,
-                                },
+                        sessions: {
+                            create: {
+                                id: sessionId,
+                                jti,
+                                expiredAt,
+                                isRevoked: false,
+                                ipAddress,
+                                userAgent:
+                                    this.databaseUtil.toPlainObject(userAgent),
+                                geoLocation:
+                                    this.databaseUtil.toPlainObject(
+                                        geoLocation
+                                    ),
+                                createdBy: userId,
                             },
                         },
                     },
                 });
 
-                return user;
+                const result: IUserLoginResult = {
+                    device,
+                    deviceOwnership,
+                    isNewDevice,
+                    user,
+                    sessionShouldBeInactive,
+                };
+
+                return result;
             }
         );
     }
@@ -1212,6 +1253,7 @@ export class UserRepository {
     }
 
     async signUp(
+        userId: string,
         username: string,
         roleId: string,
         {
@@ -1228,7 +1270,7 @@ export class UserRepository {
             passwordHash,
             passwordPeriodExpired,
         }: IAuthPassword,
-        { expiredAt, reference, token, type }: IUserVerificationCreate,
+        { expiredAt, reference, hashedToken, type }: IUserVerificationCreate,
         { ipAddress, userAgent, geoLocation }: IRequestLog
     ): Promise<User> {
         const termPolicies = await this.databaseService.termPolicy.findMany({
@@ -1248,7 +1290,6 @@ export class UserRepository {
             },
         });
 
-        const userId = this.databaseUtil.createId();
         const [user] = await this.databaseService.$transaction([
             this.databaseService.user.create({
                 data: {
@@ -1334,7 +1375,7 @@ export class UserRepository {
                         create: {
                             expiredAt,
                             reference,
-                            token,
+                            token: hashedToken,
                             type,
                             to: email,
                             createdBy: userId,
@@ -1369,7 +1410,7 @@ export class UserRepository {
     async forgotPassword(
         userId: string,
         email: string,
-        { expiredAt, reference, token }: IUserForgotPasswordCreate,
+        { expiredAt, reference, hashedToken }: IUserForgotPasswordCreate,
         { ipAddress, userAgent, geoLocation }: IRequestLog
     ): Promise<void> {
         await this.databaseService.user.update({
@@ -1397,7 +1438,7 @@ export class UserRepository {
                     create: {
                         expiredAt,
                         reference,
-                        token,
+                        token: hashedToken,
                         createdBy: userId,
                         to: email,
                     },
@@ -1469,6 +1510,7 @@ export class UserRepository {
                         data: {
                             isRevoked: true,
                             revokedAt: passwordCreated,
+                            revokedById: userId,
                         },
                     },
                 },
@@ -1516,7 +1558,7 @@ export class UserRepository {
     async requestVerificationEmail(
         userId: string,
         userEmail: string,
-        { expiredAt, reference, token, type }: IUserVerificationCreate,
+        { expiredAt, reference, hashedToken, type }: IUserVerificationCreate,
         { ipAddress, userAgent, geoLocation }: IRequestLog
     ): Promise<User> {
         const today = this.helperService.dateCreate();
@@ -1546,7 +1588,7 @@ export class UserRepository {
                                 create: {
                                     expiredAt,
                                     reference,
-                                    token,
+                                    token: hashedToken,
                                     type,
                                     to: userEmail,
                                     createdBy: userId,
@@ -1794,6 +1836,19 @@ export class UserRepository {
                         createdAt: now,
                     },
                 },
+                sessions: {
+                    updateMany: {
+                        where: {
+                            isRevoked: false,
+                            expiredAt: { gte: now },
+                        },
+                        data: {
+                            isRevoked: true,
+                            revokedAt: now,
+                            revokedById: userId,
+                        },
+                    },
+                },
             },
             include: {
                 role: true,
@@ -1872,7 +1927,11 @@ export class UserRepository {
                 sessions: {
                     updateMany: {
                         where: { isRevoked: false, expiredAt: { gte: now } },
-                        data: { isRevoked: true, revokedAt: now },
+                        data: {
+                            isRevoked: true,
+                            revokedAt: now,
+                            revokedById: updatedBy,
+                        },
                     },
                 },
             },

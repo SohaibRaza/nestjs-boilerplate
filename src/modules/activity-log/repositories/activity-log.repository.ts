@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ActivityLog, EnumActivityLogAction, Prisma } from '@prisma/client';
 
 import { DatabaseService } from '@common/database/services/database.service';
 import { DatabaseUtil } from '@common/database/utils/database.util';
@@ -11,6 +10,11 @@ import {
 import { PaginationService } from '@common/pagination/services/pagination.service';
 import { IRequestLog } from '@common/request/interfaces/request.interface';
 import { IResponsePagingReturn } from '@common/response/interfaces/response.interface';
+import {
+    ActivityLog,
+    EnumActivityLogAction,
+    Prisma,
+} from '@generated/prisma-client';
 import {
     IActivityLog,
     IActivityLogMetadata,

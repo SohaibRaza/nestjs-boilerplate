@@ -1,6 +1,6 @@
 {
     "name": "sdms-backend",
-    "version": "8.2.0",
+    "version": "8.2.2",
     "description": "Sales and Distribution Management System",
     "repository": {
         "type": "git",

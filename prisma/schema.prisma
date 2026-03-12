@@ -91,7 +91,7 @@ model UserMobileNumber {
 
   country       Country        @relation("UserMobileNumberCountry", fields: [countryId], references: [id])
   user          User           @relation("UserMobileNumberUser", fields: [userId], references: [id])
-  verifications Verification[] @relation("UserMobileNumberVerification")
+  verifications Verification[]   @relation("UserMobileNumberVerification")
 
   @@unique([userId, countryId, phoneCode, number])
   @@index([userId, isVerified])
@@ -102,7 +102,7 @@ model User {
   id              String             @id @default(uuid(7)) @db.Uuid
   name            String?
   username        String
-  isVerified      Boolean            @default(false)
+  isVerified      Boolean             @default(false)
   verifiedAt      DateTime?
   email           String
   roleId          String             @db.Uuid
@@ -130,19 +130,21 @@ model User {
   deletedAt DateTime?
   deletedBy String?   @db.Uuid
 
-  mobileNumbers        UserMobileNumber[]         @relation("UserMobileNumberUser")
-  verifications        Verification[]             @relation("UserVerifications")
-  passwordHistories    PasswordHistory[]          @relation("UserPasswordHistories")
-  activityLogs         ActivityLog[]              @relation("UserActivityLogs")
-  role                 Role                       @relation("UserRole", fields: [roleId], references: [id])
-  country              Country                    @relation("UserCountry", fields: [countryId], references: [id])
-  sessions             Session[]                  @relation("UserSessions")
-  acceptances          TermPolicyUserAcceptance[] @relation("TermPolicyUserAcceptanceUser")
-  forgotPasswords      ForgotPassword[]           @relation("UserForgotPassword")
-  twoFactor            TwoFactor?                 @relation("UserTwoFactor")
-  notifications        Notification[]             @relation("UserNotifications")
-  notificationSettings NotificationUserSetting[]  @relation("UserNotificationSettings")
-  devices              Device[]                   @relation("UserDevices")
+  mobileNumbers           UserMobileNumber[]         @relation("UserMobileNumberUser")
+  verifications            Verification[]              @relation("UserVerifications")
+  passwordHistories       PasswordHistory[]          @relation("UserPasswordHistories")
+  activityLogs            ActivityLog[]              @relation("UserActivityLogs")
+  role                    Role                       @relation("UserRole", fields: [roleId], references: [id])
+  country                 Country                    @relation("UserCountry", fields: [countryId], references: [id])
+  sessions                Session[]                  @relation("UserSessions")
+  acceptances             TermPolicyUserAcceptance[] @relation("TermPolicyUserAcceptanceUser")
+  forgotPasswords         ForgotPassword[]           @relation("UserForgotPassword")
+  twoFactor               TwoFactor?                 @relation("UserTwoFactor")
+  notifications            Notification[]              @relation("UserNotifications")
+  notificationSettings     NotificationUserSetting[]   @relation("UserNotificationSettings")
+  deviceOwnerships        DeviceOwnership[]          @relation("DeviceOwnershipUser")
+  revokedSessions         Session[]                  @relation("SessionRevokedByUser")
+  revokedDeviceOwnerships DeviceOwnership[]          @relation("DeviceOwnershipRevokedByUser")
 
   @@unique([username])
   @@unique([email])
@@ -215,21 +217,23 @@ model ActivityLog {
 }
 
 model Session {
-  id          String    @id @default(uuid(7)) @db.Uuid
-  userId      String    @db.Uuid
-  deviceId    String    @db.Uuid
-  jti         String
-  ipAddress   String
+  id                String    @id @default(uuid(7)) @db.Uuid
+  userId            String    @db.Uuid
+  deviceOwnershipId String    @db.Uuid
+  jti               String
+  ipAddress         String
   // UserAgent stored as JSON: { ua, browser, cpu, device, engine, os }
-  userAgent   Json
+  userAgent         Json
   // GeoLocation stored as JSON: { latitude, longitude, country, region, city }
-  geoLocation Json?
-  expiredAt   DateTime
-  revokedAt   DateTime?
-  isRevoked   Boolean   @default(false)
+  geoLocation       Json?
+  expiredAt         DateTime
+  revokedAt         DateTime?
+  isRevoked         Boolean   @default(false)
+  revokedById       String?   @db.Uuid
 
-  user   User   @relation("UserSessions", fields: [userId], references: [id])
-  device Device @relation("DeviceSessions", fields: [deviceId], references: [id])
+  revokedBy       User?            @relation("SessionRevokedByUser", fields: [revokedById], references: [id])
+  user            User?            @relation("UserSessions", fields: [userId], references: [id])
+  deviceOwnership DeviceOwnership? @relation("DeviceOwnershipSessions", fields: [deviceOwnershipId], references: [id])
 
   createdAt DateTime @default(now())
   createdBy String?  @db.Uuid
@@ -239,8 +243,8 @@ model Session {
   @@unique([userId, jti])
   @@index([userId, expiredAt(sort: Desc), isRevoked])
   @@index([isRevoked, expiredAt(sort: Asc)])
-  @@index([userId, deviceId, isRevoked])
-  @@index([deviceId])
+  @@index([userId, deviceOwnershipId, isRevoked])
+  @@index([deviceOwnershipId])
   @@index([createdAt])
   @@index([updatedAt])
   @@map("Sessions")
@@ -248,26 +252,48 @@ model Session {
 
 model Device {
   id                   String                          @id @default(uuid(7)) @db.Uuid
-  userId               String                          @db.Uuid
-  fingerprint           String
+  fingerprint          String
   name                 String?
   platform             EnumDevicePlatform
   lastActiveAt         DateTime                        @default(now())
-  notificationToken     String?
-  notificationProvider  EnumDeviceNotificationProvider?
+  notificationToken    String?
+  notificationProvider EnumDeviceNotificationProvider?
 
   createdAt DateTime @default(now())
   createdBy String?  @db.Uuid
   updatedAt DateTime @updatedAt
   updatedBy String?  @db.Uuid
 
-  user     User      @relation("UserDevices", fields: [userId], references: [id])
-  sessions Session[] @relation("DeviceSessions")
+  ownerships DeviceOwnership[] @relation("DeviceOwnershipDevice")
 
-  @@unique([userId, fingerprint])
+  @@unique([fingerprint])
   @@index([notificationToken])
-  @@index([userId, lastActiveAt(sort: Desc)])
   @@map("Devices")
+}
+
+model DeviceOwnership {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  deviceId     String    @db.Uuid
+  userId       String    @db.Uuid
+  revokedAt    DateTime?
+  isRevoked    Boolean   @default(false)
+  revokedById  String?   @db.Uuid
+  lastActiveAt DateTime  @default(now())
+
+  createdAt DateTime @default(now())
+  createdBy String?  @db.Uuid
+  updatedAt DateTime @updatedAt
+  updatedBy String?  @db.Uuid
+
+  revokedBy User?     @relation("DeviceOwnershipRevokedByUser", fields: [revokedById], references: [id])
+  device    Device    @relation("DeviceOwnershipDevice", fields: [deviceId], references: [id])
+  user      User      @relation("DeviceOwnershipUser", fields: [userId], references: [id])
+  sessions  Session[] @relation("DeviceOwnershipSessions")
+
+  @@index([deviceId, revokedAt])
+  @@index([userId, revokedAt])
+  @@index([deviceId, userId, revokedAt])
+  @@map("DeviceOwnerships")
 }
 
 model TwoFactor {
@@ -557,6 +583,7 @@ enum EnumActivityLogAction {
   adminUserUpdatePassword
   adminUserResetTwoFactor
   adminUserImport
+  adminDeviceRemove
 }
 
 enum EnumDevicePlatform {

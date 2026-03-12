@@ -1,4 +1,3 @@
-import { ApiKey, EnumApiKeyType, Prisma } from '@prisma/client';
 import {
     BadRequestException,
     ForbiddenException,
@@ -23,6 +22,7 @@ import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { ApiKeyCreateRequestDto } from '@modules/api-key/dtos/request/api-key.create.request.dto';
 import { ApiKeyUpdateDateRequestDto } from '@modules/api-key/dtos/request/api-key.update-date.request.dto';
 import { ApiKeyUpdateRequestDto } from '@modules/api-key/dtos/request/api-key.update.request.dto';
+import { ApiKey, EnumApiKeyType, Prisma } from '@generated/prisma-client';
 import { ApiKeyUpdateStatusRequestDto } from '@modules/api-key/dtos/request/api-key.update-status.request.dto';
 import { ApiKeyCreateResponseDto } from '@modules/api-key/dtos/response/api-key.create.response.dto';
 import { IApiKeyService } from '@modules/api-key/interfaces/api-key.service.interface';
