@@ -48,7 +48,11 @@ import {
     Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { EnumUserLoginWith, GeoLocation, UserAgent } from '@prisma/client';
+import { EnumUserLoginWith } from '@prisma/client';
+import {
+    GeoLocation,
+    UserAgent,
+} from '@common/database/interfaces/database.interface';
 
 @ApiTags('modules.public.user')
 @Controller({

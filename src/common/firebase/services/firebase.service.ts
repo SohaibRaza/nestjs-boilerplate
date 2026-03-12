@@ -25,9 +25,9 @@ import { Messaging } from 'firebase-admin/lib/messaging/messaging';
 export class FirebaseService implements OnModuleInit {
     private readonly logger = new Logger(FirebaseService.name);
 
-    private readonly projectId: string;
-    private readonly clientEmail: string;
-    private readonly privateKey: string;
+    private readonly projectId?: string;
+    private readonly clientEmail?: string;
+    private privateKey?: string;
 
     private app: FirebaseApp | null = null;
     private messaging: Messaging | null = null;
@@ -41,15 +41,17 @@ export class FirebaseService implements OnModuleInit {
             'firebase.clientEmail'
         );
 
-        const privateKeyBuffer = Buffer.from(
-            this.configService.get<string>('firebase.privateKey'),
-            'base64'
+        const privateKey = this.configService.get<string>(
+            'firebase.privateKey'
         );
-        this.privateKey = createPrivateKey({
-            key: privateKeyBuffer,
-            format: 'der',
-            type: 'pkcs8',
-        }).export({ type: 'pkcs8', format: 'pem' }) as string;
+        if (privateKey) {
+            const privateKeyBuffer = Buffer.from(privateKey, 'base64');
+            this.privateKey = createPrivateKey({
+                key: privateKeyBuffer,
+                format: 'der',
+                type: 'pkcs8',
+            }).export({ type: 'pkcs8', format: 'pem' }) as string;
+        }
     }
 
     /**

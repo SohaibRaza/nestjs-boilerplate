@@ -1,5 +1,9 @@
 import { FastifyRequest } from 'fastify';
-import { ApiKey, GeoLocation, UserAgent } from '@prisma/client';
+import { ApiKey } from '@prisma/client';
+import {
+    GeoLocation,
+    UserAgent,
+} from '@common/database/interfaces/database.interface';
 
 import type { IFile } from '@common/file/interfaces/file.interface';
 import { IPaginationQuery } from '@common/pagination/interfaces/pagination.interface';

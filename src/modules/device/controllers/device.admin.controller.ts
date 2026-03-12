@@ -15,12 +15,11 @@ import {
     IResponsePagingReturn,
     IResponseReturn,
 } from '@common/response/interfaces/response.interface';
+import { EnumRoleType, Prisma } from '@prisma/client';
 import {
-    EnumRoleType,
     GeoLocation,
-    Prisma,
     UserAgent,
-} from '@generated/prisma-client';
+} from '@common/database/interfaces/database.interface';
 import { ApiKeyProtected } from '@modules/api-key/decorators/api-key.decorator';
 import {
     AuthJwtAccessProtected,
@@ -53,7 +52,7 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('modules.admin.user.device')
 @Controller({
     version: '1',
-    path: '/user/:userId/password-history',
+    path: '/user/:userId/device',
 })
 export class DeviceAdminController {
     constructor(private readonly deviceService: DeviceService) {}

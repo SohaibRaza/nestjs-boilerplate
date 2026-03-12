@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
-import { EnumActivityLogAction, UserAgent } from '@prisma/client';
+import { UserAgent } from '@common/database/interfaces/database.interface';
+import { EnumActivityLogAction, Prisma } from '@prisma/client';
 import { getClientIp } from '@supercharge/request-ip';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';

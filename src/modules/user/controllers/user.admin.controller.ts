@@ -27,10 +27,12 @@ import {
     EnumActivityLogAction,
     EnumRoleType,
     EnumUserStatus,
-    GeoLocation,
     Prisma,
-    UserAgent,
 } from '@prisma/client';
+import {
+    GeoLocation,
+    UserAgent,
+} from '@common/database/interfaces/database.interface';
 import { UserProtected } from '@modules/user/decorators/user.decorator';
 import {
     AuthJwtAccessProtected,

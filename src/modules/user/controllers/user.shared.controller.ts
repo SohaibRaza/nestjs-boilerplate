@@ -12,7 +12,10 @@ import {
 import { RequestRequiredPipe } from '@common/request/pipes/request.required.pipe';
 import { Response } from '@common/response/decorators/response.decorator';
 import { IResponseReturn } from '@common/response/interfaces/response.interface';
-import { GeoLocation, UserAgent } from '@generated/prisma-client';
+import {
+    GeoLocation,
+    UserAgent,
+} from '@common/database/interfaces/database.interface';
 import { ApiKeyProtected } from '@modules/api-key/decorators/api-key.decorator';
 import {
     AuthJwtAccessProtected,

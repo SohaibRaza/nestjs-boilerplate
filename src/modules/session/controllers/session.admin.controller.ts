@@ -35,13 +35,11 @@ import { TermPolicyAcceptanceProtected } from '@modules/term-policy/decorators/t
 import { UserProtected } from '@modules/user/decorators/user.decorator';
 import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { EnumActivityLogAction, EnumRoleType, Prisma } from '@prisma/client';
 import {
-    EnumActivityLogAction,
-    EnumRoleType,
     GeoLocation,
-    Prisma,
     UserAgent,
-} from '@prisma/client';
+} from '@common/database/interfaces/database.interface';
 
 @ApiTags('modules.admin.user.session')
 @Controller({

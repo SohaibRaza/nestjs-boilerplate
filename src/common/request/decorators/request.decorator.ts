@@ -18,7 +18,7 @@ import { IRequestApp } from '@common/request/interfaces/request.interface';
 import { UAParser } from 'ua-parser-js';
 import { getClientIp } from '@supercharge/request-ip';
 import geoIp from 'geoip-lite';
-import { GeoLocation } from '@generated/prisma-client';
+import { GeoLocation } from '@common/database/interfaces/database.interface';
 
 /**
  * Request timeout decorator for route handlers.
