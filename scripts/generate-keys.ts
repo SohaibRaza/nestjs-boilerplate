@@ -1,6 +1,6 @@
-import crypto from 'crypto';
-import fs from 'fs';
-import path, { join } from 'path';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path, { join } from 'node:path';
 
 /**
  * Utility class for generating and managing JWT key pairs (ES256 for access, ES512 for refresh) and separate JWKS files.

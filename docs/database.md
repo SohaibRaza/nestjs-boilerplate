@@ -24,37 +24,28 @@ This documentation explains the database architecture and features in ACK NestJS
   - [Template Seeds](#template-seeds)
   - [AWS S3 Configuration Seed](#aws-s3-configuration-seed)
 - [Initial Seeded Data](#initial-seeded-data)
- 	- [API Keys](#api-keys)
- 	- [Roles](#roles)
- 	- [Users](#users)
- 	- [Feature Flags](#feature-flags)
- 	- [Term Policies](#term-policies)
-- [Composite Types](#composite-types)
- 	- [GeoLocation](#geolocation)
- 	- [UserAgent](#useragent)
- 	- [UserTermPolicy](#usertermpolicy)
- 	- [UserPhoto](#userphoto)
- 	- [RoleAbility](#roleability)
- 	- [TermPolicyContent](#termpolicycontent)
+  - [API Keys](#api-keys)
+  - [Roles](#roles)
+  - [Users](#users)
+  - [Feature Flags](#feature-flags)
+  - [Term Policies](#term-policies)
+- [JSON Data (Soft Architecture)](#json-data-soft-architecture)
+  - [GeoLocation](#geolocation)
+  - [UserAgent](#useragent)
+  - [UserTermPolicy](#usertermpolicy)
+  - [UserPhoto](#userphoto)
+  - [RoleAbility](#roleability)
+  - [TermPolicyContent](#termpolicycontent)
 - [Docker](#docker)
 - [Database Tools](#database-tools)
   - [Prisma ORM](#prisma-orm)
   - [Why Prisma for Repository Design Pattern?](#why-prisma-for-repository-design-pattern)
   - [Change DB with Minimal Effort](#change-db-with-minimal-effort)
 
-## Prerequisites
+- `pnpm db:migrate:dev` — Create and apply a migration in development.
+- `pnpm db:migrate` — Apply pending migrations in production.
 
-> **💡 Tip:** Use Docker setup from the installation guide for automatic MongoDB replica set configuration.
-
-**MongoDB 8.0.x** running as a **replica set** (required for transactions)
-
-## Migration
-
-Prisma does not support migrations for MongoDB. Instead, use `prisma db push` to sync your Prisma schema with the MongoDB database.
-
-In ACK NestJS Boilerplate, you can use the `pnpm db:migrate` script to quickly sync your schema to MongoDB.
-
-For details, see the official Prisma documentation: [Prisma for MongoDB][ref-prisma-mongodb]
+For details, see the official Prisma documentation: [Prisma Migrate][ref-prisma-migrate]
 
 ## Generate Database Client
 
@@ -89,7 +80,7 @@ ACK NestJS Boilerplate provides ready-to-use seed scripts to help you quickly in
 
 - `pnpm migration:seed` — runs all seed commands to populate initial data.
 - `pnpm migration:remove` — removes all seeded data from the database.
-- `pnpm migration:fresh` — force-resets the database schema (`prisma db push --force-reset`) then immediately re-seeds all data. Useful during development when you need a clean slate.
+- `pnpm migration:fresh` — force-resets the database schema (`prisma migrate dev`) then immediately re-seeds all data. Useful during development when you need a clean slate.
 
 **How to Seed/Remove a Specific Module:**
 Run the command:
@@ -197,9 +188,9 @@ When you run `pnpm migration:seed`, the following initial data will be created i
 Two API keys are created for authentication and service access:
 
 | Name | Type | Key | Secret | Usage |
-| ----- | ----- | ----- | ------ | ----- |
-| Api Key Default | `default` | `fyFGb7ywyM37TqDY8nuhAmGW5` | `qbp7LmCxYUTHFwKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For general API access |
-| Api Key System | `system` | `UTDH0fuDMAbd1ZVnwnyrQJd8Q` | `qbp7LmCxYUTHFwKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For system-level operations |
+| ---- | ---- | --- | ------ | ----- |
+| Api Key Default | `default` | `fyFGb7ywyM37TqDY8nuhAmGW5` | `qbp7LmCxYUTHFkKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For general API access |
+| Api Key System | `system` | `UTDH0fuDMAbd1ZVnwnyrQJd8Q` | `qbp7LmCxYUTHFkKvHnxGW1aTyjSNU6ytN21etK89MaP2Dj2KZP` | For system-level operations |
 
 **API Key Prefix Convention:**
 
@@ -246,10 +237,10 @@ The seeded users differ per environment. This is controlled by `migrationUserDat
 **User accounts:**
 
 | Email | Name | Role | Password | Country | Environments |
-|-------|------|------|----------|---------|-------------|
-| <superadmin@mail.com> | Super Admin | superadmin | `aaAA@123` | ID (Indonesia) | all |
-| <admin@mail.com> | Admin | admin | `aaAA@123` | ID (Indonesia) | all |
-| <user@mail.com> | User | user | `aaAA@123` | ID (Indonesia) | `local` only |
+| ----- | ---- | ---- | -------- | ------- | ------------ |
+| `superadmin@mail.com` | Super Admin | superadmin | aaAA@123 | ID (Indonesia) | all |
+| `admin@mail.com` | Admin | admin | aaAA@123 | ID (Indonesia) | all |
+| `user@mail.com` | User | user | aaAA@123 | ID (Indonesia) | local only |
 
 ### Feature Flags
 
@@ -276,35 +267,35 @@ Four term policy documents are created:
 | `privacy` | 1 | EN | Privacy policy document |
 | `termsOfService` | 1 | EN | Terms of Service document |
 
-The actual content for these policies is stored as file references in `src/migration/data/term-policy/*`. The files are not automatically linked to the database records. You must run the term policy migration script to link the files and update the content keys in the database.
+The actual content for these policies (as file references) is stored in `src/migration/data/term-policy/*`. The files are not automatically linked to the database records. You must run the term policy migration script to link the files and update the content keys in the database.
 
 For more details on how seeding works, see: [Template Seeds](#template-seeds)
 
-## Composite Types
+## JSON Data (Soft Architecture)
 
-Prisma composite types are embedded sub-documents in MongoDB (not separate collections). They are defined with the `type` keyword in `prisma/schema.prisma` and stored inline within the parent document rather than in separate collections.
+PostgreSQL uses `Json` fields for semi-structured data, replacing the concept of composite types used in MongoDB.
 
 ### GeoLocation
 
 Represents the geographic location derived from a client's IP address using `geoip-lite`.
 
-```prisma
-type GeoLocation {
-  latitude  Float
-  longitude Float
-  country   String
-  region    String
-  city      String
+```typescript
+export interface GeoLocation {
+    latitude: number;
+    longitude: number;
+    country: string;
+    region: string;
+    city: string;
 }
 ```
 
 | Field | Type | Description |
-|---|---|---|
-| `latitude` | `Float` | Latitude coordinate |
-| `longitude` | `Float` | Longitude coordinate |
-| `country` | `String` | ISO country code (e.g. `"ID"`) |
-| `region` | `String` | Region/state code (e.g. `"JK"`) |
-| `city` | `String` | City name (e.g. `"Jakarta"`) |
+| ----- | ---- | ----------- |
+| `latitude` | `number` | Latitude coordinate |
+| `longitude` | `number` | Longitude coordinate |
+| `country` | `string` | ISO country code |
+| `region` | `string` | Region/state code |
+| `city` | `string` | City name |
 
 **Used in:**
 
@@ -317,56 +308,54 @@ Resolved automatically via the `@RequestGeoLocation()` parameter decorator. See 
 
 ### UserAgent
 
-Represents parsed user-agent information from the client's `User-Agent` HTTP header using `ua-parser-js`. `UserAgent` is the top-level type that embeds four sub-types.
+Represents parsed user-agent information from the client's `User-Agent` HTTP header using `ua-parser-js`.
 
-```prisma
-type UserAgent {
-  ua      String?
-  browser UserAgentBrowser?
-  cpu     UserAgentCpu?
-  device  UserAgentDevice?
-  engine  UserAgentEngine?
-  os      UserAgentOs?
+```typescript
+export interface UserAgent {
+    ua?: string;
+    browser?: UserAgentBrowser;
+    cpu?: UserAgentCpu;
+    device?: UserAgentDevice;
+    engine?: UserAgentEngine;
+    os?: UserAgentOs;
 }
 
-type UserAgentBrowser {
-  name    String?
-  version String?
-  major   String?
-  type    String?
+export interface UserAgentBrowser {
+    name?: string;
+    version?: string;
+    major?: string;
+    type?: string;
 }
 
-type UserAgentCpu {
-  architecture String?
+export interface UserAgentCpu {
+    architecture?: string;
 }
 
-type UserAgentDevice {
-  type   String?
-  vendor String?
-  model  String?
+export interface UserAgentDevice {
+    type?: string;
+    vendor?: string;
+    model?: string;
 }
 
-type UserAgentEngine {
-  name    String?
-  version String?
+export interface UserAgentEngine {
+    name?: string;
+    version?: string;
 }
 
-type UserAgentOs {
-  name    String?
-  version String?
+export interface UserAgentOs {
+    name?: string;
+    version?: string;
 }
 ```
 
-**`UserAgent` fields:**
-
 | Field | Type | Description |
-|---|---|---|
-| `ua` | `String?` | Raw user-agent string |
-| `browser` | `UserAgentBrowser?` | Browser details |
-| `cpu` | `UserAgentCpu?` | CPU architecture |
-| `device` | `UserAgentDevice?` | Device details |
-| `engine` | `UserAgentEngine?` | Rendering engine details |
-| `os` | `UserAgentOs?` | Operating system details |
+| ----- | ---- | ----------- |
+| `ua` | `string?` | Raw user-agent string |
+| `browser` | `object?` | Browser details |
+| `cpu` | `object?` | CPU architecture |
+| `device` | `object?` | Device details |
+| `engine` | `object?` | Rendering engine details |
+| `os` | `object?` | Operating system details |
 
 **Used in:**
 
@@ -379,23 +368,23 @@ Resolved automatically via the `@RequestUserAgent()` parameter decorator. See [S
 
 ### UserTermPolicy
 
-Represents the user's acceptance flags for each term policy type. Stored inline on the `User` document.
+Acceptance flags stored as JSON or in a join table.
 
-```prisma
-type UserTermPolicy {
-  termsOfService Boolean
-  privacy        Boolean
-  marketing      Boolean
-  cookies        Boolean
+```typescript
+export interface UserTermPolicy {
+    termsOfService: boolean;
+    privacy: boolean;
+    marketing: boolean;
+    cookies: boolean;
 }
 ```
 
 | Field | Type | Description |
-|---|---|---|
-| `termsOfService` | `Boolean` | Has accepted Terms of Service |
-| `privacy` | `Boolean` | Has accepted Privacy Policy |
-| `marketing` | `Boolean` | Has accepted Marketing terms |
-| `cookies` | `Boolean` | Has accepted Cookie policy |
+| ----- | ---- | ----------- |
+| `termsOfService` | `boolean` | Has accepted/rejected Terms of Service |
+| `privacy` | `boolean` | Has accepted/rejected Privacy policy |
+| `marketing` | `boolean` | Has accepted/rejected Marketing consent |
+| `cookies` | `boolean` | Has accepted/rejected Cookie policy |
 
 **Used in:**
 
@@ -405,29 +394,29 @@ type UserTermPolicy {
 
 ### UserPhoto
 
-Represents the user's profile photo stored in AWS S3.
+Represents the user's profile photo.
 
-```prisma
-type UserPhoto {
-  bucket       String
-  key          String
-  cdnUrl       String?
-  completedUrl String
-  mime         String
-  extension    String
-  access       String
+```typescript
+export interface UserPhoto {
+    bucket: string;
+    key: string;
+    cdnUrl?: string;
+    completedUrl: string;
+    mime: string;
+    extension: string;
+    access: string;
 }
 ```
 
 | Field | Type | Description |
-|---|---|---|
-| `bucket` | `String` | S3 bucket name |
-| `key` | `String` | S3 object key |
-| `cdnUrl` | `String?` | Optional CDN base URL |
-| `completedUrl` | `String` | Full resolved URL (CDN or S3 direct) |
-| `mime` | `String` | MIME type (e.g. `image/jpeg`) |
-| `extension` | `String` | File extension (e.g. `jpg`) |
-| `access` | `String` | Access level (`public` or `private`) |
+| ----- | ---- | ----------- |
+| `bucket` | `string` | S3 bucket name |
+| `key` | `string` | S3 object key |
+| `cdnUrl` | `string?` | Optional CDN base URL |
+| `completedUrl` | `string` | Full resolved URL (CDN or S3) |
+| `mime` | `string` | MIME type (e.g. `image/jpeg`) |
+| `extension` | `string` | File extension (e.g. `jpg`) |
+| `access` | `string` | Access level (`public` or `private`) |
 
 **Used in:**
 
@@ -439,17 +428,17 @@ type UserPhoto {
 
 Represents a single CASL ability entry embedded in a `Role`. Each entry defines which actions are allowed on a given policy subject.
 
-```prisma
-type RoleAbility {
-  action  String[]
-  subject String
+```typescript
+export interface RoleAbility {
+    action: string[];
+    subject: string;
 }
 ```
 
 | Field | Type | Description |
-|---|---|---|
-| `action` | `String[]` | List of allowed actions (e.g. `["read", "create"]`) |
-| `subject` | `String` | Policy subject (e.g. `"user"`, `"apiKey"`) |
+| ----- | ---- | ----------- |
+| `action` | `string[]` | List of allowed actions (e.g. `["read", "create"]`) |
+| `subject` | `string` | Policy subject (e.g. `"user"`, `"apiKey"`) |
 
 **Used in:**
 
@@ -463,31 +452,31 @@ See [Authorization Documentation][ref-doc-authorization] for how abilities are e
 
 Represents a localized content file for a term policy document, stored in AWS S3.
 
-```prisma
-type TermPolicyContent {
-  language     String
-  bucket       String
-  key          String
-  cdnUrl       String?
-  completedUrl String
-  mime         String
-  extension    String
-  access       String
-  size         Int
+```typescript
+export interface TermPolicyContent {
+    language: string;
+    bucket: string;
+    key: string;
+    cdnUrl?: string;
+    completedUrl: string;
+    mime: string;
+    extension: string;
+    access: string;
+    size: number;
 }
 ```
 
 | Field | Type | Description |
-|---|---|---|
-| `language` | `String` | Language code (e.g. `"en"`) |
-| `bucket` | `String` | S3 bucket name |
-| `key` | `String` | S3 object key |
-| `cdnUrl` | `String?` | Optional CDN base URL |
-| `completedUrl` | `String` | Full resolved URL |
-| `mime` | `String` | MIME type (e.g. `application/pdf`) |
-| `extension` | `String` | File extension (e.g. `pdf`) |
-| `access` | `String` | Access level (`public` or `private`) |
-| `size` | `Int` | File size in bytes |
+| ----- | ---- | ----------- |
+| `language` | `string` | Language code (e.g. `en`, `ur`) |
+| `bucket` | `string` | S3 bucket name |
+| `key` | `string` | S3 object key |
+| `cdnUrl` | `string?` | Optional CDN base URL |
+| `completedUrl` | `string` | Full resolved URL |
+| `mime` | `string` | MIME type (e.g. `application/pdf`) |
+| `extension` | `string` | File extension (e.g. `pdf`) |
+| `access` | `string` | Access level (`public` or `private`) |
+| `size` | `number` | File size in bytes |
 
 **Used in:**
 
@@ -495,7 +484,7 @@ type TermPolicyContent {
 
 ## Docker
 
-Running database commands inside Docker containers from your host machine:
+Running database commands inside Docker containers from host machine:
 
 **Generate Prisma Client inside container:**
 
@@ -503,13 +492,13 @@ Running database commands inside Docker containers from your host machine:
 docker-compose exec apis pnpm db:generate
 ```
 
-**Run database migration inside container:**
+**Run migrations inside container:**
 
 ```bash
-docker-compose exec apis pnpm db:migrate
+docker-compose exec apis pnpm db:migrate:dev
 ```
 
-**Run all seeds inside container:**
+**Run seeds inside container:**
 
 ```bash
 docker-compose exec apis pnpm migration:seed
@@ -527,20 +516,20 @@ These commands execute directly in the running Docker container without needing 
 
 ### **Prisma ORM**
 
-ACK NestJS Boilerplate uses **[Prisma][ref-prisma] v6.19.x** as the primary database toolkit. Prisma is not just an ORM - it's a complete database toolkit that provides the foundation for implementing clean architecture patterns.
+This Boilerplate uses **Prisma v7.5.x**.
 
 ### **Why Prisma for Repository Design Pattern?**
 
 Prisma perfectly enables **Repository Design Pattern** implementation:
 
-- **Type-Safe Repository Layer**: Auto-generated TypeScript types ensure compile-time validation throughout repositories
-- **Clean Architecture**: PrismaClient provides foundation for clean separation between database and business logic  
+- **Type-Safe Repository Layer**: Auto-generated TypeScript types ensure compile-time validation
+- **Clean Architecture**: Separation between DB and business logic
 - **Easy Implementation**: Consistent query API and transaction support simplify repository development
-- **Database Agnostic**: Switch between MongoDB, PostgreSQL without changing repository code
+- **Database Agnostic**: Switch between databases (PostgreSQL, MongoDB) with minimal effort
 
 ### Change DB with Minimal Effort
 
-Prisma, combined with the Repository Pattern, allows you to switch databases with minimal effort and maximum codebase stability. The data access layer is fully abstracted, so your service and business logic remain unchanged regardless of the underlying database engine.
+Prisma, combined with the Repository Pattern, allows you to switch databases with minimal effort. The data access layer is fully abstracted, so your service and business logic remain unchanged regardless of the underlying database engine.
 
 #### Supported Databases
 
@@ -599,13 +588,15 @@ pnpm migration:seed
 
 #### Learn More
 
+- [Prisma: Quickstart with PostgreSQL][ref-prisma-postgresql]
 - [Prisma: Switching Databases][ref-prisma-setup]
-- [Prisma MongoDB Documentation][ref-prisma-mongodb]
+- [Prisma Migrate][ref-prisma-migrate]
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 
 <!-- REFERENCES -->
 
-[ref-prisma-mongodb]: https://www.prisma.io/docs/orm/overview/databases/mongodb#commonalities-with-other-database-provider
+[ref-prisma-postgresql]: https://www.prisma.io/docs/prisma-orm/quickstart/postgresql
+[ref-prisma-migrate]: https://www.prisma.io/docs/concepts/components/prisma-migrate
 [ref-prisma-setup]: https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project#switching-databases
 [ref-commander]: https://nest-commander.jaymcdoniel.dev
 

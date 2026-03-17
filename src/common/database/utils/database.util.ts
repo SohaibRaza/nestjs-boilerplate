@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { createId } from '@paralleldrive/cuid2';
+import {
+    validate as uuidValidate,
+    version as uuidVersion,
+    v7 as uuidv7,
+} from 'uuid';
 
 /**
  * Database utility service providing common database operations.
  *
  * This injectable service provides utility methods for database-related operations,
- * including ID generation using CUID2 format. The generated IDs are
- * URL-safe, collision-resistant, and well-suited as primary keys in PostgreSQL.
+ * including ID generation using UUID v7 format. The generated IDs are
+ * sortable and well-suited as primary keys in PostgreSQL.
  *
  * @class DatabaseUtil
  * @injectable
@@ -15,27 +19,24 @@ import { createId } from '@paralleldrive/cuid2';
 @Injectable()
 export class DatabaseUtil {
     /**
-     * Checks if the provided ID string is a valid non-empty string.
-     *
-     * In the PostgreSQL / CUID2 world, any non-empty string that fits within
-     * the expected length range (1–36 chars) is considered valid.
+     * Checks if the provided ID string is a valid UUID v7.
      *
      * @param {string} id - The ID string to validate
-     * @returns {boolean} True if the ID is a valid non-empty string
+     * @returns {boolean} True if the ID is a valid UUID v7
      */
     checkIdIsValid(id: string): boolean {
-        return typeof id === 'string' && id.length > 0 && id.length <= 36;
+        return uuidValidate(id) && uuidVersion(id) === 7;
     }
 
     /**
-     * Creates a new unique identifier using CUID2.
+     * Creates a new unique identifier using UUID v7.
      *
-     * Generates a collision-resistant, URL-safe, sortable identifier.
+     * Generates a sortable, unique identifier.
      *
-     * @returns {string} A CUID2 string identifier
+     * @returns {string} A UUID v7 string identifier
      */
     createId(): string {
-        return createId();
+        return uuidv7();
     }
 
     /**

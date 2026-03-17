@@ -47,9 +47,9 @@
     },
     "dependencies": {
         "@2toad/profanity": "^3.2.0",
-        "@aws-sdk/client-s3": "^3.1004.0",
-        "@aws-sdk/client-ses": "^3.1004.0",
-        "@aws-sdk/s3-request-presigner": "^3.1004.0",
+        "@aws-sdk/client-s3": "^3.1009.0",
+        "@aws-sdk/client-ses": "^3.1009.0",
+        "@aws-sdk/s3-request-presigner": "^3.1009.0",
         "@casl/ability": "^6.8.0",
         "@faker-js/faker": "^10.3.0",
         "@fastify/compress": "^8.3.1",
@@ -70,16 +70,15 @@
         "@nestjs/swagger": "^11.2.6",
         "@nestjs/terminus": "^11.1.1",
         "@nestjs/throttler": "^6.5.0",
-        "@paralleldrive/cuid2": "^3.3.0",
-        "@prisma/adapter-pg": "^7.4.2",
-        "@prisma/client": "^6.19.0",
-        "@sentry/nestjs": "^10.42.0",
-        "@sentry/profiling-node": "^10.42.0",
-        "@smithy/types": "^4.13.0",
+        "@prisma/adapter-pg": "^7.5.0",
+        "@prisma/client": "^7.5.0",
+        "@sentry/nestjs": "^10.43.0",
+        "@sentry/profiling-node": "^10.43.0",
+        "@smithy/types": "^4.13.1",
         "@supercharge/request-ip": "^1.2.0",
         "axios": "^1.13.6",
         "bcryptjs": "^3.0.3",
-        "bullmq": "^5.70.4",
+        "bullmq": "^5.71.0",
         "bytes": "^3.1.2",
         "cache-manager": "^7.2.8",
         "case": "^1.6.3",
@@ -101,7 +100,7 @@
         "ms": "^2.1.3",
         "nest-commander": "^3.20.1",
         "nestjs-i18n": "^10.6.0",
-        "nestjs-pino": "^4.6.0",
+        "nestjs-pino": "^4.6.1",
         "nestjs-real-ip": "^3.0.1",
         "otplib": "^13.3.0",
         "papaparse": "^5.5.3",
@@ -117,11 +116,11 @@
         "ua-parser-js": "^2.0.9",
         "uuid": "^13.0.0",
         "verify-apple-id-token": "^3.1.2",
-        "vitest": "^4.0.18"
+        "vitest": "^4.1.0"
     },
     "devDependencies": {
-        "@commitlint/cli": "^20.4.3",
-        "@commitlint/config-conventional": "^20.4.3",
+        "@commitlint/cli": "^20.4.4",
+        "@commitlint/config-conventional": "^20.4.4",
         "@eslint/js": "^10.0.1",
         "@golevelup/ts-jest": "^1.2.1",
         "@nestjs/cli": "^11.0.16",
@@ -138,22 +137,22 @@
         "@types/lodash": "^4.17.24",
         "@types/luxon": "^3.7.1",
         "@types/ms": "^2.1.0",
-        "@types/node": "^25.3.5",
+        "@types/node": "^25.5.0",
         "@types/papaparse": "^5.5.2",
         "@types/passport-jwt": "^4.0.1",
-        "@types/pg": "^8.18.0",
+        "@types/pg": "8.11.11",
         "@types/supertest": "^7.2.0",
-        "@typescript-eslint/eslint-plugin": "^8.56.1",
-        "@typescript-eslint/parser": "^8.56.1",
+        "@typescript-eslint/eslint-plugin": "^8.57.0",
+        "@typescript-eslint/parser": "^8.57.0",
         "cspell": "^9.7.0",
         "eslint": "^10.0.3",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-import": "^2.32.0",
         "husky": "^9.1.7",
-        "jest": "^30.2.0",
+        "jest": "^30.3.0",
         "lint-staged": "^16.3.2",
         "prettier": "^3.8.1",
-        "prisma": "^6.19.0",
+        "prisma": "^7.5.0",
         "rimraf": "^6.1.3",
         "rxjs-marbles": "^7.0.1",
         "stop-only": "^3.4.4",
@@ -163,7 +162,7 @@
         "ts-prune": "^0.10.3",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.56.1"
+        "typescript-eslint": "^8.57.0"
     },
     "lint-staged": {
         "**/*.ts": [
@@ -174,7 +173,7 @@
             "prettier --write"
         ]
     },
-    "packageManager": "pnpm@10.31.0",
+    "packageManager": "pnpm@10.32.1",
     "engines": {
         "npm": "please-use-pnpm",
         "yarn": "please-use-pnpm",
@@ -190,6 +189,7 @@
         "brace-expansion": "^4.0.1",
         "tmp": "^0.2.4",
         "body-parser": "^2.2.1",
-        "minimatch": "^10.0.0"
+        "minimatch": "^10.0.0",
+        "@types/pg": "8.11.11"
     }
 }

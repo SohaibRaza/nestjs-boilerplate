@@ -1,6 +1,5 @@
 datasource db {
   provider     = "postgresql"
-  url          = env("DATABASE_URL")
   relationMode = "foreignKeys"
 }
 
@@ -102,8 +101,8 @@ model User {
   id              String             @id @default(uuid(7)) @db.Uuid
   name            String?
   username        String
-  isVerified      Boolean             @default(false)
-  verifiedAt      DateTime?
+  isVerified       Boolean            @default(false)
+  verifiedAt       DateTime?
   email           String
   roleId          String             @db.Uuid
   password        String?
@@ -120,7 +119,9 @@ model User {
   lastIPAddress   String?
   lastLoginFrom   EnumUserLoginFrom?
   lastLoginWith   EnumUserLoginWith?
+  // UserTermPolicy stored as JSON: { termsOfService, privacy, marketing, cookies }
   termPolicy      Json
+  // UserPhoto stored as JSON: { bucket, key, cdnUrl?, completedUrl, mime, extension, access }
   photo           Json?
 
   createdAt DateTime  @default(now())

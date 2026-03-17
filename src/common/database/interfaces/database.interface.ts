@@ -41,3 +41,37 @@ export interface GeoLocation {
     region: string;
     city: string;
 }
+
+export interface UserTermPolicy {
+    termsOfService: boolean;
+    privacy: boolean;
+    marketing: boolean;
+    cookies: boolean;
+}
+
+export interface UserPhoto {
+    bucket: string;
+    key: string;
+    cdnUrl?: string;
+    completedUrl: string;
+    mime: string;
+    extension: string;
+    access: string;
+}
+
+export interface RoleAbility {
+    action: string[];
+    subject: string;
+}
+
+export interface TermPolicyContent {
+    language: string;
+    bucket: string;
+    key: string;
+    cdnUrl?: string;
+    completedUrl: string;
+    mime: string;
+    extension: string;
+    access: string;
+    size: number;
+}

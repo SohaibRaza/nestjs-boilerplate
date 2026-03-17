@@ -1,10 +1,11 @@
-# ACK NestJS Boilerplate — Claude Code Instructions
+# Sales and Distribution Management System — Claude Code Instructions
 
 ## Project Overview
 
-ACK NestJS Boilerplate (v8.2.0+) is an enterprise-grade authentication and authorization service built with:
+Sales and Distribution Management System (v8.2.0+) is an enterprise-grade authentication and authorization service built with:
+
 - **NestJS v11** + **TypeScript** (strict)
-- **Prisma ORM** → MongoDB (replica set required for transactions)
+- **Prisma ORM** → PostgreSQL
 - **Redis** → cache + session store (`db:0`) and BullMQ queues (`db:1`)
 - **PNPM** as the only allowed package manager
 - **ES256** (access token) / **ES512** (refresh token) JWT algorithms
@@ -12,6 +13,7 @@ ACK NestJS Boilerplate (v8.2.0+) is an enterprise-grade authentication and autho
 ## Architecture
 
 ### Repository Design Pattern
+
 - `Repository` → data access only, injects `DatabaseService` directly (no `@Inject`)
 - `Service` → business logic only, injects repository as class (no interface for repo)
 - `Service` always implements an **interface** (`IUserService`)
@@ -33,15 +35,18 @@ export class UserService implements IUserService {
 ### Module Structure
 
 Every feature module follows:
+
 ```
 module/
 ├── controllers/    dtos/        entities/     enums/
 ├── exceptions/     guards/      interfaces/   repositories/
 ├── services/       utils/       decorators/   docs/
-└── processors/     templates/   validations/
+├── processors/     templates/   validations/
+└── schemas/        types/
 ```
 
 ### Path Aliases (always use, never relative paths)
+
 ```
 @app/*      → src/app/*
 @common/*   → src/common/*
@@ -91,6 +96,7 @@ async method() {}
 - Always invalidate sessions on: password change, password reset, logout, device removal
 
 ### Session Lifecycle
+
 1. Login → create session in Redis + DB, linked to `DeviceOwnership`
 2. Every request → verify signature → check Redis → match `jti`
 3. Refresh → verify → rotate `jti` in Redis + DB → issue new tokens
@@ -106,6 +112,7 @@ async method() {}
 - Notification: `fcm` (android), `apns` (ios), none (web)
 
 ### Remove Device Flow
+
 ```
 DELETE /user/device/remove/:deviceId
 → DeviceOwnership: isRevoked = true (retained for audit)
@@ -116,6 +123,7 @@ DELETE /user/device/remove/:deviceId
 ```
 
 ### Device List API Behavior
+
 - User endpoint → return `isRevoked = false` only
 - Admin endpoint → default `isRevoked = false`, support `?includeRevoked=true` for audit
 
@@ -133,7 +141,8 @@ DELETE /user/device/remove/:deviceId
 
 ## Database & Transactions
 
-- MongoDB must run as **replica set** (required for transactions)
+- PostgreSQL is the primary database.
+- Primary Keys use UUID v7 (`@default(uuid(7)) @db.Uuid`).
 - Use callback syntax for complex transactions:
 
 ```typescript
@@ -152,12 +161,13 @@ await this.databaseService.$transaction([
 ```
 
 ### Scripts
+
 ```bash
-pnpm db:migrate        # Sync schema to MongoDB
-pnpm db:generate       # Regenerate Prisma client (after schema changes)
+pnpm db:migrate:dev    # Apply migrations in development
+pnpm db:migrate        # Apply pending migrations in production
+pnpm db:generate       # Regenerate Prisma client
 pnpm db:studio         # Open Prisma Studio
 pnpm migration:seed    # Seed all data
-pnpm migration {module} --type seed    # Seed specific module
 ```
 
 ## Cache (Redis)
@@ -255,6 +265,7 @@ Sensitive data (password, token, apiKey, etc.) auto-redacted by Pino.
 ## Third-Party Services (No-Op Mode)
 
 All external services operate in **no-op mode** when credentials are missing:
+
 - AWS S3: check `isInitialized()` before S3 operations
 - AWS SES: check `isInitialized()` before sending email
 - Firebase: leave env vars empty to disable push
@@ -287,7 +298,7 @@ pnpm format            # Prettier
 pnpm test              # Run tests
 pnpm generate:keys     # Generate ES256/ES512 JWT key pairs
 pnpm clean             # Clean node_modules + dist
-docker-compose up -d   # Start MongoDB + Redis + JWKS server
+docker-compose up -d   # Start PostgreSQL + Redis + JWKS server
 ```
 
 ## Anti-Patterns (Never Do)
