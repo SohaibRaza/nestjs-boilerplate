@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides step-by-step instructions for setting up the ACK NestJS Boilerplate on your development environment.
+This document provides step-by-step instructions for setting up the Sales and Distribution Management System on your development environment.
 
 ## Related Documents
 
@@ -36,34 +36,28 @@ This document provides step-by-step instructions for setting up the ACK NestJS B
 
 ## Prerequisites
 
-> **Note**: ACK NestJS Boilerplate uses PNPM for package management. All documentation examples will use PNPM commands.
+> **Note**: This project uses PNPM for package management. All documentation examples will use PNPM commands.
 
 Before starting, install the following tools and packages. We recommend using the LTS (Long Term Support) versions for stability and compatibility.
 
 ### Required Tools
 
 | Tool | Version |
-| ---- | ------- |
-| [Node.js](https://nodejs.org) | v24.11.0+ |
-| [MongoDB](https://docs.mongodb.com/) | v8.0.x |
+| ---- | --------- |
+| [Node.js](https://nodejs.org) | v22.12.0+ |
+| [PostgreSQL](https://www.postgresql.org/) | v16.x+ |
 | [Redis](https://redis.io) | v8.x |
-| [PNPM](http://pnpm.io) | v10.25.x |
+| [PNPM](http://pnpm.io) | v9.15.x |
 | [Git](https://git-scm.com) | v2.39.x |
-
-> **Important**: MongoDB must be configured to run as a **replica set** for database transactions to work properly. You can either use [Docker installation](#installation-with-docker) for automatic setup or create a database on [MongoDB Atlas][ref-mongodb] which supports replica sets by default.
 
 ## Clone Repository
 
 Clone the project repository from GitHub:
 
 ```bash
-# Clone the repository
-git clone https://github.com/andrechristikan/ack-nestjs-boilerplate.git
+git clone https://github.com/SohaibRaza/nestjs-boilerplate.git
+cd nestjs-boilerplate
 
-# Navigate to the project directory
-cd ack-nestjs-boilerplate
-
-# Check the current branch (should be 'main')
 git branch
 ```
 
@@ -76,7 +70,6 @@ Standard installation assumes all dependencies are installed correctly and avail
 This step will install all the required Node.js packages and dependencies for the project.
 
 ```bash
-# Install all dependencies
 pnpm install
 ```
 
@@ -136,27 +129,25 @@ AUTH_JWT_REFRESH_TOKEN_JWKS_URI="https://your-domain.com/.well-known/refresh-jwk
 
 ## 🐳 Installation with Docker
 
-> **Note:** You can skip this section if all dependencies are already installed and you do not want to use Docker for your setup.
-
-Docker provides the fastest and most reliable way to set up the ACK NestJS Boilerplate. This method automatically configures the entire development environment with all dependencies and services pre-configured.
+Docker provides the fastest and most reliable way to set up the environment. This method automatically configures the entire development environment with all dependencies and services pre-configured.
 
 ### What's Included
 
 The Docker setup provides:
 
-- **MongoDB replica set** - Configured for transactions
+- **PostgreSQL** - Relational database
 - **Redis instances** - Separate instances for caching and queues
 - **JWKS server** - Hosts your JWT public keys automatically
 - **BullMQ Dashboard** - Queue monitoring interface
 
-### Prerequisites
+### Prerequisites (Docker)
 
 Ensure you have Docker and Docker Compose installed on your system:
 
 #### Required Tools
 
 | Tool | Version |
-|------|---------|
+| ---- | ------- |
 | [Docker](https://docs.docker.com) | v28.5.x+ |
 | [Docker Compose](https://docs.docker.com/compose/) | v2.40.x+ |
 
@@ -178,8 +169,8 @@ For Docker installation, ensure these specific values in your `.env` file:
 **Database Configuration:**
 
 ```bash
-# MongoDB (Docker containers)
-DATABASE_URL=mongodb://localhost:27017/ACKNestJs?retryWrites=true&w=majority&replicaSet=rs0
+# PostgreSQL (Docker containers)
+DATABASE_URL=postgresql://sohaib:sohaib@127.0.0.1:5432/ack_nestjs?schema=public&sslmode=disable
 ```
 
 **Redis Configuration:**
@@ -233,12 +224,12 @@ The Docker setup includes a JWKS server that automatically hosts the generated k
 
 Now you're ready to start the complete Docker environment with all services.
 
-> **Note**: By default, Docker installation only sets up dependencies (MongoDB, Redis, JWKS server, BullMQ dashboard). The API container is not included. To also run the API container, use the `apis` profile.
+> **Note**: By default, Docker installation only sets up dependencies (PostgreSQL, Redis, JWKS server, BullMQ dashboard). The API container is not included. To also run the API container, use the `apis` profile.
 
 **Start only dependencies:**
 
 ```bash
-# Start MongoDB, Redis, JWKS, and BullMQ dashboard
+# Start PostgreSQL, Redis, JWKS server and BullMQ dashboard
 docker-compose up -d
 ```
 
@@ -246,12 +237,12 @@ docker-compose up -d
 
 ```bash
 # Start all services including the API container
-docker-compose --profile apis up -d
+docker-compose up -d --profile apis
 ```
 
 **What this command does:**
 
-- Starts MongoDB replica set with 1 nodes (ports 27017)
+- Starts PostgreSQL (ports 5432)
 - Launches Redis server for caching and queues (port 6379)
 - Starts JWKS server to host your JWT public keys (port 3011)
 - Runs BullMQ dashboard for queue monitoring (port 3010)
@@ -274,7 +265,6 @@ The Docker setup includes comprehensive health checks for all services, ensuring
 
 - **Port conflicts**: Ensure ports 27017, 6379, 3010, 3011 are not in use by other applications
 - **Host resolution issues**: Add `127.0.0.1 host.docker.internal` to your `/etc/hosts` file if needed
-- **MongoDB replica set initialization**: Wait 1-2 minutes for complete setup
 - **Permission issues**: Ensure Docker has proper permissions to create volumes and networks
 
 ## Generate Database Client
@@ -289,10 +279,10 @@ pnpm db:generate
 
 ## Database Migration & Seeding
 
-**Migrate schema to MongoDB:**
+**Apply migrations to PostgreSQL:**
 
 ```bash
-pnpm db:migrate
+pnpm db:migrate:dev
 ```
 
 **Seed all initial data:**
@@ -321,14 +311,14 @@ For a complete guide and module details, see [Database Documentation][ref-doc-da
 
 ## Run Project
 
-Congratulations! You're now ready to start the project. Make sure all your services (MongoDB, Redis) are running before starting the application.
+Make sure all your services (PostgreSQL, Redis) are running before starting the application.
 
 ```bash
 # Start in development mode with hot reload
 pnpm start:dev
 ```
 
-Production Commands
+### Production Commands
 
 ```bash
 # Build the project for production
